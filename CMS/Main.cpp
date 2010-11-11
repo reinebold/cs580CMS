@@ -89,8 +89,7 @@ void main(int argc, char **argv)
     }
     if (!glewIsSupported("GL_VERSION_3_3"))
     {
-        cerr << "Error: OpenGL version 3.3 not supported" << endl;
-        std::exit(EXIT_FAILURE);
+        cerr << "Warning: OpenGL version 3.3 not supported with GLEW" << endl;
     }
 
     Utils::printStatus();

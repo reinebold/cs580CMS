@@ -186,6 +186,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\Matrix.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Model.cpp"
 				>
 			</File>
@@ -221,10 +225,6 @@
 			</File>
 			<File
 				RelativePath=".\Lights.h"
-				>
-			</File>
-			<File
-				RelativePath=".\Matrix.cpp"
 				>
 			</File>
 			<File
