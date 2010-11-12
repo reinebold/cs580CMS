@@ -5,12 +5,15 @@ Description:
 
 **********************************************/
 
+#include <iostream>
+
 #include "Utilities.h"
 #include "Camera.h"
 #include "Controls.h"
 #include "Lights.h"
 #include "State.h"
 #include "CMS.h"
+#include "City.h"
 
 Camera      camera;
 Lights      lights;
@@ -20,6 +23,7 @@ CMS         cms;
 
 void display()
 {
+
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
     
     if(state.getPrintInfoOnScreen())
@@ -71,6 +75,28 @@ void reshape(GLsizei width, GLsizei height)
 
 void main(int argc, char **argv)
 {
+
+	City c;
+	c.setPopulation(4);
+	c.setDevelopment(1);
+
+	int gridWidth = 2;
+	int gridHeight = 2;
+
+	int** grid = c.getGrid(gridWidth, gridHeight);
+
+	for(int i=0; i < gridWidth; i++) {
+		for(int j=0; j < gridHeight; j++) {
+			std::cout << grid[i][j];
+		}
+		std::cout << endl;
+	}
+
+	for(int i=0; i < gridWidth; i++) {
+		delete grid[i];
+	}
+	delete grid;
+
     //Initialize GLUT
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
