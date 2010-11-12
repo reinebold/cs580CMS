@@ -178,6 +178,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\City.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Controls.cpp"
 				>
 			</File>
@@ -217,6 +221,10 @@
 			>
 			<File
 				RelativePath=".\Camera.h"
+				>
+			</File>
+			<File
+				RelativePath=".\City.h"
 				>
 			</File>
 			<File
