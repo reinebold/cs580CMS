@@ -16,7 +16,7 @@ public:
     void display();
     void init();
 
-    void continuousModelSynthesis(Edge &edges, Vertex &verticies);
+    void continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &verticies);
 
 private:
     CMSModel input;

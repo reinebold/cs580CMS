@@ -21,7 +21,7 @@ CMS::CMS()
 
 }
 
-void CMS::continuousModelSynthesis(Edge &edges, Vertex &verticies)
+void CMS::continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &verticies)
 {
 
 
@@ -156,4 +156,6 @@ void CMS::init()
 
     //Figure out edges and verticies.
     grid.init(input, boundingbox);
+
+    continuousModelSynthesis(grid.edges, grid.verticies);
 }
