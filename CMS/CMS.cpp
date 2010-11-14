@@ -10,12 +10,13 @@
 #include "CMSModel.h"
 #include "Geometry.h"
 #include "Grid.h"
+#include "Camera.h"
 #include <time.h>
 using namespace Geometry;
 
 extern Lights lights;
 extern State state;
-
+extern Camera camera;
 CMS::CMS()
 {
 
@@ -113,7 +114,7 @@ void CMS::display()
     glPointSize(4.0f);          //Change the size of the point
     glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
     glBegin(GL_POINTS);
-        for(int x=0; x < grid.totalVerts; x++)
+        for(int x=0; x < (int)grid.verticies.size(); x++)
         {
             glVertex3fv(grid.verticies[x]->val);
         }
@@ -131,13 +132,12 @@ void CMS::init()
     
     srand((unsigned int)time(NULL));
 
-
     //Bounding box info (will get from text file)
     Vertex bbverticies[4];
     bbverticies[0] = Vertex(0.0f,  0.0f,  0.0f);
-    bbverticies[1] = Vertex(20.0f, 0.0f,  0.0f);
-    bbverticies[2] = Vertex(20.0f, 20.0f, 0.0f);
-    bbverticies[3] = Vertex(0.0f,  20.0f, 0.0f);
+    bbverticies[1] = Vertex(50.0f, 0.0f,  0.0f);
+    bbverticies[2] = Vertex(50.0f, 50.0f, 0.0f);
+    bbverticies[3] = Vertex(0.0f,  50.0f, 0.0f);
 
     //Input file info (will get from text file)
     int numVerticies = 3;

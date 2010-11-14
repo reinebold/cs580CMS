@@ -29,19 +29,19 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
         else if(fabs(slope.num - 0.0) < EPSILON)
         {
             slopetype = HORIZONTAL;
-            currenty = 0.0f+Utils::randFloat(0.0f, spacing);
+            currenty = 0.0f+Utils::randFloat(0.0f, spacing/2.0f);
             yincrement = spacing;
         }
         else if(slope.value > 0.0)
         {
             slopetype = POSITIVE;
-            currenty = -slope.value*rightx+slope.value*leftx+bottomy+Utils::randFloat(0.0f, spacing);
+            currenty = -slope.value*rightx+slope.value*leftx+bottomy+Utils::randFloat(0.0f, spacing/2.0f);
             yincrement = fabs(spacing/sin(atan(1.0f/slope.value)));
         }
         else
         {
             slopetype = NEGATIVE;
-            currenty = -slope.value*leftx+slope.value*rightx+bottomy+Utils::randFloat(0.0f, spacing);
+            currenty = -slope.value*leftx+slope.value*rightx+bottomy+Utils::randFloat(0.0f, spacing/2.0f);
             yincrement = fabs(spacing/sin(atan(-1.0f/slope.value)));
         }
 
@@ -217,7 +217,39 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                 verticiesOnEdge[j+1]->edges[verticiesOnEdge[j+1]->currentEdge] = edge;
                 verticiesOnEdge[j]->currentEdge++;
                 verticiesOnEdge[j+1]->currentEdge++;
-            }   
+            } 
+        }
+    }
+
+    //If a vertex only has one edge.
+    for(int x = 0; x < (int)verticies.size(); x++)
+    {
+        if(verticies[x]->currentEdge == 1)
+        {
+            for(int y = 0; y < (int)edges.size(); y++)
+            {
+                if(edges[y] == verticies[x]->edges[0])
+                {
+                    Vertex * temp;
+                    if(edges[y]->begin == verticies[x])
+                    {
+                        edges[y]->end->currentEdge--;
+                        temp = edges[y]->end;
+                    }
+                    else
+                    {
+                        edges[y]->begin->currentEdge--;
+                        temp = edges[y]->begin;
+                    }
+                    //delete edges[x];
+                   // edges[x] = NULL;
+                    delete edges[y];
+                    edges[y] = NULL;
+                    edges.erase(edges.begin()+y);
+                    verticies.erase(verticies.begin()+x);
+                }
+            }
+            
         }
     }
 

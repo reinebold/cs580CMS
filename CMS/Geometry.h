@@ -60,13 +60,24 @@ namespace Geometry
             val[X] = 0.0f;
             val[Y] = 0.0f;
             val[Z] = 0.0f;
+
+            edges[0] = NULL;
+            edges[1] = NULL;
+            edges[2] = NULL;
+            edges[3] = NULL;
         }
 
         Vertex(float xval, float yval, float zval = 0.0f)
+            :currentEdge(0)
         {
             val[X] = xval;
             val[Y] = yval;
             val[Z] = zval;
+
+            edges[0] = NULL;
+            edges[1] = NULL;
+            edges[2] = NULL;
+            edges[3] = NULL;
         }
 
         void operator=(Vertex &vert)
@@ -74,6 +85,12 @@ namespace Geometry
             val[X] = vert.val[X];
             val[Y] = vert.val[Y];
             val[Z] = vert.val[Z];
+
+            currentEdge = vert.currentEdge;
+            edges[0] = vert.edges[0];
+            edges[1] = vert.edges[1];
+            edges[2] = vert.edges[2];
+            edges[3] = vert.edges[3];
         }
 
         float val[3];
@@ -105,6 +122,18 @@ namespace Geometry
             :begin(beginval),
              end(endval)
         {
+            edgestate.slope.num = (end->val[Y] - begin->val[Y]);
+            edgestate.slope.den = (end->val[X] - begin->val[X]);
+            edgestate.slope.value = edgestate.slope.num/edgestate.slope.den;
+            edgestate.leftFace  = UNASSIGNED;
+            edgestate.rightFace = UNASSIGNED;
+        }
+
+        void operator=(const Edge &edge)
+        {
+            begin = edge.begin;
+            end = edge.end;
+
             edgestate.slope.num = (end->val[Y] - begin->val[Y]);
             edgestate.slope.den = (end->val[X] - begin->val[X]);
             edgestate.slope.value = edgestate.slope.num/edgestate.slope.den;

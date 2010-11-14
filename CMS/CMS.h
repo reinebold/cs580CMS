@@ -18,7 +18,6 @@ public:
 
     void continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &verticies);
 
-private:
     CMSModel input;
     Cuboid boundingbox;
     Cuboid world;

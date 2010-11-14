@@ -107,7 +107,15 @@ void Camera::setModelViewMatrix()
 {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0,0,30,0,0,0,0,1,0);
+    //gluLookAt(0,0,30,0,0,0,0,1,0);
+    gluLookAt(20.0f,25,40,20,25,0,0,1,0);
+}
+
+void Camera::setModelViewMatrix(GLfloat posx, GLfloat posy, GLfloat posz, GLfloat lookx, GLfloat looky, GLfloat lookz)
+{
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    gluLookAt(posx,posy,posz,lookx,looky,lookz,0,1,0);
 }
 
 void Camera::moveTo3DSCamera( Model &model )
