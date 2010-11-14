@@ -16,6 +16,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
     float currenty;
     SlopeType slopetype;
     parallelEdges = new Edge*[model._numVerticies];
+    float yincrement;
     
     for(int edgeNum = 0; edgeNum < model._numVerticies; ++edgeNum)
     {
@@ -29,16 +30,19 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
         {
             slopetype = HORIZONTAL;
             currenty = 0.0f+Utils::randFloat(0.0f, spacing);
+            yincrement = spacing;
         }
         else if(slope.value > 0.0)
         {
             slopetype = POSITIVE;
             currenty = -slope.value*rightx+slope.value*leftx+bottomy+Utils::randFloat(0.0f, spacing);
+            yincrement = fabs(spacing/sin(atan(1.0f/slope.value)));
         }
         else
         {
             slopetype = NEGATIVE;
             currenty = -slope.value*leftx+slope.value*rightx+bottomy+Utils::randFloat(0.0f, spacing);
+            yincrement = fabs(spacing/sin(atan(-1.0f/slope.value)));
         }
 
         //TODO: Only allocate for DISTINCT edges
@@ -136,7 +140,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                 std::cout << "ERROR: Invalid slope type." << std::endl;
                 exit(EXIT_FAILURE);
             }
-            currenty += spacing;
+            currenty += yincrement;
         }
         numEdges[edgeNum] = currentedge;
 
