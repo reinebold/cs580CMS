@@ -94,6 +94,10 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
         state.setWireFrame(!state.getWireFrame());
         glutPostRedisplay();
         break;
+    case 'd':
+        state.setDrawLights(!state.getDrawLights());
+        glutPostRedisplay();
+        break;
     case 'r':   //Resets all transformations
         camera.setTranslatex(0.0f);
         camera.setTranslatey(0.0f);

@@ -1,10 +1,12 @@
 /**
     \class CMS
-    \brief Class to start creating the continuous model synthesis
+    \brief Class for continuous model synthesis
 */
 
 #include <GL/glew.h>
-#include "Texture.h"
+#include "CMSModel.h"
+#include "Geometry.h"
+#include "Grid.h"
 
 class CMS
 {
@@ -14,8 +16,11 @@ public:
     void display();
     void init();
 
-private:
-    GLuint programID;
-    Texture texWater;
+    void continuousModelSynthesis(Edge &edges, Vertex &verticies);
 
+private:
+    CMSModel input;
+    Cuboid boundingbox;
+    Cuboid world;
+    Grid grid;
 };

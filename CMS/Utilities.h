@@ -32,6 +32,12 @@ namespace Utils
     ///Returns a number to a string
     template <typename T>
     std::string numToString(T value);
+
+    float randFloat(float a, float b);
+
+    int randInt(int low, int high);
+
+    void quicksortWithInsertion(int *a, int left, int right);
 }
 
 #endif // _UTILITIES_H

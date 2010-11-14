@@ -4,6 +4,9 @@
 */
 
 #include "Lights.h"
+#include "State.h"
+
+extern State state;
 
 Lights::Lights()
 :numLights(-1)
@@ -45,7 +48,7 @@ void Lights::renderLights()
     for(int i = 0; i <= numLights; ++i)
     {
         //Draw a small dot to show where the light source is.
-        if(lightInfo[i].position[W] == 1.0f)
+        if(state.getDrawLights() && lightInfo[i].position[W] == 1.0f)
         {
             glDisable(GL_LIGHTING);
             glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.

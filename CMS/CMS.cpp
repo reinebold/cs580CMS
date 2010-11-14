@@ -7,6 +7,11 @@
 #include "Lights.h"
 #include "State.h"
 #include "Program.h"
+#include "CMSModel.h"
+#include "Geometry.h"
+#include "Grid.h"
+#include <time.h>
+using namespace Geometry;
 
 extern Lights lights;
 extern State state;
@@ -16,93 +21,139 @@ CMS::CMS()
 
 }
 
-void CMS::display()
+void CMS::continuousModelSynthesis(Edge &edges, Vertex &verticies)
 {
-    glDisable(GL_TEXTURE_2D);
-    if(state.getTest() == 0) //Use normal coloring
-    {
-        glColor3f(1.0f, 0.0f, 0.0f);
-    }
-    else if(state.getTest() == 1)   //Use a shader program that colors everything teal
-    {
-        glUseProgram(programID);
-    }
-    else
-    {
-        glEnable(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, texWater.getId());
-    }
-   
-    GLfloat size = 10.0;
+
+
+}
+
+void CMS::display()
+{   
+    //Draw Bounding Box
+    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
     glBegin(GL_QUADS);
         glNormal3f(0.0f, 1.0f, 0.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f(-size, size, -size);     //top
-        glTexCoord2f(1.0f, 1.0f); glVertex3f( size, size, -size);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f( size,  size, size);
-        glTexCoord2f(0.0f, 0.0f); glVertex3f(-size,  size, size);
+        glVertex3fv(boundingbox.verticies[0].val);
+        glVertex3fv(boundingbox.verticies[1].val);
+        glVertex3fv(boundingbox.verticies[2].val);
+        glVertex3fv(boundingbox.verticies[3].val);
+    glEnd();
+   
+    //Draw input model (translate it over so it's not in the bounding box...)
+    glTranslatef(-10.0f, 0.0f, 0.0f);
+    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+    glBegin(GL_LINES);
+        glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+        glVertex3fv(input._verticies[0].val);  
+        glVertex3fv(input._verticies[1].val);
+        
+        glColor4f(0.25f, 0.25f, 1.0f, 1.0f);
+        glVertex3fv(input._verticies[1].val);
+        glVertex3fv(input._verticies[2].val);
+        
+        glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+        glVertex3fv(input._verticies[2].val);
+        glVertex3fv(input._verticies[0].val);
+    glEnd();
+    glTranslatef(10.0f,0.0f,0.0f);
 
-        glNormal3f(1.0f, 0.0f, 0.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f(size, size, size);       //right
-        glTexCoord2f(1.0f, 1.0f); glVertex3f(size, size, -size);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f(size, -size,-size);
-        glTexCoord2f(0.0f, 0.0f); glVertex3f(size, -size, size);
-
-        glNormal3f(0.0f, 0.0f, -1.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f(-size, size, -size);     //far
-        glTexCoord2f(1.0f, 1.0f); glVertex3f( size, size, -size);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f( size, -size,-size);
-        glTexCoord2f(0.0f, 0.0f); glVertex3f(-size,  -size, -size);
-
-        glNormal3f(0.0f, 0.0f, 1.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f(-size, size, size);      //front
-        glTexCoord2f(1.0f, 1.0f); glVertex3f( size, size, size);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f( size, -size, size);
-        glTexCoord2f(0.0f, 0.0f); glVertex3f(-size, -size, size);
-
-        glNormal3f(-1.0f, 0.0f, 0.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f(-size, size, -size);     //left
-        glTexCoord2f(1.0f, 1.0f); glVertex3f(-size,  size, size);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f(-size, -size, size);
-        glTexCoord2f(0.0f, 0.0f); glVertex3f(-size, -size, -size);
-
-        glNormal3f(0.0f,-1.0f, 0.0f);
-        glTexCoord2f(0.0f, 1.0f); glVertex3f(-size, -size, size);     //bottom
-        glTexCoord2f(1.0f, 1.0f); glVertex3f( size,  -size, size);
-        glTexCoord2f(1.0f, 0.0f); glVertex3f(size,  -size, -size);
-        glTexCoord2f(0.0f, 0.0f); glVertex3f(-size,  -size, -size);
+    //Draw grid
+    /*glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+    glBegin(GL_LINES);
+        for(int x = 0; x < grid.numEdges[2]; x++)
+        {
+            glVertex3fv(grid.parallelEdges[2][x].begin->val);
+            glVertex3fv(grid.parallelEdges[2][x].end->val);
+        }
     glEnd();
 
-    glBindTexture(GL_TEXTURE_2D,0);
-    glUseProgram(0);
+    glColor4f(0.25f, 0.25f, 1.0f, 1.0f);
+    glBegin(GL_LINES);
+        for(int x = 0; x < grid.numEdges[1]; x++)
+        {
+            glVertex3fv(grid.parallelEdges[1][x].begin->val);
+            glVertex3fv(grid.parallelEdges[1][x].end->val);
+        }
+    glEnd();
+
+    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+    glBegin(GL_LINES);
+    for(int x = 0; x < grid.numEdges[0]; x++)
+    {
+        glVertex3fv(grid.parallelEdges[0][x].begin->val);
+        glVertex3fv(grid.parallelEdges[0][x].end->val);
+    }
+    glEnd();*/
+
+   
+    for(int x = 0; x < (int)grid.edges.size(); x++)
+    {
+        if(grid.edges[x]->edgestate.set == 0)
+        {
+             glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+        }
+        else if(grid.edges[x]->edgestate.set == 1)
+        {
+            glColor4f(0.25f, 0.25f, 1.0f, 1.0f);
+        }
+        else
+        {
+            glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+        }
+        glBegin(GL_LINES);
+            glVertex3fv(grid.edges[x]->begin->val);
+            glVertex3fv(grid.edges[x]->end->val);
+        glEnd();
+        
+    }
+    
+
+    //Draw Verticies
+    glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
+    glPointSize(4.0f);          //Change the size of the point
+    glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+    glBegin(GL_POINTS);
+        for(int x=0; x < grid.totalVerts; x++)
+        {
+            glVertex3fv(grid.verticies[x]->val);
+        }
+    glEnd();
+    glDisable(GL_POINT_SMOOTH);
 }
 
 void CMS::init()
 {
-    state.setWireFrame(false);
-    state.setLighting(true);
-    state.setDrawLights(true);
+    state.setWireFrame(true);
+    state.setLighting(false);
+    state.setDrawLights(false);
     state.setDrawAxis(false);
     state.setPrintInfoOnScreen(true);
+    
+    srand((unsigned int)time(NULL));
 
-    lights.addLight( 15.0,15.0,0.0, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
-    lights.addLight(-20.0,5.0, 0.0, 1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f);
 
-    //Load program (for when t = 1)
-    Program program;
-    programID = program.createProgram("simple.vs", "simple.fs");
+    //Bounding box info (will get from text file)
+    Vertex bbverticies[4];
+    bbverticies[0] = Vertex(0.0f,  0.0f,  0.0f);
+    bbverticies[1] = Vertex(20.0f, 0.0f,  0.0f);
+    bbverticies[2] = Vertex(20.0f, 20.0f, 0.0f);
+    bbverticies[3] = Vertex(0.0f,  20.0f, 0.0f);
 
-    //Load texture (for when t = 2)
-    texWater.loadTexture(RESOURCE_DIR "water.jpg");
-    glEnable(GL_TEXTURE_2D);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE); //instead of GL_MODULATE, we do GL_REPLACE so that it won't multiply
-    glGenTextures(1, texWater.setId());                             //the texture color with the primitive color.
-    glBindTexture(GL_TEXTURE_2D, texWater.getId());
-    glTexImage2D(GL_TEXTURE_2D, 0, texWater.getFormat(), texWater.getWidth(), texWater.getHeight(), 0, texWater.getFormat(), GL_UNSIGNED_BYTE, texWater.getData());
-    texWater.destroyTexture();
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); 
-    glBindTexture(GL_TEXTURE_2D, 0);
+    //Input file info (will get from text file)
+    int numVerticies = 3;
+    Vertex *verticies = new Vertex[numVerticies];
+
+    //Must be specified in a counter-clockwise order?
+    verticies[0] = Vertex(0.0f, 0.0f);
+    verticies[1] = Vertex(5.0f, 0.0f);
+    verticies[2] = Vertex(3.0f, 2.0f);
+
+    //Figure out the edges of the bounding box
+    boundingbox.init(bbverticies);
+
+    //Load the verticies into the input model, find edges.
+    input.init(numVerticies, verticies);
+
+    //Figure out edges and verticies.
+    grid.init(input, boundingbox);
 }

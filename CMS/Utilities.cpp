@@ -154,3 +154,15 @@ void Utils::renderString(GLfloat x, GLfloat y, std::string text)
     glRasterPos2f(x,y);
     glutBitmapString(GLUT_BITMAP_8_BY_13, (unsigned char*)text.c_str());
 }
+
+float Utils::randFloat(float a, float b)
+{
+    return ((b-a)*((float)rand()/RAND_MAX))+a;
+   
+}
+
+int Utils::randInt(int low, int high)
+{
+    //make sure to seed random number generator.
+    return rand()%(high-low) + low;
+}

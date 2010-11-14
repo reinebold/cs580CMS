@@ -266,6 +266,10 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
+				RelativePath=".\input.model"
+				>
+			</File>
+			<File
 				RelativePath=".\simple.fs"
 				>
 			</File>
@@ -295,6 +299,30 @@
 			</File>
 			<File
 				RelativePath=".\CMS.h"
+				>
+			</File>
+			<File
+				RelativePath=".\CMSModel.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CMSModel.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Geometry.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Geometry.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Grid.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Grid.h"
 				>
 			</File>
 		</Filter>

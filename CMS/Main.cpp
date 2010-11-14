@@ -63,7 +63,8 @@ void init()
 {
     glEnable(GL_DEPTH_TEST);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    glClearColor(0.0,0.0,0.0,0.0);
+    glClearColor(0.0,0.0,0.0,1.0);
+    glClearDepth(1.0f);
     glShadeModel(GL_SMOOTH);    //Or GL_FLAT
     cms.init();
 }
@@ -99,7 +100,7 @@ void main(int argc, char **argv)
 
     //Initialize GLUT
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
+    glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
     glutInitWindowSize(camera.getWindowWidth(), camera.getWindowHeight());
     int x = 0, y = 0;
     Utils::centerWindow(x,y);
