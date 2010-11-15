@@ -1,6 +1,8 @@
 #include "CMS2d.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <algorithm>
+#include <vector>
 #include <time.h>
 
 namespace CMS2D
@@ -11,101 +13,45 @@ namespace CMS2D
   {
     for( std::vector<Vertex*>::iterator vertex_itr = verticies.begin();
       vertex_itr != verticies.end(); vertex_itr++)
-    {
-      //NULL out unassigned edges (already done)
-      //for(int itr = (*vertex_itr)->currentEdge; itr < 4; itr++)
-      //  (*vertex_itr)->edges[itr] = NULL;
-      //Prepare edge list for use in CMS2d
       sortEdges(*vertex_itr);
-    }
 
-    std::vector<VertexState> sourceValidStates;
+    int *relativeCounters;
+    std::vector<VertexStateEdges> sourceValidStates;
     std::vector<VertexState> validStates;
+    relativeCounters = new int[verticies.size()];
+    for(int i = verticies.size(); i >= 0; i--)
+      relativeCounters[i] = 0;
     generateValid(sourceValidStates);
-    generateStates( verticies, sourceValidStates, validStates);
+    generateStates( verticies, sourceValidStates, validStates, relativeCounters);
     srand((unsigned int)time(NULL));
     while(validStates.size() > 0)
     {
+      //for(vector<VertexState>::iterator sitr = validStates.begin();
+      //  sitr != validStates.end(); sitr ++)
+      //  std::cout << *((*sitr).relativesCounter);
+      //std::cout << std::endl;
+      sort(validStates.begin(), validStates.end());
       std::vector<VertexState>::iterator itr = validStates.begin();
-      int size = validStates.size();
-      int randomstate = rand()%(validStates.size());
-      itr += randomstate;
+      if(*((*itr).relativesCounter) > 1)
+      {
+        int size = validStates.size();
+        int randomstate = rand()%(validStates.size());
+        itr += randomstate;
+      }
+      else
+      {
+        int i = 0;
+        i++;
+      }
       VertexState state = (*itr);
       validStates.erase(itr);
       for(int i = 0; i < 4; i++)
       {
         if(state.dependentedges[i] != NULL)
         {
-          constrainEdge(state.dependentedges[i], state.dependentstates[i].leftFace,
-          state.dependentstates[i].rightFace, validStates);
-        }
-      }
-    }
-  }
-
-  /* Takes in a list of verticies,
-  * a list of valid states from source,
-  * and an empty list to put state in,
-  * and populates the empty list with
-  * all possible valid states for all vertecies.
-  */
-  void generateStates(vector<Vertex*> &verticies,
-    vector<VertexState> &sourceValidStates,
-    vector<VertexState> &validStates)
-  {
-    validStates.clear();
-    for(std::vector<Vertex*>::iterator vertex_itr = verticies.begin();
-      vertex_itr != verticies.end(); vertex_itr++)
-    {
-      Vertex *current = *vertex_itr;
-      int sets[2];
-      if(current->edges[0] != NULL)
-        sets[0] = current->edges[0]->edgestate.set;
-      else
-        sets[0] = current->edges[1]->edgestate.set;
-      if(current->edges[2] != NULL)
-        sets[1] = current->edges[2]->edgestate.set;
-      else
-        sets[1] = current->edges[3]->edgestate.set;
-
-      for(std::vector<VertexState>::iterator source_itr = sourceValidStates.begin();
-        source_itr != sourceValidStates.end(); source_itr++)
-      {
-        ;
-        if((*source_itr).setintersection[0] == sets[0] &&
-          (*source_itr).setintersection[1] == sets[1] )
-        {
-          validStates.push_back(VertexState());
-          if(current->edges[0] != NULL)
-            validStates.back().setintersection[0] = current->edges[0]->edgestate.set;
-          else
-            validStates.back().setintersection[0] = current->edges[1]->edgestate.set;
-
-          if(current->edges[2] != NULL)
-            validStates.back().setintersection[1] = current->edges[2]->edgestate.set;
-          else
-            validStates.back().setintersection[1] = current->edges[3]->edgestate.set;
-
-          validStates.back().dependentedges[0] = current->edges[0];
-          validStates.back().dependentedges[1] = current->edges[1];
-          validStates.back().dependentedges[2] = current->edges[2];
-          validStates.back().dependentedges[3] = current->edges[3];
-          validStates.back().dependentstates[0].leftFace =
-            (*source_itr).dependentstates[0].leftFace;
-          validStates.back().dependentstates[0].rightFace =
-            (*source_itr).dependentstates[0].rightFace;
-          validStates.back().dependentstates[1].leftFace =
-            (*source_itr).dependentstates[1].leftFace;
-          validStates.back().dependentstates[1].rightFace =
-            (*source_itr).dependentstates[1].rightFace;
-          validStates.back().dependentstates[2].leftFace =
-            (*source_itr).dependentstates[2].leftFace;
-          validStates.back().dependentstates[2].rightFace =
-            (*source_itr).dependentstates[2].rightFace;
-          validStates.back().dependentstates[3].leftFace =
-            (*source_itr).dependentstates[3].leftFace;
-          validStates.back().dependentstates[3].rightFace =
-            (*source_itr).dependentstates[3].rightFace;
+          constrainEdge(state.dependentedges[i],
+            state.edgeinfo.dependentstates[i].leftFace,
+            state.edgeinfo.dependentstates[i].rightFace, validStates);
         }
       }
     }
@@ -115,7 +61,7 @@ namespace CMS2D
   * currently creates a pre-defined list
   * but latter will take in a model that describes possible states
   */
-  void generateValid(vector<VertexState> &stateList)
+  void generateValid(vector<VertexStateEdges> &stateList)
   {
     stateList.clear();
     int numsets = 3;
@@ -124,7 +70,7 @@ namespace CMS2D
       for(int y = x; y < numsets; y++)
       {
         //Set All Interior state
-        stateList.push_back(VertexState());
+        stateList.push_back(VertexStateEdges(x, y));
         stateList.back().setintersection[0] = x;
         stateList.back().setintersection[1] = y;
         stateList.back().dependentstates[0].leftFace = INTERIOR;
@@ -136,7 +82,7 @@ namespace CMS2D
         stateList.back().dependentstates[3].leftFace = INTERIOR;
         stateList.back().dependentstates[3].rightFace = INTERIOR;
         //Set All Exterior state
-        stateList.push_back(VertexState());
+        stateList.push_back(VertexStateEdges(x,y));
         stateList.back().setintersection[0] = x;
         stateList.back().setintersection[1] = y;
         stateList.back().dependentstates[0].leftFace = EXTERIOR;
@@ -149,43 +95,78 @@ namespace CMS2D
         stateList.back().dependentstates[3].rightFace = EXTERIOR;
 
       }
-    
-    stateList.push_back(VertexState());
-    stateList.back().setintersection[0] = 0;
-    stateList.back().setintersection[1] = 1;
-    stateList.back().dependentstates[0].leftFace = INTERIOR;
-    stateList.back().dependentstates[0].rightFace = INTERIOR;
-    stateList.back().dependentstates[1].leftFace = INTERIOR;
-    stateList.back().dependentstates[1].rightFace = INTERIOR;
-    stateList.back().dependentstates[2].leftFace = INTERIOR;
-    stateList.back().dependentstates[2].rightFace = INTERIOR;
-    stateList.back().dependentstates[3].leftFace = INTERIOR;
-    stateList.back().dependentstates[3].rightFace = INTERIOR;
 
-    stateList.push_back(VertexState());
-    stateList.back().setintersection[0] = 0;
-    stateList.back().setintersection[1] = 1;
-    stateList.back().dependentstates[0].leftFace = INTERIOR;
-    stateList.back().dependentstates[0].rightFace = INTERIOR;
-    stateList.back().dependentstates[1].leftFace = INTERIOR;
-    stateList.back().dependentstates[1].rightFace = INTERIOR;
-    stateList.back().dependentstates[2].leftFace = INTERIOR;
-    stateList.back().dependentstates[2].rightFace = EXTERIOR;
-    stateList.back().dependentstates[3].leftFace = INTERIOR;
-    stateList.back().dependentstates[3].rightFace = EXTERIOR;
+      stateList.push_back(VertexStateEdges(0,1));
+      stateList.back().dependentstates[0].leftFace = INTERIOR;
+      stateList.back().dependentstates[0].rightFace = INTERIOR;
+      stateList.back().dependentstates[1].leftFace = INTERIOR;
+      stateList.back().dependentstates[1].rightFace = INTERIOR;
+      stateList.back().dependentstates[2].leftFace = INTERIOR;
+      stateList.back().dependentstates[2].rightFace = INTERIOR;
+      stateList.back().dependentstates[3].leftFace = INTERIOR;
+      stateList.back().dependentstates[3].rightFace = INTERIOR;
+
+      stateList.push_back(VertexStateEdges(0,1));
+      stateList.back().dependentstates[0].leftFace = INTERIOR;
+      stateList.back().dependentstates[0].rightFace = INTERIOR;
+      stateList.back().dependentstates[1].leftFace = INTERIOR;
+      stateList.back().dependentstates[1].rightFace = INTERIOR;
+      stateList.back().dependentstates[2].leftFace = INTERIOR;
+      stateList.back().dependentstates[2].rightFace = EXTERIOR;
+      stateList.back().dependentstates[3].leftFace = INTERIOR;
+      stateList.back().dependentstates[3].rightFace = EXTERIOR;
 
 
-    stateList.push_back(VertexState());
-    stateList.back().setintersection[0] = 1;
-    stateList.back().setintersection[1] = 2;
-    stateList.back().dependentstates[0].leftFace = INTERIOR;
-    stateList.back().dependentstates[0].rightFace = EXTERIOR;
-    stateList.back().dependentstates[1].leftFace = INTERIOR;
-    stateList.back().dependentstates[1].rightFace = EXTERIOR;
-    stateList.back().dependentstates[2].leftFace = INTERIOR;
-    stateList.back().dependentstates[2].rightFace = INTERIOR;
-    stateList.back().dependentstates[3].leftFace = INTERIOR;
-    stateList.back().dependentstates[3].rightFace = INTERIOR;
+      stateList.push_back(VertexStateEdges(1,2));
+      stateList.back().dependentstates[0].leftFace = INTERIOR;
+      stateList.back().dependentstates[0].rightFace = EXTERIOR;
+      stateList.back().dependentstates[1].leftFace = INTERIOR;
+      stateList.back().dependentstates[1].rightFace = EXTERIOR;
+      stateList.back().dependentstates[2].leftFace = INTERIOR;
+      stateList.back().dependentstates[2].rightFace = INTERIOR;
+      stateList.back().dependentstates[3].leftFace = INTERIOR;
+      stateList.back().dependentstates[3].rightFace = INTERIOR;
+  }
+
+  /* Takes in a list of verticies,
+  * a list of valid states from source,
+  * and an empty list to put state in,
+  * and populates the empty list with
+  * all possible valid states for all vertecies.
+  */
+  void generateStates(vector<Vertex*> &verticies,
+    vector<VertexStateEdges> &sourceValidStates,
+    vector<VertexState> &validStates, int *relativesCounter)
+  {
+    validStates.clear();
+    for(unsigned int i = 0; i < verticies.size(); i++)
+    {
+      Vertex *current = *(verticies.begin() + i);
+      int sets[2];
+      if(current->edges[0] != NULL)
+        sets[0] = current->edges[0]->edgestate.set;
+      else
+        sets[0] = current->edges[1]->edgestate.set;
+      if(current->edges[2] != NULL)
+        sets[1] = current->edges[2]->edgestate.set;
+      else
+        sets[1] = current->edges[3]->edgestate.set;
+
+      for(std::vector<VertexStateEdges>::iterator source_itr = sourceValidStates.begin();
+        source_itr != sourceValidStates.end(); source_itr++)
+      {
+        if((*source_itr).setintersection[0] == sets[0] &&
+          (*source_itr).setintersection[1] == sets[1] )
+        {
+          validStates.push_back(VertexState(&(relativesCounter[i]), (*source_itr)));
+          relativesCounter[i]++;
+          validStates.back().dependentedges[0] = current->edges[0];
+          validStates.back().dependentedges[1] = current->edges[1];
+          validStates.back().dependentedges[2] = current->edges[2];
+          validStates.back().dependentedges[3] = current->edges[3];
+        }
+      }
+    }
   }
 
   /* 
@@ -266,8 +247,8 @@ namespace CMS2D
         //see if the edge is the edge we are concidering
         if((*itr).dependentedges[i] == edge &&
           // If so, then see if th edge does not conform to the constrained state
-          (edge->edgestate.leftFace != (*itr).dependentstates[i].leftFace ||
-          edge->edgestate.rightFace != (*itr).dependentstates[i].rightFace ))
+          (edge->edgestate.leftFace != (*itr).edgeinfo.dependentstates[i].leftFace ||
+          edge->edgestate.rightFace != (*itr).edgeinfo.dependentstates[i].rightFace ))
         {
           //vertex is now an invalid vertex
           statevalid = false;
@@ -275,11 +256,51 @@ namespace CMS2D
         }
       }
       if (statevalid == false)
+      {
         // Remove invalid vertex state from the vertexStates list
+        *((*itr).relativesCounter)--;
         itr = vertexStates.erase(itr);
+      }
       else
         // Or continue
         itr++;
     }
   }
+
+  VertexStateEdges::VertexStateEdges(int seta, int setb)
+  {
+    if(seta < setb)
+    {
+      setintersection[0] = seta;
+      setintersection[1] = setb;
+    }
+    else
+    {
+      setintersection[0] = setb;
+      setintersection[1] = seta;
+    }
+  }
+
+  VertexStateEdges::VertexStateEdges(const VertexStateEdges &other)
+  {
+    setintersection[0] = other.setintersection[0];
+    setintersection[1] = other.setintersection[1];
+    dependentstates[0] = other.dependentstates[0];
+    dependentstates[1] = other.dependentstates[1];
+    dependentstates[2] = other.dependentstates[2];
+    dependentstates[3] = other.dependentstates[3];
+  }
+
+  VertexState::VertexState(int *relCount, VertexStateEdges edges):
+  edgeinfo(edges)
+  {
+    relativesCounter = relCount;
+  }
+
+  bool VertexState::operator<(VertexState &rhs)
+  {
+    return *(relativesCounter) < *(rhs.relativesCounter);
+  }
+
+
 }

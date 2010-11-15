@@ -82,10 +82,10 @@ void CMS::display()
         {
           //Interior
           if(grid.edges[x]->edgestate.leftFace == INTERIOR)
-            glColor4f(0.9, 0.9, 0.9, 1.0f);
+            glColor4f(0.9f, 0.9f, 0.9f, 1.0f);
           //Exterior
           else
-            glColor4f(0.2, 0.2, 0.2, 1.0f);
+            glColor4f(0.2f, 0.2f, 0.2f, 1.0f);
         }
 
         glBegin(GL_LINES);
@@ -116,7 +116,7 @@ void CMS::init()
     state.setDrawAxis(false);
     state.setPrintInfoOnScreen(true);
     
-    srand(time(NULL));
+    srand((unsigned int)time(NULL));
 
     //srand(23423567);
 
