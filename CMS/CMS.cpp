@@ -60,22 +60,34 @@ void CMS::display()
    
     for(int x = 0; x < (int)grid.edges.size(); x++)
     {
-        if(grid.edges[x]->edgestate.set == 0)
-        {
-             glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-        }
-        else if(grid.edges[x]->edgestate.set == 1)
-        {
-            glColor4f(0.25f, 0.25f, 1.0f, 1.0f);
-        }
-        else
-        {
-            glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-        }
+        //if(grid.edges[x]->edgestate.set == 0)
+        //{
+        //     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+        //}
+        //else if(grid.edges[x]->edgestate.set == 1)
+        //{
+        //    glColor4f(0.25f, 0.25f, 1.0f, 1.0f);
+        //}
+        //else
+        //{
+        //    glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+        //}
+        //Edge
         if(grid.edges[x]->edgestate.leftFace != grid.edges[x]->edgestate.rightFace)
         {
-            glColor4f(0.9f, 0.9f, 0.9f, 1.0f);
+            glColor4f(0.5f, 0.9f, 0.5f, 1.0f);
         }
+        //Either interior or exterior
+        else
+        {
+          //Interior
+          if(grid.edges[x]->edgestate.leftFace == INTERIOR)
+            glColor4f(0.9, 0.9, 0.9, 1.0f);
+          //Exterior
+          else
+            glColor4f(0.2, 0.2, 0.2, 1.0f);
+        }
+
         glBegin(GL_LINES);
             glVertex3fv(grid.edges[x]->begin->val);
             glVertex3fv(grid.edges[x]->end->val);
