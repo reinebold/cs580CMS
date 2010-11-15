@@ -118,7 +118,37 @@ namespace CMS2D
   void generateValid(vector<VertexState> &stateList)
   {
     stateList.clear();
+    int numsets = 3;
+    //For every lower, uppser set pair
+    for(int x = 0; x < numsets; x++)
+      for(int y = x; y < numsets; y++)
+      {
+        //Set All Interior state
+        stateList.push_back(VertexState());
+        stateList.back().setintersection[0] = x;
+        stateList.back().setintersection[1] = y;
+        stateList.back().dependentstates[0].leftFace = INTERIOR;
+        stateList.back().dependentstates[0].rightFace = INTERIOR;
+        stateList.back().dependentstates[1].leftFace = INTERIOR;
+        stateList.back().dependentstates[1].rightFace = INTERIOR;
+        stateList.back().dependentstates[2].leftFace = INTERIOR;
+        stateList.back().dependentstates[2].rightFace = INTERIOR;
+        stateList.back().dependentstates[3].leftFace = INTERIOR;
+        stateList.back().dependentstates[3].rightFace = INTERIOR;
+        //Set All Exterior state
+        stateList.push_back(VertexState());
+        stateList.back().setintersection[0] = x;
+        stateList.back().setintersection[1] = y;
+        stateList.back().dependentstates[0].leftFace = EXTERIOR;
+        stateList.back().dependentstates[0].rightFace = EXTERIOR;
+        stateList.back().dependentstates[1].leftFace = EXTERIOR;
+        stateList.back().dependentstates[1].rightFace = EXTERIOR;
+        stateList.back().dependentstates[2].leftFace = EXTERIOR;
+        stateList.back().dependentstates[2].rightFace = EXTERIOR;
+        stateList.back().dependentstates[3].leftFace = EXTERIOR;
+        stateList.back().dependentstates[3].rightFace = EXTERIOR;
 
+      }
     
     stateList.push_back(VertexState());
     stateList.back().setintersection[0] = 0;
