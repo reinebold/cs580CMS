@@ -29,6 +29,7 @@ public:
     void setOrthoProjectionMatrix();        ///< Sets the projection matrix to use an orthographic projection
     void setPerspectiveProjectionMatrix();  ///< Sets the projection matrix to use a perspective projection
     void changeWindowSize(GLint width, GLint height); ///< Changes the window size
+    void setModelViewMatrix(GLfloat posx, GLfloat posy, GLfloat posz, GLfloat lookx, GLfloat looky, GLfloat lookz);
 
     //Gets
     GLfloat getRotatez() const      { return rotatez; }

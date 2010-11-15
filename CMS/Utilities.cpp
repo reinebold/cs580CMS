@@ -9,9 +9,11 @@
 #include "Defines.h"
 #include "Camera.h"
 #include "Utilities.h"
+#include "CMS.h"
 using namespace std;
 
 extern Camera camera;
+extern CMS cms;
 
 template <typename T>
 string Utils::numToString(T value)
@@ -116,6 +118,15 @@ void Utils::printInfoOnScreen()
             renderString(0,count,"Trans y:  " + numToString(camera.getTranslatey()));
             count += 10;
             renderString(0,count,"Trans z:  " + numToString(camera.getTranslatez()));
+            count += 20;
+            renderString(0,count,"-CMS-");
+            count += 10;
+            renderString(0,count,"Verticies: " + numToString(cms.grid.verticies.size()));
+            count += 10;
+            renderString(0,count,"Edges:     " + numToString(cms.grid.edges.size()));
+            count += 10;
+            renderString(0,count,"Spacing:   " + numToString(cms.grid.spacing));
+            count += 10;
         glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
