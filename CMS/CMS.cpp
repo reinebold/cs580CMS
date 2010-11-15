@@ -25,7 +25,7 @@ CMS::CMS()
 
 void CMS::continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &verticies)
 {
-  CMS2D::continuousModelSynthesis2D(edges, verticies);
+  //CMS2D::continuousModelSynthesis2D(edges, verticies);
 }
 
 void CMS::display()
@@ -104,7 +104,9 @@ void CMS::init()
     state.setDrawAxis(false);
     state.setPrintInfoOnScreen(true);
     
-    srand((unsigned int)time(NULL));
+    srand(time(NULL));
+
+    //srand(23423567);
 
     //Bounding box info (will get from text file)
     Vertex bbverticies[4];

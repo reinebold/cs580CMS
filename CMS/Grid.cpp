@@ -173,13 +173,10 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                 }
             }
             //Need to make sure we only include verticies that are on an edge with more than one intersection, or odd results will follow.
-            if(start < 2)
+            if(start == 1)
             {
-                for(int z = 0; z < start; z++)
-                {
-                    verticies.erase(verticies.end()-1 - z);
-                }
-                currentVert -= start;
+                verticies.erase(verticies.end()-1);
+                currentVert--;
             }
         }
     }
@@ -207,23 +204,23 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
             if((int)verticiesOnEdge.size() > 1)
             {
 
-                sortVerticies(verticiesOnEdge,0,verticiesOnEdge.size()-1);
+                sortVerticies(verticiesOnEdge,0,verticiesOnEdge.size()-1);                
                 
-                //Sanity check
+#ifdef _DEBUG
+                //Sanity check: Make sure the verticies are in order.
                 for(int a = 0; a < (int)verticiesOnEdge.size()-1; a++)
                 {
                     if(!(verticiesOnEdge[a]->val[X] < verticiesOnEdge[a+1]->val[X]))
                     {
-                        cout << "ERROR: Value not less than" << endl;
+                        cout << "SANITY ERROR: Verticies are not sorted." << endl;
                         cout << verticiesOnEdge[a]->val[X] << " " <<  verticiesOnEdge[a+1]->val[X] << endl;
-                     
                         exit(EXIT_FAILURE);
                     }
                 }
+#endif
                 
                 for(int j = 0; j < (int)verticiesOnEdge.size()-1; j++)
                 {
-
                     Edge *edge = new Edge(verticiesOnEdge[j],verticiesOnEdge[j+1]);
                     edge->edgestate.set = x;
                     edges.push_back(edge);
@@ -232,7 +229,6 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                     verticiesOnEdge[j+1]->edges[verticiesOnEdge[j+1]->currentEdge] = edge;
                     verticiesOnEdge[j]->currentEdge++;
                     verticiesOnEdge[j+1]->currentEdge++;
-
                 } 
             }
         }
@@ -246,13 +242,13 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
             for(int y = 0; y < (int)edges.size(); y++)
             {
                 //Find the edge in 'edges' that corresponds to the one edge in verticies.
-                if(edges[y] == verticies[x]->edges[0])
+                if((edges[y] != NULL) && (edges[y] == verticies[x]->edges[0]) )
                 {
                     //Make sure that we decrement the number of edges of the other vertex it is connected to,
                     //Then make the pointer to that edge go to null
                     Vertex *setToNull;
                     int z = 0;
-                    if(edges[y]->begin == verticies[x])
+                    if((verticies[x] != NULL) && (edges[y]->begin == verticies[x]))
                     {
 
                         edges[y]->end->currentEdge--;
@@ -277,80 +273,24 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                             }
                         }
                     }
-
-
-                    for(int x = 0; x < (int)edges.size(); x++)
-                    {
-                        if(edges[x]->begin->val[Y] > topy || edges[x]->begin->val[Y] < bottomy)
-                        {
-                            cout << "Error: begin, y value" << endl;
-                        }
-                        else if(edges[x]->begin->val[X] > rightx || edges[x]->begin->val[X] < leftx)
-                        {
-                            cout << "Error: begin, x value" << endl;
-                        }
-                        else if(edges[x]->end->val[Y] > topy || edges[x]->end->val[Y] < bottomy)
-                        {
-                            cout << "Error: end, y value" << endl;
-                        }
-                        else if(edges[x]->end->val[X] > rightx || edges[x]->end->val[X] < leftx)
-                        {
-                            cout << "Error: end, x value" << endl;
-                        }
-                    }
-
-                    Edge tempedge = *edges[y];
-                    Vertex tempvert = *verticies[x];
-
-                    Vertex beginbf = *edges[y]->begin;
-                    Vertex endbf = *edges[y]->end;
-
-                    delete verticies[x];
-                    verticies[x] = NULL;
-                    verticies.erase(verticies.begin()+x);
-
-                    Vertex beginaf = *edges[y]->begin;
-                    Vertex endaf = *edges[y]->end;
-                    
-                    
                     delete edges[y];
                     edges[y] = NULL;
                     edges.erase(edges.begin()+y);
 
+                    delete verticies[x];
+                    verticies[x] = NULL;
+                    verticies.erase(verticies.begin()+x);
+                
                     setToNull->edges[z] = NULL;
-                    
 
-
-
-                    for(int x = 0; x < (int)edges.size(); x++)
-                    {
-                        if(edges[x]->begin->val[Y] > topy || edges[x]->begin->val[Y] < bottomy)
-                        {
-                            cout << "Error: begin, y value" << endl;
-                        }
-                        else if(edges[x]->begin->val[X] > rightx || edges[x]->begin->val[X] < leftx)
-                        {
-                            cout << "Error: begin, x value" << endl;
-                        }
-                        else if(edges[x]->end->val[Y] > topy || edges[x]->end->val[Y] < bottomy)
-                        {
-                            cout << "Error: end, y value" << endl;
-                        }
-                        else if(edges[x]->end->val[X] > rightx || edges[x]->end->val[X] < leftx)
-                        {
-                            cout << "Error: end, x value" << endl;
-                        }
-                    }
-
-           
-
+                    break;
                 }
             }
-            
         }
     }
 
-    //Sanity check
+#ifdef _DEBUG
+    //Sanity check: Make sure all currentEdge counts are correct and everything else is null.
     for(int x = 0; x < (int)verticies.size(); x++)
     {
         int count = 0;
@@ -364,38 +304,40 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
         }
         if(count != verticies[x]->currentEdge)
         {
-            cout << "ERROR: inconsistent edges" << endl;
-            //exit(EXIT_FAILURE);
+            cout << "SANITY ERROR: currentEdge count is incorrect for some verticies (or some edges don't point to NULL like they should" << endl;
+            exit(EXIT_FAILURE);
         }
     }
 
-    //Sanity check
+    //Sanity check: Make sure the values for vertex val are reasonable.
     for(int x = 0; x < (int)edges.size(); x++)
     {
         if(edges[x]->begin->val[Y] > topy || edges[x]->begin->val[Y] < bottomy)
         {
-            cout << "Error: begin, y value" << endl;
+            cout << "SANITY ERROR: Vertex values unreasonable - begin, y value" << endl;
+            exit(EXIT_FAILURE);
         }
         else if(edges[x]->begin->val[X] > rightx || edges[x]->begin->val[X] < leftx)
         {
-            cout << "Error: begin, x value" << endl;
+            cout << "SANITY ERROR: Vertex values unreasonable - begin, x value" << endl;
+            exit(EXIT_FAILURE);
         }
         else if(edges[x]->end->val[Y] > topy || edges[x]->end->val[Y] < bottomy)
         {
-            cout << "Error: end, y value" << endl;
+            cout << "SANITY ERROR: Vertex values unreasonable - end, y value" << endl;
+            exit(EXIT_FAILURE);
         }
         else if(edges[x]->end->val[X] > rightx || edges[x]->end->val[X] < leftx)
         {
-            cout << "Error: end, x value" << endl;
+            cout << "SANITY ERROR: Vertex values unreasonable - end, x value" << endl;
+            exit(EXIT_FAILURE);
         }
     }
-
+#endif
 }
-
 
 void Grid::sortVerticies(vector<Vertex*> &verticies, int left, int right)
 {
-
     if(left>=right)
         return;
     int middle = left;
@@ -404,8 +346,7 @@ void Grid::sortVerticies(vector<Vertex*> &verticies, int left, int right)
         {
             Vertex *temp = verticies[++middle];
             verticies[middle] = verticies[i];
-            verticies[i] = temp;
-           
+            verticies[i] = temp;  
         }
     }
     Vertex *temp = verticies[left];
@@ -413,34 +354,4 @@ void Grid::sortVerticies(vector<Vertex*> &verticies, int left, int right)
     verticies[middle] = temp;
     sortVerticies(verticies,left,middle-1);
     sortVerticies(verticies,middle+1,right);
-
-    /*if(right-left < 2)
-        return;
-
-    //swap
-    int randtemp = Utils::randInt(left,right);
-    Vertex *temp = verticies[left];
-    verticies[left] = verticies[randtemp];
-    verticies[randtemp] = temp;
-    int j = 0, i =0;
-    float t;
-    t = verticies[left]->val[X]; i =left; j = right+1;
-    while(1){
-        do{
-            i++;
-        }while(i <=right && verticies[i]->val[X] < t);
-        do{
-            j--;
-        }while(verticies[j]->val[X] > t);
-        if(i > j)
-            break;
-        temp = verticies[i];
-        verticies[i] = verticies[j];
-        verticies[j] = temp;
-    }
-    temp = verticies[left];
-    verticies[left] = verticies[j];
-    verticies[j] = temp;
-    sortVerticies(verticies,left, j-1);
-    sortVerticies(verticies,j+1,right);*/
 }
