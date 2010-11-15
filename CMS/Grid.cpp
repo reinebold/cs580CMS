@@ -1,3 +1,7 @@
+/**
+    \file Grid.cpp
+    \brief 
+*/
 
 #include "CMSModel.h"
 #include "Grid.h"
@@ -8,15 +12,16 @@
 
 void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
 {
-    enum SlopeType {VERTICAL = 0, HORIZONTAL, POSITIVE, NEGATIVE};
+    enum SlopeType {VERTICAL = 0, HORIZONTAL, POSITIVE, NEGATIVE, UNASSIGNED};
     float topy = boundingbox.edges[TOP].end->val[Y];
     float bottomy = boundingbox.edges[BOTTOM].end->val[Y];
     float rightx = boundingbox.edges[RIGHT].end->val[X];
     float leftx = boundingbox.edges[LEFT].end->val[X];
-    float currenty;
-    SlopeType slopetype;
+
+    float currenty = 0.0;
+    SlopeType slopetype = UNASSIGNED;
     parallelEdges = new Edge*[model._numVerticies];
-    float yincrement;
+    float yincrement = 0.0;
     
     for(int edgeNum = 0; edgeNum < model._numVerticies; ++edgeNum)
     {
@@ -58,7 +63,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                 float tempx = ((topy-currenty)+slope.value*leftx)/slope.value;
                 if(tempx < rightx)
                 {
-                    Vertex *begin = new Vertex(0.0f, currenty);
+                    Vertex *begin = new Vertex(leftx, currenty);
                     Vertex *end  = new Vertex(tempx, topy);
                     //Edge *edge = new Edge(begin, end);
                     parallelEdges[edgeNum][currentedge] = Edge(begin, end);
@@ -146,12 +151,6 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
 
     }
 
-   // totalVerts = 1;
-    //for(int x = 0; x < model._numVerticies; x++)
-    //{
-    //    totalVerts *= numEdges[x];
-    //}
-    //verticies = new Vertex[totalVerts];
     int currentVert = 0;
 
     //Find vertex intersections
@@ -163,7 +162,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
             {
                 for(int j = 0; j < numEdges[i]; j++)
                 {
-                    Vertex *temp = new Vertex();
+                    Vertex *temp = NULL;
                     if(parallelEdges[x][y].intersect(parallelEdges[i][j],temp) == INTERESECTING)
                     {
                         verticies.push_back(temp);
@@ -194,62 +193,189 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                 }
             }
 
-            sortVerticies(verticiesOnEdge,0,verticiesOnEdge.size()-1);
-            
-            //Sanity check
-            for(int a = 0; a < (int)verticiesOnEdge.size()-1; a++)
+            if((int)verticiesOnEdge.size() > 1)
             {
-                if(!(verticiesOnEdge[a]->val[X] < verticiesOnEdge[a+1]->val[X]))
+
+                sortVerticies(verticiesOnEdge,0,verticiesOnEdge.size()-1);
+                
+                //Sanity check
+                for(int a = 0; a < (int)verticiesOnEdge.size()-1; a++)
                 {
-                    cout << "ERROR: Value not less than" << endl;
-                    cout << verticiesOnEdge[a]->val[X] << " " <<  verticiesOnEdge[a+1]->val[X] << endl;
-                 
-                    exit(EXIT_FAILURE);
+                    if(!(verticiesOnEdge[a]->val[X] < verticiesOnEdge[a+1]->val[X]))
+                    {
+                        cout << "ERROR: Value not less than" << endl;
+                        cout << verticiesOnEdge[a]->val[X] << " " <<  verticiesOnEdge[a+1]->val[X] << endl;
+                     
+                        exit(EXIT_FAILURE);
+                    }
                 }
+                
+                for(int j = 0; j < (int)verticiesOnEdge.size()-1; j++)
+                {
+
+                    Edge *edge = new Edge(verticiesOnEdge[j],verticiesOnEdge[j+1]);
+                    edge->edgestate.set = x;
+                    edges.push_back(edge);
+
+                    verticiesOnEdge[j]->edges[verticiesOnEdge[j]->currentEdge] = edge;
+                    verticiesOnEdge[j+1]->edges[verticiesOnEdge[j+1]->currentEdge] = edge;
+                    verticiesOnEdge[j]->currentEdge++;
+                    verticiesOnEdge[j+1]->currentEdge++;
+
+                } 
             }
-            
-            for(int j = 0; j < (int)verticiesOnEdge.size()-1; j++)
-            {
-                Edge *edge = new Edge(verticiesOnEdge[j],verticiesOnEdge[j+1]);
-                edge->edgestate.set = x;
-                edges.push_back(edge);
-                verticiesOnEdge[j]->edges[verticiesOnEdge[j]->currentEdge] = edge;
-                verticiesOnEdge[j+1]->edges[verticiesOnEdge[j+1]->currentEdge] = edge;
-                verticiesOnEdge[j]->currentEdge++;
-                verticiesOnEdge[j+1]->currentEdge++;
-            } 
         }
     }
 
-    //If a vertex only has one edge.
+    //Find if a vertex only has one edge.
     for(int x = 0; x < (int)verticies.size(); x++)
     {
         if(verticies[x]->currentEdge == 1)
         {
             for(int y = 0; y < (int)edges.size(); y++)
             {
+                //Find the edge in 'edges' that corresponds to the one edge in verticies.
                 if(edges[y] == verticies[x]->edges[0])
                 {
-                    Vertex * temp;
+                    //Make sure that we decrement the number of edges of the other vertex it is connected to,
+                    //Then make the pointer to that edge go to null
+                    Vertex *setToNull;
+                    int z = 0;
                     if(edges[y]->begin == verticies[x])
                     {
+
                         edges[y]->end->currentEdge--;
-                        temp = edges[y]->end;
+                        for(z = 0;  z < 4; z++)
+                        {
+                            if(edges[y] == edges[y]->end->edges[z])
+                            {
+                                setToNull = edges[y]->end;
+                                break;
+                            }
+                        }
                     }
                     else
                     {
                         edges[y]->begin->currentEdge--;
-                        temp = edges[y]->begin;
+                        for(z = 0;  z < 4; z++)
+                        {
+                            if(edges[y] == edges[y]->begin->edges[z])
+                            {
+                                setToNull = edges[y]->begin;
+                                break;
+                            }
+                        }
                     }
-                    //delete edges[x];
-                   // edges[x] = NULL;
+
+
+                    for(int x = 0; x < (int)edges.size(); x++)
+                    {
+                        if(edges[x]->begin->val[Y] > topy || edges[x]->begin->val[Y] < bottomy)
+                        {
+                            cout << "Error: begin, y value" << endl;
+                        }
+                        else if(edges[x]->begin->val[X] > rightx || edges[x]->begin->val[X] < leftx)
+                        {
+                            cout << "Error: begin, x value" << endl;
+                        }
+                        else if(edges[x]->end->val[Y] > topy || edges[x]->end->val[Y] < bottomy)
+                        {
+                            cout << "Error: end, y value" << endl;
+                        }
+                        else if(edges[x]->end->val[X] > rightx || edges[x]->end->val[X] < leftx)
+                        {
+                            cout << "Error: end, x value" << endl;
+                        }
+                    }
+
+                    Edge tempedge = *edges[y];
+                    Vertex tempvert = *verticies[x];
+
+                    Vertex beginbf = *edges[y]->begin;
+                    Vertex endbf = *edges[y]->end;
+
+                    delete verticies[x];
+                    verticies[x] = NULL;
+                    verticies.erase(verticies.begin()+x);
+
+                    Vertex beginaf = *edges[y]->begin;
+                    Vertex endaf = *edges[y]->end;
+                    
+                    
                     delete edges[y];
                     edges[y] = NULL;
                     edges.erase(edges.begin()+y);
-                    verticies.erase(verticies.begin()+x);
+
+                    setToNull->edges[z] = NULL;
+                    
+
+
+
+                    for(int x = 0; x < (int)edges.size(); x++)
+                    {
+                        if(edges[x]->begin->val[Y] > topy || edges[x]->begin->val[Y] < bottomy)
+                        {
+                            cout << "Error: begin, y value" << endl;
+                        }
+                        else if(edges[x]->begin->val[X] > rightx || edges[x]->begin->val[X] < leftx)
+                        {
+                            cout << "Error: begin, x value" << endl;
+                        }
+                        else if(edges[x]->end->val[Y] > topy || edges[x]->end->val[Y] < bottomy)
+                        {
+                            cout << "Error: end, y value" << endl;
+                        }
+                        else if(edges[x]->end->val[X] > rightx || edges[x]->end->val[X] < leftx)
+                        {
+                            cout << "Error: end, x value" << endl;
+                        }
+                    }
+
+           
+
                 }
             }
             
+        }
+    }
+
+    //Sanity check
+    for(int x = 0; x < (int)verticies.size(); x++)
+    {
+        int count = 0;
+        for(int y = 0; y < 4; y++)
+        {
+            
+            if(verticies[x]->edges[y] != NULL)
+            {
+                count++;
+            }
+        }
+        if(count != verticies[x]->currentEdge)
+        {
+            cout << "ERROR: inconsistent edges" << endl;
+            //exit(EXIT_FAILURE);
+        }
+    }
+
+    //Sanity check
+    for(int x = 0; x < (int)edges.size(); x++)
+    {
+        if(edges[x]->begin->val[Y] > topy || edges[x]->begin->val[Y] < bottomy)
+        {
+            cout << "Error: begin, y value" << endl;
+        }
+        else if(edges[x]->begin->val[X] > rightx || edges[x]->begin->val[X] < leftx)
+        {
+            cout << "Error: begin, x value" << endl;
+        }
+        else if(edges[x]->end->val[Y] > topy || edges[x]->end->val[Y] < bottomy)
+        {
+            cout << "Error: end, y value" << endl;
+        }
+        else if(edges[x]->end->val[X] > rightx || edges[x]->end->val[X] < leftx)
+        {
+            cout << "Error: end, x value" << endl;
         }
     }
 

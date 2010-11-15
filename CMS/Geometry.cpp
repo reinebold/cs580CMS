@@ -36,7 +36,7 @@ void Cuboid::init(Vertex *_verticies)
     }
 }
 
-IntersectResult Edge::intersect(const Edge& otheredge, Vertex *intersection)
+IntersectResult Edge::intersect(const Edge& otheredge, Vertex* &intersection)
 {
     float denom  = ((otheredge.end->val[Y] - otheredge.begin->val[Y])*(end->val[X] - begin->val[X])) -
                    ((otheredge.end->val[X] - otheredge.begin->val[X])*(end->val[Y] - begin->val[Y]));
@@ -62,6 +62,7 @@ IntersectResult Edge::intersect(const Edge& otheredge, Vertex *intersection)
     if(ua >= 0.0f && ua <= 1.0f && ub >= 0.0f && ub <= 1.0f)
     {
         // Get the intersection point.
+        intersection = new Vertex();
         intersection->val[X] = begin->val[X] + ua*(end->val[X] - begin->val[X]);
         intersection->val[Y] = begin->val[Y] + ua*(end->val[Y] - begin->val[Y]);
 

@@ -8,7 +8,7 @@
 
 #include "Defines.h"
 #include <math.h>
-#define EPSILON .00001
+#define EPSILON .0001
 #define INFINITY FLT_MAX
 
 namespace Geometry
@@ -141,7 +141,7 @@ namespace Geometry
             edgestate.rightFace = UNASSIGNED;
         }
 
-        IntersectResult intersect(const Edge& otheredge, Vertex *intersection);
+        IntersectResult intersect(const Edge& otheredge, Vertex* &intersection);
 
         EdgeState edgestate;
     };

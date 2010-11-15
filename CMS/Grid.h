@@ -27,7 +27,7 @@ public:
     Edge  **parallelEdges;
     vector<Vertex*> verticies;
     vector<Edge*>   edges;
-    int     numEdges[500];
+    int     numEdges[1000];
     int     totalVerts;
     float   spacing;
 };
