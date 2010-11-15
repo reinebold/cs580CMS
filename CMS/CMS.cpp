@@ -25,7 +25,7 @@ CMS::CMS()
 
 void CMS::continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &verticies)
 {
-  //CMS2D::continuousModelSynthesis2D(edges, verticies);
+  CMS2D::continuousModelSynthesis2D(edges, verticies);
 }
 
 void CMS::display()

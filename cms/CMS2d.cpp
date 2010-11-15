@@ -103,18 +103,8 @@ namespace CMS2D
       stateList.push_back(VertexStateEdges(0,1));
       stateList.back().dependentstates[0].leftFace = INTERIOR;
       stateList.back().dependentstates[0].rightFace = INTERIOR;
-      stateList.back().dependentstates[1].leftFace = INTERIOR;
-      stateList.back().dependentstates[1].rightFace = INTERIOR;
-      stateList.back().dependentstates[2].leftFace = INTERIOR;
-      stateList.back().dependentstates[2].rightFace = INTERIOR;
-      stateList.back().dependentstates[3].leftFace = INTERIOR;
-      stateList.back().dependentstates[3].rightFace = INTERIOR;
-
-      stateList.push_back(VertexStateEdges(0,1));
-      stateList.back().dependentstates[0].leftFace = INTERIOR;
-      stateList.back().dependentstates[0].rightFace = INTERIOR;
-      stateList.back().dependentstates[1].leftFace = INTERIOR;
-      stateList.back().dependentstates[1].rightFace = INTERIOR;
+      stateList.back().dependentstates[1].leftFace = EXTERIOR;
+      stateList.back().dependentstates[1].rightFace = EXTERIOR;
       stateList.back().dependentstates[2].leftFace = INTERIOR;
       stateList.back().dependentstates[2].rightFace = EXTERIOR;
       stateList.back().dependentstates[3].leftFace = INTERIOR;
@@ -128,8 +118,8 @@ namespace CMS2D
       stateList.back().dependentstates[1].rightFace = EXTERIOR;
       stateList.back().dependentstates[2].leftFace = INTERIOR;
       stateList.back().dependentstates[2].rightFace = INTERIOR;
-      stateList.back().dependentstates[3].leftFace = INTERIOR;
-      stateList.back().dependentstates[3].rightFace = INTERIOR;
+      stateList.back().dependentstates[3].leftFace = EXTERIOR;
+      stateList.back().dependentstates[3].rightFace = EXTERIOR;
   }
 
   /* Takes in a list of verticies,
