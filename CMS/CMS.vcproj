@@ -302,6 +302,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMS2d.cpp"
+				DeploymentContent="true"
+				>
+			</File>
+			<File
+				RelativePath=".\CMS2d.h"
+				>
+			</File>
+			<File
 				RelativePath=".\CMSModel.cpp"
 				>
 			</File>

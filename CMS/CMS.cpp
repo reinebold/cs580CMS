@@ -4,6 +4,7 @@
 */
 
 #include "CMS.h"
+#include "CMS2d.h"
 #include "Lights.h"
 #include "State.h"
 #include "Program.h"
@@ -23,8 +24,7 @@ CMS::CMS()
 
 void CMS::continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &verticies)
 {
-
-
+  continuousModelSynthesis2D(edges, verticies);
 }
 
 void CMS::display()
@@ -99,6 +99,10 @@ void CMS::display()
         else
         {
             glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+        }
+        if(grid.edges[x]->edgestate.leftFace != grid.edges[x]->edgestate.rightFace)
+        {
+            glColor4f(0.9f, 0.9f, 0.9f, 1.0f);
         }
         glBegin(GL_LINES);
             glVertex3fv(grid.edges[x]->begin->val);

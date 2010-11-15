@@ -2,7 +2,37 @@
 
 void continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &verticies)
 {
+  for( std::vector<Vertex*>::iterator vertex_itr = verticies.begin();
+    vertex_itr != verticies.end(); vertex_itr++)
+  {
+    //NULL out unassigned edges
+    for(int itr = (*vertex_itr)->currentEdge; itr < 4; itr++)
+      (*vertex_itr)->edges[itr] = NULL;
+    //Prepare edge list for use in CMS2d
+    sortEdges(*vertex_itr);
+  }
 
+  vector<VertexState> validStates;
+  for(std::vector<Vertex*>::iterator vertex_itr = verticies.begin();
+    vertex_itr != verticies.end(); vertex_itr++)
+  {
+    Vertex *current = *vertex_itr;
+    validStates.push_back(VertexState());
+    if(current->edges[0] != NULL)
+      validStates.back().setintersection[0] = current->edges[0]->edgestate.set;
+    else if( current->edges[1] != NULL)
+      validStates.back().setintersection[0] = current->edges[1]->edgestate.set;
+
+    if(current->edges[2] != NULL)
+      validStates.back().setintersection[1] = current->edges[2]->edgestate.set;
+    else if( current->edges[3] != NULL)
+      validStates.back().setintersection[1] = current->edges[3]->edgestate.set;
+    
+    validStates.back().dependentedges[0] = current->edges[0];
+    validStates.back().dependentedges[1] = current->edges[1];
+    validStates.back().dependentedges[2] = current->edges[2];
+    validStates.back().dependentedges[3] = current->edges[3];
+  }
 }
 
 /* 
