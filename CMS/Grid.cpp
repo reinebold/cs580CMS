@@ -158,6 +158,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
     {
         for(int y = 0; y < numEdges[x]; y++)
         {
+            int start = 0;
             for(int i = x+1; i < model._numVerticies; i++)
             {
                 for(int j = 0; j < numEdges[i]; j++)
@@ -167,8 +168,18 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                     {
                         verticies.push_back(temp);
                         currentVert++;
+                        start++;
                     }
                 }
+            }
+            //Need to make sure we only include verticies that are on an edge with more than one intersection, or odd results will follow.
+            if(start < 2)
+            {
+                for(int z = 0; z < start; z++)
+                {
+                    verticies.erase(verticies.end()-1 - z);
+                }
+                currentVert -= start;
             }
         }
     }

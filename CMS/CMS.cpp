@@ -57,35 +57,6 @@ void CMS::display()
         glVertex3fv(input._verticies[0].val);
     glEnd();
     glTranslatef(10.0f,0.0f,0.0f);
-
-    //Draw grid
-    /*glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-    glBegin(GL_LINES);
-        for(int x = 0; x < grid.numEdges[2]; x++)
-        {
-            glVertex3fv(grid.parallelEdges[2][x].begin->val);
-            glVertex3fv(grid.parallelEdges[2][x].end->val);
-        }
-    glEnd();
-
-    glColor4f(0.25f, 0.25f, 1.0f, 1.0f);
-    glBegin(GL_LINES);
-        for(int x = 0; x < grid.numEdges[1]; x++)
-        {
-            glVertex3fv(grid.parallelEdges[1][x].begin->val);
-            glVertex3fv(grid.parallelEdges[1][x].end->val);
-        }
-    glEnd();
-
-    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-    glBegin(GL_LINES);
-    for(int x = 0; x < grid.numEdges[0]; x++)
-    {
-        glVertex3fv(grid.parallelEdges[0][x].begin->val);
-        glVertex3fv(grid.parallelEdges[0][x].end->val);
-    }
-    glEnd();*/
-
    
     for(int x = 0; x < (int)grid.edges.size(); x++)
     {
@@ -107,7 +78,6 @@ void CMS::display()
         glEnd();
         
     }
-    
 
     //Draw Verticies
     glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
@@ -157,5 +127,6 @@ void CMS::init()
     //Figure out edges and verticies.
     grid.init(input, boundingbox);
 
+    //Do the algorithm that changes the states.
     continuousModelSynthesis(grid.edges, grid.verticies);
 }
