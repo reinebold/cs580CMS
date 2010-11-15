@@ -1,25 +1,35 @@
 #ifndef _CMS2D_H
 #define _CMS2D_H
 
-#include <GL/glew.h>
 #include "CMSModel.h"
 #include "Geometry.h"
 #include "Grid.h"
 
 namespace CMS2D
 {
-  class VertexState
+  class VertexStateEdges
   {
   public:
+    VertexStateEdges(int seta, int setb);
+    VertexStateEdges(const VertexStateEdges &other);
     int setintersection[2];
-    Edge *dependentedges[4];
     EdgeState dependentstates[4];
   };
 
+  class VertexState
+  {
+  public:
+    VertexState(int *relCount, VertexStateEdges edges);
+    bool operator<(VertexState &rhs);
+    Edge *dependentedges[4];
+    int *relativesCounter;
+    VertexStateEdges edgeinfo;
+  };
+
   void continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &verticies);
-  void generateStates(vector<Vertex*> &verticies, vector<VertexState> &source,
-    vector<VertexState> &stateList);
-  void generateValid(vector<VertexState> &stateList);
+  void generateStates(vector<Vertex*> &verticies, vector<VertexStateEdges> &source,
+    vector<VertexState> &stateList, int *relativesCounter);
+  void generateValid(vector<VertexStateEdges> &stateList);
   void sortEdges(Vertex *v);
   void constrainEdge(Edge *edge, FaceState left, FaceState right,
     vector<VertexState> &vertexStates);
