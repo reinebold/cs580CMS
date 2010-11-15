@@ -19,7 +19,7 @@ namespace CMS2D
     std::vector<VertexStateEdges> sourceValidStates;
     std::vector<VertexState> validStates;
     relativeCounters = new int[verticies.size()];
-    for(int i = verticies.size(); i >= 0; i--)
+    for(int i = 0; i < verticies.size(); i++)
       relativeCounters[i] = 0;
     generateValid(sourceValidStates);
     generateStates( verticies, sourceValidStates, validStates, relativeCounters);
@@ -55,6 +55,7 @@ namespace CMS2D
         }
       }
     }
+    delete relativeCounters;
   }
 
   /* Populates stateList with a list of valid states
