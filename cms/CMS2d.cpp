@@ -55,6 +55,9 @@ namespace CMS2D
         }
       }
     }
+    for(int i = 0; i < verticies.size(); i++)
+      std::cout << relativeCounters[i];
+    std::cout << std::endl;
     delete relativeCounters;
   }
 
@@ -259,7 +262,7 @@ namespace CMS2D
       if (statevalid == false)
       {
         // Remove invalid vertex state from the vertexStates list
-        *((*itr).relativesCounter)--;
+        (*((*itr).relativesCounter))--;
         itr = vertexStates.erase(itr);
       }
       else
