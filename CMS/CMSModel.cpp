@@ -1,30 +1,43 @@
-
+/**
+    \file CMSModel.h
+    \brief
+*/
 
 #include "CMSModel.h"
 
-void CMSModel::init(int numVerticies, Vertex *verticies)
+CMSModel::CMSModel()
 {
-    _numVerticies = numVerticies;
+
+}
+
+CMSModel::~CMSModel()
+{
+    delete [] verticies;
+    delete [] edges;
+}
+
+void CMSModel::init(int _numVerticies, Vertex *_verticies)
+{
+    numVerticies = _numVerticies;
 
     //TODO: Lots of error checking.
 
-
     //Allocate memory
-    _verticies = new Vertex[_numVerticies];
-    _edges = new Edge[_numVerticies];
+    verticies = new Vertex[numVerticies];
+    edges = new Edge[numVerticies];
 
     //Assign the verticies
-    for(int x = 0; x < _numVerticies; ++x)
+    for(int x = 0; x < numVerticies; ++x)
     {
-        _verticies[x] = verticies[x];
+        verticies[x] = _verticies[x];
     }
 
     //Assign the edges (based on the verticies)
-    for(int x = 0; x < _numVerticies; ++x)
+    for(int x = 0; x < numVerticies; ++x)
     {
         int begin = x;
         int end;
-        if(x+1 == _numVerticies)
+        if(x+1 == numVerticies)
         {
             end = 0;
         }
@@ -33,14 +46,8 @@ void CMSModel::init(int numVerticies, Vertex *verticies)
             end = x+1;
         }
 
-        _edges[x].begin = &_verticies[begin];
-        _edges[x].end = &_verticies[end];
-
-        _edges[x].edgestate.slope.num = (_verticies[end].val[Y] - _verticies[begin].val[Y]);
-        _edges[x].edgestate.slope.den = (_verticies[end].val[X] - _verticies[begin].val[X]);
-        _edges[x].edgestate.slope.value = _edges[x].edgestate.slope.num/_edges[x].edgestate.slope.den;
-        //TODO: Figure out how to find out if the left side or right side is exterior or interior
-        _edges[x].edgestate.leftFace = INTERIOR;
-        _edges[x].edgestate.rightFace = EXTERIOR;
+        edges[x].begin = &verticies[begin];
+        edges[x].end = &verticies[end];
+        edges[x].updateEdgeState();
     }
 }

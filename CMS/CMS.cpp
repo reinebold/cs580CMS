@@ -18,10 +18,13 @@ using namespace Geometry;
 extern Lights lights;
 extern State state;
 extern Camera camera;
+
 CMS::CMS()
 {
 
 }
+
+
 
 void CMS::continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &verticies)
 {
@@ -45,16 +48,16 @@ void CMS::display()
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
     glBegin(GL_LINES);
         glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-        glVertex3fv(input._verticies[0].val);  
-        glVertex3fv(input._verticies[1].val);
+        glVertex3fv(input.verticies[0].val);  
+        glVertex3fv(input.verticies[1].val);
         
         glColor4f(0.25f, 0.25f, 1.0f, 1.0f);
-        glVertex3fv(input._verticies[1].val);
-        glVertex3fv(input._verticies[2].val);
+        glVertex3fv(input.verticies[1].val);
+        glVertex3fv(input.verticies[2].val);
         
         glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-        glVertex3fv(input._verticies[2].val);
-        glVertex3fv(input._verticies[0].val);
+        glVertex3fv(input.verticies[2].val);
+        glVertex3fv(input.verticies[0].val);
     glEnd();
     glTranslatef(10.0f,0.0f,0.0f);
    
@@ -102,6 +105,11 @@ void CMS::display()
     glBegin(GL_POINTS);
         for(int x=0; x < (int)grid.verticies.size(); x++)
         {
+            if((grid.verticies[x]->edges[0] == NULL && grid.verticies[x]->edges[1] == NULL) ||
+                (grid.verticies[x]->edges[2] == NULL && grid.verticies[x]->edges[3] == NULL))
+                glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+            else
+                glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
             glVertex3fv(grid.verticies[x]->val);
         }
     glEnd();
@@ -116,7 +124,8 @@ void CMS::init()
     state.setDrawAxis(false);
     state.setPrintInfoOnScreen(true);
     
-    srand((unsigned int)time(NULL));
+    //srand((unsigned int)time(NULL));
+    srand(23423567);
 
     //Bounding box info (will get from text file)
     Vertex bbverticies[4];

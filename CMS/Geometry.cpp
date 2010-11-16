@@ -1,7 +1,120 @@
 
-
+#include "Defines.h"
 #include "Geometry.h"
+#include <math.h>
 using namespace Geometry;
+
+EdgeState::EdgeState()
+    :leftFace(UNASSIGNED),
+     rightFace(UNASSIGNED),
+     set(-1)
+{
+}
+
+Fraction::Fraction()
+:num(0),
+ den(0),
+ value(0)
+{
+
+}
+
+Fraction::Fraction(float numval, float denval)
+    :num(numval),
+     den(denval)
+{
+    if(den != 0)
+    {
+        value = num/den;
+    }
+}
+
+bool Fraction::operator==(const Fraction &rhs) const
+{
+    return ((fabs(num-rhs.num) < EPSILON) && (fabs(den-rhs.den) < EPSILON));
+}
+
+void Fraction::operator=(const Fraction &rhs)
+{
+    num = rhs.num;
+    den = rhs.den;
+    value = rhs.value;
+}
+
+Vertex::Vertex()
+    :connectedEdges(0)
+{
+    val[X] = 0.0f;
+    val[Y] = 0.0f;
+    val[Z] = 0.0f;
+
+    edges[0] = NULL;
+    edges[1] = NULL;
+    edges[2] = NULL;
+    edges[3] = NULL;
+}
+
+Vertex::Vertex(float xval, float yval, float zval)
+    :connectedEdges(0)
+{
+    val[X] = xval;
+    val[Y] = yval;
+    val[Z] = zval;
+
+    edges[0] = NULL;
+    edges[1] = NULL;
+    edges[2] = NULL;
+    edges[3] = NULL;
+}
+
+void Vertex::operator=(const Vertex &vert)
+{
+    val[X] = vert.val[X];
+    val[Y] = vert.val[Y];
+    val[Z] = vert.val[Z];
+
+    connectedEdges = vert.connectedEdges;
+    edges[0] = vert.edges[0];
+    edges[1] = vert.edges[1];
+    edges[2] = vert.edges[2];
+    edges[3] = vert.edges[3];
+}
+
+Edge::Edge() 
+    :begin(NULL),
+     end(NULL)
+{
+
+}
+
+Edge::Edge(Vertex* beginval, Vertex* endval)
+    :begin(beginval),
+     end(endval)
+{
+    updateEdgeState();
+}
+
+void Edge::operator=(const Edge &edge)
+{
+    begin = edge.begin;
+    end = edge.end;
+
+    updateEdgeState();
+}
+
+void Edge::updateEdgeState()
+{
+    edgestate.slope.num = (end->val[Y] - begin->val[Y]);
+    edgestate.slope.den = (end->val[X] - begin->val[X]);
+    edgestate.slope.value = edgestate.slope.num/edgestate.slope.den;
+    edgestate.leftFace  = UNASSIGNED;
+    edgestate.rightFace = UNASSIGNED;
+}
+
+Cuboid::Cuboid()
+{
+
+}
 
 void Cuboid::init(Vertex *_verticies)
 {
@@ -36,6 +149,7 @@ void Cuboid::init(Vertex *_verticies)
     }
 }
 
+/// Modified from http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/ (Author: Damian Coventry)
 IntersectResult Edge::intersect(const Edge& otheredge, Vertex* &intersection)
 {
     float denom  = ((otheredge.end->val[Y] - otheredge.begin->val[Y])*(end->val[X] - begin->val[X])) -

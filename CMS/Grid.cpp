@@ -20,12 +20,12 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
 
     float currenty = 0.0;
     SlopeType slopetype = UNASSIGNED;
-    parallelEdges = new Edge*[model._numVerticies];
+    parallelEdges = new Edge*[model.numVerticies];
     float yincrement = 0.0;
     
-    for(int edgeNum = 0; edgeNum < model._numVerticies; ++edgeNum)
+    for(int edgeNum = 0; edgeNum < model.numVerticies; ++edgeNum)
     {
-        Fraction slope = model._edges[edgeNum].edgestate.slope;
+        Fraction slope = model.edges[edgeNum].edgestate.slope;
         if(fabs(slope.den - 0.0) < EPSILON)
         {
             slopetype = VERTICAL;
@@ -154,12 +154,12 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
     int currentVert = 0;
 
     //Find vertex intersections
-    for(int x = 0; x < model._numVerticies; x++)
+    for(int x = 0; x < model.numVerticies; x++)
     {
         for(int y = 0; y < numEdges[x]; y++)
         {
             int start = 0;
-            for(int i = x+1; i < model._numVerticies; i++)
+            for(int i = x+1; i < model.numVerticies; i++)
             {
                 for(int j = 0; j < numEdges[i]; j++)
                 {
@@ -185,7 +185,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
     //BRUTE FORCE
     //Separate the edges, assign verticies to edges, and edges to verticies.
     int currentEdge = 0;
-    for(int x = 0; x < model._numVerticies; x++)
+    for(int x = 0; x < model.numVerticies; x++)
     {
         for(int y = 0; y < numEdges[x]; y++)
         {
@@ -225,10 +225,10 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                     edge->edgestate.set = x;
                     edges.push_back(edge);
 
-                    verticiesOnEdge[j]->edges[verticiesOnEdge[j]->currentEdge] = edge;
-                    verticiesOnEdge[j+1]->edges[verticiesOnEdge[j+1]->currentEdge] = edge;
-                    verticiesOnEdge[j]->currentEdge++;
-                    verticiesOnEdge[j+1]->currentEdge++;
+                    verticiesOnEdge[j]->edges[verticiesOnEdge[j]->connectedEdges] = edge;
+                    verticiesOnEdge[j+1]->edges[verticiesOnEdge[j+1]->connectedEdges] = edge;
+                    verticiesOnEdge[j]->connectedEdges++;
+                    verticiesOnEdge[j+1]->connectedEdges++;
                 } 
             }
         }
@@ -237,7 +237,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
     //Find if a vertex only has one edge.
     for(int x = 0; x < (int)verticies.size(); x++)
     {
-        if(verticies[x]->currentEdge == 1)
+        if(verticies[x]->connectedEdges == 1)
         {
             for(int y = 0; y < (int)edges.size(); y++)
             {
@@ -251,7 +251,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                     if((verticies[x] != NULL) && (edges[y]->begin == verticies[x]))
                     {
 
-                        edges[y]->end->currentEdge--;
+                        edges[y]->end->connectedEdges--;
                         for(z = 0;  z < 4; z++)
                         {
                             if(edges[y] == edges[y]->end->edges[z])
@@ -263,7 +263,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                     }
                     else
                     {
-                        edges[y]->begin->currentEdge--;
+                        edges[y]->begin->connectedEdges--;
                         for(z = 0;  z < 4; z++)
                         {
                             if(edges[y] == edges[y]->begin->edges[z])
@@ -302,7 +302,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                 count++;
             }
         }
-        if(count != verticies[x]->currentEdge)
+        if(count != verticies[x]->connectedEdges)
         {
             cout << "SANITY ERROR: currentEdge count is incorrect for some verticies (or some edges don't point to NULL like they should" << endl;
             exit(EXIT_FAILURE);

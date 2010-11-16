@@ -23,13 +23,13 @@ public:
     void init(const CMSModel &model,const Cuboid &boundingbox);
     void sortVerticies(vector<Vertex*> &verticies, int left, int right);
 
-    Cuboid  boundingbox;
-    Edge  **parallelEdges;
+    Cuboid          boundingbox;
+    Edge          **parallelEdges;
     vector<Vertex*> verticies;
     vector<Edge*>   edges;
-    int     numEdges[1000];
-    int     totalVerts;
-    float   spacing;
+    int             numEdges[1000];
+    int             totalVerts;
+    float           spacing;
 };
 
 

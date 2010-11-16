@@ -1,4 +1,7 @@
-
+/**
+    \class CMSModel
+    \brief Contains information for the model that was given via the text file.
+*/
 
 #ifndef _CMSMODEL_H
 #define _CMSMODEL_H
@@ -9,19 +12,15 @@ using namespace Geometry;
 class CMSModel
 {
 public:
-    CMSModel() {}
+    CMSModel();     
+    ~CMSModel();    ///< Deallocates verticies and edges
 
-    void init(int numVerticies, Vertex *verticies);
+    ///Fills in the data members.
+    void init(int _numVerticies, Vertex *_verticies);
    
-    ~CMSModel()
-    {
-        delete [] _verticies;
-        delete [] _edges;
-    }
-
-    int         _numVerticies;
-    Vertex     *_verticies;
-    Edge       *_edges;
+    int         numVerticies;      ///< The number of verticies of the model
+    Vertex    *verticies;         ///< The verticies of the model
+    Edge      *edges;             ///< The edges of the model
 };
 
 
