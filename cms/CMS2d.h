@@ -12,6 +12,8 @@ namespace CMS2D
   public:
     VertexStateEdges(int seta, int setb);
     VertexStateEdges(const VertexStateEdges &other);
+    bool operator<(VertexStateEdges &rhs);
+    bool operator==(VertexStateEdges &rhs);
     int setintersection[2];
     EdgeState dependentstates[4];
   };
@@ -26,10 +28,12 @@ namespace CMS2D
     VertexStateEdges edgeinfo;
   };
 
-  void continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &verticies);
+  void continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &verticies,
+    CMSModel &input, Grid &grid);
+  void generateValid(vector<VertexStateEdges> &stateList,  CMSModel &input, Grid &grid);
+  bool concaveTest(Edge *a, Edge *b);
   void generateStates(vector<Vertex*> &verticies, vector<VertexStateEdges> &source,
     vector<VertexState> &stateList, int *relativesCounter);
-  void generateValid(vector<VertexStateEdges> &stateList);
   void sortEdges(Vertex *v);
   void constrainEdge(Edge *edge, FaceState left, FaceState right,
     vector<VertexState> &vertexStates);

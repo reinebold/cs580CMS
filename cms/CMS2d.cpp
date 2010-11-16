@@ -4,12 +4,14 @@
 #include <algorithm>
 #include <vector>
 #include <time.h>
+#include <limits>
 
 namespace CMS2D
 {
   /* Continuous model synthesis main function
   */
-  void continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &verticies)
+  void continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &verticies,
+    CMSModel &input,  Grid &grid)
   {
     for( std::vector<Vertex*>::iterator vertex_itr = verticies.begin();
       vertex_itr != verticies.end(); vertex_itr++)
@@ -19,17 +21,15 @@ namespace CMS2D
     std::vector<VertexStateEdges> sourceValidStates;
     std::vector<VertexState> validStates;
     relativeCounters = new int[verticies.size()];
-    for(int i = 0; i < verticies.size(); i++)
+    for(unsigned int i = 0; i < verticies.size(); i++)
       relativeCounters[i] = 0;
-    generateValid(sourceValidStates);
+    generateValid(sourceValidStates, input, grid);
     generateStates( verticies, sourceValidStates, validStates, relativeCounters);
-    srand((unsigned int)time(NULL));
+    unsigned int seed = time(NULL);
+    std::cout << seed << std::endl;
+    srand(seed);
     while(validStates.size() > 0)
     {
-      //for(vector<VertexState>::iterator sitr = validStates.begin();
-      //  sitr != validStates.end(); sitr ++)
-      //  std::cout << *((*sitr).relativesCounter);
-      //std::cout << std::endl;
       sort(validStates.begin(), validStates.end());
       std::vector<VertexState>::iterator itr = validStates.begin();
       if(*((*itr).relativesCounter) > 1)
@@ -55,7 +55,7 @@ namespace CMS2D
         }
       }
     }
-    for(int i = 0; i < verticies.size(); i++)
+    for(unsigned int i = 0; i < verticies.size(); i++)
       std::cout << relativeCounters[i];
     std::cout << std::endl;
     delete relativeCounters;
@@ -65,18 +65,19 @@ namespace CMS2D
   * currently creates a pre-defined list
   * but latter will take in a model that describes possible states
   */
-  void generateValid(vector<VertexStateEdges> &stateList)
+  void generateValid(vector<VertexStateEdges> &stateList,  CMSModel &input,
+    Grid &grid)
+    //inputmodel is a counterclockwise list of verticies
   {
     stateList.clear();
     int numsets = 3;
     //For every lower, uppser set pair
+    //genarate inside outside states that are always valid
     for(int x = 0; x < numsets; x++)
-      for(int y = x; y < numsets; y++)
+      for(int y = x+1; y < numsets; y++)
       {
         //Set All Interior state
         stateList.push_back(VertexStateEdges(x, y));
-        stateList.back().setintersection[0] = x;
-        stateList.back().setintersection[1] = y;
         stateList.back().dependentstates[0].leftFace = INTERIOR;
         stateList.back().dependentstates[0].rightFace = INTERIOR;
         stateList.back().dependentstates[1].leftFace = INTERIOR;
@@ -87,8 +88,6 @@ namespace CMS2D
         stateList.back().dependentstates[3].rightFace = INTERIOR;
         //Set All Exterior state
         stateList.push_back(VertexStateEdges(x,y));
-        stateList.back().setintersection[0] = x;
-        stateList.back().setintersection[1] = y;
         stateList.back().dependentstates[0].leftFace = EXTERIOR;
         stateList.back().dependentstates[0].rightFace = EXTERIOR;
         stateList.back().dependentstates[1].leftFace = EXTERIOR;
@@ -100,26 +99,120 @@ namespace CMS2D
 
       }
 
-      stateList.push_back(VertexStateEdges(0,1));
-      stateList.back().dependentstates[0].leftFace = INTERIOR;
-      stateList.back().dependentstates[0].rightFace = INTERIOR;
-      stateList.back().dependentstates[1].leftFace = EXTERIOR;
-      stateList.back().dependentstates[1].rightFace = EXTERIOR;
-      stateList.back().dependentstates[2].leftFace = INTERIOR;
-      stateList.back().dependentstates[2].rightFace = EXTERIOR;
-      stateList.back().dependentstates[3].leftFace = INTERIOR;
-      stateList.back().dependentstates[3].rightFace = EXTERIOR;
+      for(int itr = 0; itr < input.numVerticies; itr++)
+      {
+        Vertex *curr = &(input.verticies[itr]);
+        float inboundslope = curr->edges[0]->edgestate.slope.value;
+        float outboundslope = curr->edges[1]->edgestate.slope.value;
+        float inbounddiff = numeric_limits<float>::infinity();
+        float outbounddiff = numeric_limits<float>::infinity();
+        int inboundbestset = -1;
+        int outboundbestset = -1;
+        //Find best matching set for each inbound and outbound edges
+        for(int itrg = 0; itrg < input.numVerticies; itrg++)
+        {
+          if(abs(inboundslope-grid.parallelEdges[itrg]->edgestate.slope.value) < inbounddiff)
+          {
+            inbounddiff = abs(inboundslope-grid.parallelEdges[itrg]->edgestate.slope.value);
+            inboundbestset = itrg;
+          }
+          if(abs(outboundslope-grid.parallelEdges[itrg]->edgestate.slope.value) < outbounddiff)
+          {
+            outbounddiff = abs(inboundslope-grid.parallelEdges[itrg]->edgestate.slope.value);
+            outboundbestset = itrg;
+          }
+        }
+        int sets[2];
+        if(inboundbestset == outboundbestset)
+          // Vertex is actually just a split edge
+          continue;
+        int inboundindex = 0;
+        int outboundindex = 2;
+        if(inboundbestset < outboundbestset)
+        {
+          sets[0] = inboundbestset;
+          sets[1] = outboundbestset;
+          inboundindex = 0;
+          outboundindex = 2;
+        }
+        else
+        {
+          sets[1] = inboundbestset;
+          sets[0] = outboundbestset;
+          inboundindex = 2;
+          outboundindex = 0;
+        }
+        bool inswap;
+        bool outswap;
+        //Case where vertex is an edge vertex aligned with inbound
+        inswap = (curr->edges[0]->edgestate.slope.den *
+          grid.parallelEdges[inboundbestset]->edgestate.slope.den) < 0;
+        outswap = curr->edges[1]->edgestate.slope.den *
+          grid.parallelEdges[outboundbestset]->edgestate.slope.den < 0;
+        if(!concaveTest(curr->edges[0], curr->edges[1]))
+          outswap = !outswap;
+        stateList.push_back(VertexStateEdges(sets[0],sets[1]));
+        stateList.back().dependentstates[inboundindex].leftFace =
+          (inswap ? EXTERIOR:INTERIOR);
+        stateList.back().dependentstates[inboundindex].rightFace =
+          (inswap ? INTERIOR:EXTERIOR);
+        stateList.back().dependentstates[inboundindex+1].leftFace =
+          (inswap ? EXTERIOR:INTERIOR);
+        stateList.back().dependentstates[inboundindex+1].rightFace =
+          (inswap ? INTERIOR:EXTERIOR);
+        stateList.back().dependentstates[outboundindex].leftFace =
+          (outswap ? INTERIOR:EXTERIOR);
+        stateList.back().dependentstates[outboundindex].rightFace =
+          (outswap ? INTERIOR:EXTERIOR);
+        stateList.back().dependentstates[outboundindex+1].leftFace =
+          (outswap ? EXTERIOR:INTERIOR);
+        stateList.back().dependentstates[outboundindex+1].rightFace =
+          (outswap ? EXTERIOR:INTERIOR);
 
+        //Case where vertex is an edge vertex aligned with outbound
+        inswap = (curr->edges[0]->edgestate.slope.den *
+          grid.parallelEdges[inboundbestset]->edgestate.slope.den) < 0;
+        if(!concaveTest(curr->edges[0], curr->edges[1]))
+        inswap = curr->edges[1]->edgestate.slope.den *
+          grid.parallelEdges[outboundbestset]->edgestate.slope.den < 0;
+          outswap = !outswap;
+        stateList.push_back(VertexStateEdges(sets[0],sets[1]));
+        stateList.back().dependentstates[outboundindex].leftFace =
+          (outswap ? EXTERIOR:INTERIOR);
+        stateList.back().dependentstates[outboundindex].rightFace =
+          (outswap ? INTERIOR:EXTERIOR);
+        stateList.back().dependentstates[outboundindex+1].leftFace =
+          (outswap ? EXTERIOR:INTERIOR);
+        stateList.back().dependentstates[outboundindex+1].rightFace =
+          (outswap ? INTERIOR:EXTERIOR);
+        stateList.back().dependentstates[inboundindex].leftFace =
+          (inswap ? INTERIOR:EXTERIOR);
+        stateList.back().dependentstates[inboundindex].rightFace =
+          (inswap ? INTERIOR:EXTERIOR);
+        stateList.back().dependentstates[inboundindex+1].leftFace =
+          (inswap ? EXTERIOR:INTERIOR);
+        stateList.back().dependentstates[inboundindex+1].rightFace =
+          (inswap ? EXTERIOR:INTERIOR);
+      }
 
-      stateList.push_back(VertexStateEdges(1,2));
-      stateList.back().dependentstates[0].leftFace = INTERIOR;
-      stateList.back().dependentstates[0].rightFace = EXTERIOR;
-      stateList.back().dependentstates[1].leftFace = INTERIOR;
-      stateList.back().dependentstates[1].rightFace = EXTERIOR;
-      stateList.back().dependentstates[2].leftFace = INTERIOR;
-      stateList.back().dependentstates[2].rightFace = INTERIOR;
-      stateList.back().dependentstates[3].leftFace = EXTERIOR;
-      stateList.back().dependentstates[3].rightFace = EXTERIOR;
+      //Remove duplications
+      sort(stateList.begin(), stateList.end());
+      for(vector<VertexStateEdges>::iterator itr = stateList.begin();
+        itr != stateList.end(); itr++)
+      {
+        vector<VertexStateEdges>::iterator next = itr+1;
+        while(next != stateList.end() && (*itr) == (*next))
+          next = stateList.erase(next);
+      }
+  }
+
+  bool concaveTest(Edge *a, Edge *b)
+  {
+    float ax = a->edgestate.slope.den;
+    float ay = a->edgestate.slope.num;
+    float bx = b->edgestate.slope.den;
+    float by = b->edgestate.slope.num;
+    return( (ax*by - ay*bx) > 0.0f);
   }
 
   /* Takes in a list of verticies,
@@ -283,6 +376,125 @@ namespace CMS2D
     dependentstates[1] = other.dependentstates[1];
     dependentstates[2] = other.dependentstates[2];
     dependentstates[3] = other.dependentstates[3];
+  }
+
+  bool VertexStateEdges::operator<(VertexStateEdges &rhs)
+  {
+    // first check lower set
+    if(setintersection[0] != rhs.setintersection[0])
+    {
+      if(setintersection[0] < rhs.setintersection[0])
+        return true;
+      else
+        return false;
+    }
+    //then check upper set
+    if(setintersection[1] != rhs.setintersection[1])
+    {
+      if(setintersection[1] < rhs.setintersection[1])
+        return true;
+      else
+        return false;
+    }
+    
+    //then check first edge
+    if(dependentstates[0].leftFace != rhs.dependentstates[0].leftFace)
+    {
+      if(dependentstates[0].leftFace == EXTERIOR)
+        return true;
+      else
+        return false;
+    }
+    
+    if(dependentstates[0].rightFace != rhs.dependentstates[0].rightFace)
+    {
+      if(dependentstates[0].rightFace == EXTERIOR)
+        return true;
+      else
+        return false;
+    }
+    //then check second edge
+    if(dependentstates[1].leftFace != rhs.dependentstates[1].leftFace)
+    {
+      if(dependentstates[1].leftFace == EXTERIOR)
+        return true;
+      else
+        return false;
+    }
+    
+    if(dependentstates[1].rightFace != rhs.dependentstates[1].rightFace)
+    {
+      if(dependentstates[1].rightFace == EXTERIOR)
+        return true;
+      else
+        return false;
+    }
+    //then check third edge
+    if(dependentstates[2].leftFace != rhs.dependentstates[2].leftFace)
+    {
+      if(dependentstates[2].leftFace == EXTERIOR)
+        return true;
+      else
+        return false;
+    }
+    
+    if(dependentstates[2].rightFace != rhs.dependentstates[2].rightFace)
+    {
+      if(dependentstates[2].rightFace == EXTERIOR)
+        return true;
+      else
+        return false;
+    }
+    //then check second edge
+    if(dependentstates[3].leftFace != rhs.dependentstates[3].leftFace)
+    {
+      if(dependentstates[3].leftFace == EXTERIOR)
+        return true;
+      else
+        return false;
+    }
+    
+    if(dependentstates[3].rightFace != rhs.dependentstates[3].rightFace)
+    {
+      if(dependentstates[3].rightFace == EXTERIOR)
+        return true;
+      else
+        return false;
+    }
+    //equals, with strict less than we return false
+    return false;
+  }
+
+  bool VertexStateEdges::operator==(VertexStateEdges &rhs)
+  {
+    // first check lower set
+    if(setintersection[0] != rhs.setintersection[0])
+      return false;
+    //then check upper set
+    if(setintersection[1] != rhs.setintersection[1])
+      return false;
+    //then check first edge
+    if(dependentstates[0].leftFace != rhs.dependentstates[0].leftFace)
+      return false;
+    if(dependentstates[0].rightFace != rhs.dependentstates[0].rightFace)
+      return false;
+    //then check second edge
+    if(dependentstates[1].leftFace != rhs.dependentstates[1].leftFace)
+      return false;
+    if(dependentstates[1].rightFace != rhs.dependentstates[1].rightFace)
+      return false;
+    //then check third edge
+    if(dependentstates[2].leftFace != rhs.dependentstates[2].leftFace)
+      return false;
+    if(dependentstates[2].rightFace != rhs.dependentstates[2].rightFace)
+      return false;
+    //then check second edge
+    if(dependentstates[3].leftFace != rhs.dependentstates[3].leftFace)
+      return false;
+    if(dependentstates[3].rightFace != rhs.dependentstates[3].rightFace)
+      return false;
+    //equals, with strict less than we return false
+    return true;
   }
 
   VertexState::VertexState(int *relCount, VertexStateEdges edges):

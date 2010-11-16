@@ -47,7 +47,11 @@ void CMSModel::init(int _numVerticies, Vertex *_verticies)
         }
 
         edges[x].begin = &verticies[begin];
+        verticies[begin].edges[1] = &edges[x];
+
         edges[x].end = &verticies[end];
+        verticies[end].edges[0] = &edges[x];
+
         edges[x].updateEdgeState();
     }
 }

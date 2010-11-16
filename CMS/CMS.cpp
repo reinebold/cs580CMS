@@ -28,7 +28,7 @@ CMS::CMS()
 
 void CMS::continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &verticies)
 {
-  CMS2D::continuousModelSynthesis2D(edges, verticies);
+    CMS2D::continuousModelSynthesis2D(edges, verticies, input, grid);
 }
 
 void CMS::display()
@@ -90,6 +90,11 @@ void CMS::display()
           else
             glColor4f(0.2f, 0.2f, 0.2f, 1.0f);
         }
+
+        //Sanity Check
+        if(grid.edges[x]->edgestate.leftFace == UNASSIGNED ||
+          grid.edges[x]->edgestate.rightFace == UNASSIGNED)
+          glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
 
         glBegin(GL_LINES);
             glVertex3fv(grid.edges[x]->begin->val);
