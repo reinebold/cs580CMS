@@ -105,11 +105,6 @@ void CMS::display()
     glBegin(GL_POINTS);
         for(int x=0; x < (int)grid.verticies.size(); x++)
         {
-            if((grid.verticies[x]->edges[0] == NULL && grid.verticies[x]->edges[1] == NULL) ||
-                (grid.verticies[x]->edges[2] == NULL && grid.verticies[x]->edges[3] == NULL))
-                glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-            else
-                glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
             glVertex3fv(grid.verticies[x]->val);
         }
     glEnd();
@@ -125,7 +120,7 @@ void CMS::init()
     state.setPrintInfoOnScreen(true);
     
     //srand((unsigned int)time(NULL));
-    srand(23423567);
+    srand(1289895057);
 
     //Bounding box info (will get from text file)
     Vertex bbverticies[4];

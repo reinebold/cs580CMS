@@ -15,7 +15,7 @@ namespace CMS2D
       vertex_itr != verticies.end(); vertex_itr++)
       sortEdges(*vertex_itr);
 
-   /* int *relativeCounters;
+    int *relativeCounters;
     std::vector<VertexStateEdges> sourceValidStates;
     std::vector<VertexState> validStates;
     relativeCounters = new int[verticies.size()];
@@ -58,7 +58,7 @@ namespace CMS2D
     for(int i = 0; i < verticies.size(); i++)
       std::cout << relativeCounters[i];
     std::cout << std::endl;
-    delete relativeCounters;*/
+    delete relativeCounters;
   }
 
   /* Populates stateList with a list of valid states

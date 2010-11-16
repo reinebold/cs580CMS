@@ -172,12 +172,6 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                     }
                 }
             }
-            //Need to make sure we only include verticies that are on an edge with more than one intersection, or odd results will follow.
-            if(start == 1)
-            {
-                verticies.erase(verticies.end()-1);
-                currentVert--;
-            }
         }
     }
     totalVerts = currentVert;
