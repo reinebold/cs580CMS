@@ -10,7 +10,7 @@ namespace CMS2D
 {
   /* Continuous model synthesis main function
   */
-  void continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &verticies,
+  bool continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &verticies,
     CMSModel &input,  Grid &grid)
   {
     for( std::vector<Vertex*>::iterator vertex_itr = verticies.begin();
@@ -58,10 +58,18 @@ namespace CMS2D
         }
       }
     }
+    bool result = true;
     for(unsigned int i = 0; i < verticies.size(); i++)
+    {
       std::cout << relativeCounters[i];
+      if( relativeCounters[i] == 0)
+      {
+        result = false;
+      }
+    }
     std::cout << std::endl;
     delete relativeCounters;
+    return result;
   }
 
   /* Populates stateList with a list of valid states

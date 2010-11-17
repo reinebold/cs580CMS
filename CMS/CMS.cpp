@@ -28,7 +28,8 @@ CMS::CMS()
 
 void CMS::continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &verticies)
 {
-    CMS2D::continuousModelSynthesis2D(edges, verticies, input, grid);
+    while(!CMS2D::continuousModelSynthesis2D(edges, verticies, input, grid))
+      std::cout << "Algorithm did not converge. Restarting" << std::endl << std::endl;
 }
 
 void CMS::display3D()
