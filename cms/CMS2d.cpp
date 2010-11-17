@@ -26,7 +26,7 @@ namespace CMS2D
     generateValid(sourceValidStates, input, grid);
     generateStates( verticies, sourceValidStates, validStates, relativeCounters);
     unsigned int seed = time(NULL);
-    std::cout << seed << std::endl;
+    //std::cout << seed << std::endl;
     srand(seed);
     while(validStates.size() > 0)
     {
@@ -144,6 +144,9 @@ namespace CMS2D
         }
         bool inswap = false;
         bool outswap = false;
+        bool concave = false;
+        //concave = concaveTest(curr->edges[0], curr->edges[1]);
+
         //Case where vertex is an edge vertex aligned with inbound
         //inswap = (curr->edges[0]->edgestate.slope.den *
         //  grid.parallelEdges[inboundbestset]->edgestate.slope.den) < 0;
@@ -153,7 +156,7 @@ namespace CMS2D
         //  grid.parallelEdges[outboundbestset]->edgestate.slope.den) < 0;
         //Assume grid lines are always pointed in positive X;
         outswap = (curr->edges[1]->edgestate.slope.den < 0);
-        if(!concaveTest(curr->edges[0], curr->edges[1]))
+        if(concave)
           outswap = !outswap;
         stateList.push_back(VertexStateEdges(sets[0],sets[1]));
         stateList.back().dependentstates[inboundindex].leftFace =
@@ -178,8 +181,7 @@ namespace CMS2D
         //  grid.parallelEdges[inboundbestset]->edgestate.slope.den) < 0;
         //Assume grid lines are always pointed in positive X;
         inswap = (curr->edges[0]->edgestate.slope.den < 0);
-        if(!concaveTest(curr->edges[0], curr->edges[1]))
-          inswap = !inswap;
+        if(concave) inswap = !inswap;
         //outswap = (curr->edges[1]->edgestate.slope.den *
         //  grid.parallelEdges[outboundbestset]->edgestate.slope.den) < 0;
         //Assume grid lines are always pointed in positive X;
@@ -201,6 +203,40 @@ namespace CMS2D
           (inswap ? INTERIOR:EXTERIOR);
         stateList.back().dependentstates[inboundindex+1].rightFace =
           (inswap ? INTERIOR:EXTERIOR);
+
+        //Now do corner as in model case.
+        stateList.push_back(VertexStateEdges(sets[0], sets[1]));
+        stateList.back().dependentstates[0].leftFace = concave ? INTERIOR : EXTERIOR;
+        stateList.back().dependentstates[0].rightFace = concave ? INTERIOR : EXTERIOR;
+        stateList.back().dependentstates[1].leftFace = concave ? INTERIOR : EXTERIOR;
+        stateList.back().dependentstates[1].rightFace = concave ? INTERIOR : EXTERIOR;
+        stateList.back().dependentstates[2].leftFace = concave ? INTERIOR : EXTERIOR;
+        stateList.back().dependentstates[2].rightFace = concave ? INTERIOR : EXTERIOR;
+        stateList.back().dependentstates[3].leftFace = concave ? INTERIOR : EXTERIOR;
+        stateList.back().dependentstates[3].rightFace = concave ? INTERIOR : EXTERIOR;
+        //assume grid's X direction is always positive
+        inswap = (curr->edges[0]->edgestate.slope.den < 0);
+        outswap = (curr->edges[1]->edgestate.slope.den < 0);
+        if(inswap)
+        {
+          stateList.back().dependentstates[inboundindex+1].leftFace = EXTERIOR;
+          stateList.back().dependentstates[inboundindex+1].rightFace = INTERIOR;
+        }
+        else
+        {
+          stateList.back().dependentstates[inboundindex].leftFace = INTERIOR;
+          stateList.back().dependentstates[inboundindex].rightFace = EXTERIOR;
+        }
+        if(outswap)
+        {
+          stateList.back().dependentstates[outboundindex].leftFace = EXTERIOR;
+          stateList.back().dependentstates[outboundindex].rightFace = INTERIOR;
+        }
+        else
+        {
+          stateList.back().dependentstates[outboundindex+1].leftFace = INTERIOR;
+          stateList.back().dependentstates[outboundindex+1].rightFace = EXTERIOR;
+        }
       }
 
       //Remove duplications
@@ -220,7 +256,7 @@ namespace CMS2D
     float ay = a->edgestate.slope.num;
     float bx = b->edgestate.slope.den;
     float by = b->edgestate.slope.num;
-    return( (ax*by - ay*bx) > 0.0f);
+    return( (ax*by - ay*bx) < 0.0f);
   }
 
   /* Takes in a list of verticies,

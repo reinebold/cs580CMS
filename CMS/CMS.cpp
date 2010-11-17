@@ -91,7 +91,7 @@ void CMS::display()
             glColor4f(0.2f, 0.2f, 0.2f, 1.0f);
         }
 
-        //Sanity Check
+        //Error Check
         if(grid.edges[x]->edgestate.leftFace == UNASSIGNED ||
           grid.edges[x]->edgestate.rightFace == UNASSIGNED)
           glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
@@ -100,14 +100,6 @@ void CMS::display()
             glVertex3fv(grid.edges[x]->begin->val);
             glVertex3fv(grid.edges[x]->end->val);
         glEnd();
-
-        //glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
-        //glPointSize(4.0f);  
-        //glBegin(GL_POINTS);
-        //  glVertex3f(grid.edges[x]->begin->val[0] *.25 + grid.edges[x]->end->val[0] *.75,
-        //    grid.edges[x]->begin->val[1] *.25 + grid.edges[x]->end->val[1] *.75,
-        //    grid.edges[x]->begin->val[2] *.25 + grid.edges[x]->end->val[2] *.75);
-        //glEnd();
     }
 
     //Draw Verticies
