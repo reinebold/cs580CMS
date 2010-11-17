@@ -25,9 +25,7 @@ namespace CMS2D
       relativeCounters[i] = 0;
     generateValid(sourceValidStates, input, grid);
     generateStates( verticies, sourceValidStates, validStates, relativeCounters);
-    unsigned int seed = time(NULL);
-    //std::cout << seed << std::endl;
-    srand(seed);
+    srand(time(NULL));
     while(validStates.size() > 0)
     {
       sort(validStates.begin(), validStates.end());
@@ -35,7 +33,11 @@ namespace CMS2D
       if(*((*itr).relativesCounter) > 1)
       {
         int size = validStates.size();
-        int randomstate = rand()%(validStates.size());
+        //int randomstate = rand()%(validStates.size());
+        //Sanity check, validStates should be smaller than relativesCounter
+        //if( *((*itr).relativesCounter) > validStates.size())
+        //  exit(9002);
+        int randomstate = rand() % min(*((*itr).relativesCounter), validStates.size());
         itr += randomstate;
       }
       else
@@ -43,6 +45,7 @@ namespace CMS2D
         int i = 0;
         i++;
       }
+      *((*itr).relativesCounter)--;
       VertexState state = (*itr);
       validStates.erase(itr);
       for(int i = 0; i < 4; i++)
@@ -246,7 +249,10 @@ namespace CMS2D
       {
         vector<VertexStateEdges>::iterator next = itr+1;
         while(next != stateList.end() && (*itr) == (*next))
+        {
           next = stateList.erase(next);
+          std::cout << "DUPE Removed" << std::endl;
+        }
       }
   }
 
@@ -289,7 +295,7 @@ namespace CMS2D
         if((*source_itr).setintersection[0] == sets[0] &&
           (*source_itr).setintersection[1] == sets[1] )
         {
-          validStates.push_back(VertexState(&(relativesCounter[i]), (*source_itr)));
+          validStates.push_back(VertexState(&(relativesCounter[i]), (*source_itr), current));
           relativesCounter[i]++;
           validStates.back().dependentedges[0] = current->edges[0];
           validStates.back().dependentedges[1] = current->edges[1];
@@ -525,16 +531,27 @@ namespace CMS2D
       (dependentstates[3].rightFace != rhs.dependentstates[3].rightFace));
   }
 
-  VertexState::VertexState(int *relCount, VertexStateEdges edges):
+  VertexState::VertexState(int *relCount, VertexStateEdges edges, Vertex *_parent):
   edgeinfo(edges)
   {
+    parent = _parent;
     relativesCounter = relCount;
+  }
+
+  VertexState::VertexState(const VertexState &other):
+  edgeinfo(other.edgeinfo)
+  {
+    dependentedges[0] = other.dependentedges[0];
+    dependentedges[1] = other.dependentedges[1];
+    dependentedges[2] = other.dependentedges[2];
+    dependentedges[3] = other.dependentedges[3];
+    relativesCounter = other.relativesCounter;
   }
 
   bool VertexState::operator<(VertexState &rhs)
   {
-    return *(relativesCounter) < *(rhs.relativesCounter);
+    if( *(relativesCounter) != *(rhs.relativesCounter) )
+      return *(relativesCounter) < *(rhs.relativesCounter);
+    return parent < rhs.parent;
   }
-
-
 }

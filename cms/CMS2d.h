@@ -21,11 +21,13 @@ namespace CMS2D
   class VertexState
   {
   public:
-    VertexState(int *relCount, VertexStateEdges edges);
+    VertexState(int *relCount, VertexStateEdges edges, Vertex *parent);
+    VertexState(const VertexState &other);
     bool operator<(VertexState &rhs);
     Edge *dependentedges[4];
     int *relativesCounter;
     VertexStateEdges edgeinfo;
+    Vertex *parent;
   };
 
   void continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &verticies,
