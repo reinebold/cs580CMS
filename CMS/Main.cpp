@@ -60,9 +60,7 @@ void display()
          cms.display3D();
     }
 
-    camera.printInfo();
     glutSwapBuffers();
-
     Utils::printError();
 }
 
@@ -83,8 +81,7 @@ void reshape(GLsizei width, GLsizei height)
 
 void main(int argc, char **argv)
 {
-
-	City c;
+	/*City c;
 	c.setPopulation(4);
 	c.setDevelopment(1);
 
@@ -103,7 +100,7 @@ void main(int argc, char **argv)
 	for(int i=0; i < gridWidth; i++) {
 		delete grid[i];
 	}
-	delete grid;
+	delete grid;*/
 
     //Initialize GLUT
     glutInit(&argc, argv);

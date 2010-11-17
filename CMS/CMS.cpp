@@ -130,8 +130,10 @@ void CMS::init()
     state.setDrawAxis(false);
     state.setPrintInfoOnScreen(true);
     
-    //srand((unsigned int)time(NULL));
-    srand(1289895057);
+    unsigned int seed = (unsigned int)time(NULL);
+    srand(seed);
+    cout << "Seed value: " << seed << endl;
+
     //Bounding box info (will get from text file)
     Vertex bbverticies[4];
     bbverticies[0] = Vertex(0.0f,  0.0f,  0.0f);

@@ -6,6 +6,9 @@
 #include "CMSModel.h"
 
 CMSModel::CMSModel()
+:numFaces(0),
+ numVerticies(0),
+ numEdges(0)
 {
 
 }

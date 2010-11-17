@@ -42,6 +42,19 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
     parallelEdges = new Edge*[model.numEdges];
     numEdges      = new int[model.numEdges];
 
+    //Find a random spacing between [maximumLengthVertex/2.0,maximumLengthVertex]
+    float max = 0.0;
+    for(int x = 0; x < model.numVerticies; x++)
+    {
+        float length = sqrt(model.verticies[x].val[X]*model.verticies[x].val[X] + model.verticies[x].val[Y]*model.verticies[x].val[Y]);
+        if(length > max)
+        {
+            max = length;
+        }
+    }
+    spacing = Utils::randFloat(max/2.0, max);
+    cout << "Spacing: " << spacing << endl;
+
     for(int set = 0; set < model.numEdges; ++set)
     {
         Fraction slope = model.edges[set].edgestate.slope;
@@ -238,8 +251,10 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
     }
 
     //Find if a vertex only has one edge.
+    int x = 0;
     for(vector<Vertex*>::iterator vertIter = verticies.begin(); vertIter < verticies.end(); vertIter++)
     {
+        
         if((*vertIter)->connectedEdges == 1)
         {
             for(vector<Edge*>::iterator edgeIter = edges.begin(); edgeIter < edges.end(); edgeIter++)
@@ -266,6 +281,7 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
                     else
                     {
                         (*edgeIter)->begin->connectedEdges--;
+                        
                         for(z = 0;  z < 4; z++)
                         {
                             if((*edgeIter) == (*edgeIter)->begin->edges[z])
@@ -275,13 +291,18 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
                             }
                         }
                     }
+
+
+
                     delete (*edgeIter);
                     (*edgeIter) = NULL;
                     edgeIter = edges.erase(edgeIter);
+                    edgeIter--;
 
                     delete (*vertIter);
                     (*vertIter) = NULL;
                     vertIter = verticies.erase(vertIter);
+                    vertIter--;                             
 
                     setToNull->edges[z] = NULL;
 
@@ -289,10 +310,12 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
                 }
             }
         }
+        x++;
     }
 
 #ifdef _DEBUG
     //Sanity check: Make sure all currentEdge counts are correct and everything else is null.
+    //Sanity check: Make sure all vertices have more than 1 edge.
     for(int x = 0; x < (int)verticies.size(); x++)
     {
         int count = 0;
@@ -307,6 +330,12 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
         if(count != verticies[x]->connectedEdges)
         {
             cout << "SANITY ERROR: currentEdge count is incorrect for some verticies (or some edges don't point to NULL like they should" << endl;
+            exit(EXIT_FAILURE);
+        }
+
+        if(count == 0 || count == 1)
+        {
+            cout << "SANITY ERROR: Vertex has one or no edges." << endl;
             exit(EXIT_FAILURE);
         }
     }
