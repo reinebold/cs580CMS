@@ -25,7 +25,7 @@ namespace CMS2D
       relativeCounters[i] = 0;
     generateValid(sourceValidStates, input, grid);
     generateStates( verticies, sourceValidStates, validStates, relativeCounters);
-    unsigned int seed = time(NULL);
+    unsigned int seed = (unsigned int)time(NULL);
     //std::cout << seed << std::endl;
     srand(seed);
     while(validStates.size() > 0)

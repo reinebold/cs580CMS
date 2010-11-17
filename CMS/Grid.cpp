@@ -178,7 +178,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
             vector<Vertex*> verticiesOnEdge;
             Vertex *vert = parallelEdges[x][y].begin;
             float slope = parallelEdges[x][y].edgestate.slope.value;
-            for(int i = 0; i < (int)verticies.size(); i++)
+            for(unsigned int i = 0; i < verticies.size(); i++)
             {
                 //y-y1 = m(x-x1)
                 if(fabs((vert->val[Y]-verticies[i]->val[Y]) - (slope*vert->val[X] - slope*verticies[i]->val[X])) < EPSILON)
@@ -187,9 +187,9 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                 }
             }
 
-            if((int)verticiesOnEdge.size() > 1)
+            //We don't want to include any edges that only have one vertex
+            if(verticiesOnEdge.size() > 1)
             {
-
                 sortVerticies(verticiesOnEdge,0,verticiesOnEdge.size()-1);                
                 
 #ifdef _DEBUG
@@ -205,7 +205,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                 }
 #endif
                 
-                for(int j = 0; j < (int)verticiesOnEdge.size()-1; j++)
+                for(unsigned int j = 0; j < verticiesOnEdge.size()-1; j++)
                 {
                     Edge *edge = new Edge(verticiesOnEdge[j],verticiesOnEdge[j+1]);
                     edge->edgestate.set = x;
@@ -221,50 +221,50 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
     }
 
     //Find if a vertex only has one edge.
-    for(int x = 0; x < (int)verticies.size(); x++)
+    for(vector<Vertex*>::iterator vertIter = verticies.begin(); vertIter < verticies.end(); vertIter++)
     {
-        if(verticies[x]->connectedEdges == 1)
+        if((*vertIter)->connectedEdges == 1)
         {
-            for(int y = 0; y < (int)edges.size(); y++)
+            for(vector<Edge*>::iterator edgeIter = edges.begin(); edgeIter < edges.end(); edgeIter++)
             {
                 //Find the edge in 'edges' that corresponds to the one edge in verticies.
-                if((edges[y] != NULL) && (edges[y] == verticies[x]->edges[0]) )
+                if(((*edgeIter) != NULL) && ((*edgeIter) == (*vertIter)->edges[0]) )
                 {
                     //Make sure that we decrement the number of edges of the other vertex it is connected to,
                     //Then make the pointer to that edge go to null
                     Vertex *setToNull;
                     int z = 0;
-                    if((verticies[x] != NULL) && (edges[y]->begin == verticies[x]))
+                    if(((*vertIter) != NULL) && ((*edgeIter)->begin == (*vertIter)))
                     {
-                        edges[y]->end->connectedEdges--;
+                        (*edgeIter)->end->connectedEdges--;
                         for(z = 0;  z < 4; z++)
                         {
-                            if(edges[y] == edges[y]->end->edges[z])
+                            if((*edgeIter) == (*edgeIter)->end->edges[z])
                             {
-                                setToNull = edges[y]->end;
+                                setToNull = (*edgeIter)->end;
                                 break;
                             }
                         }
                     }
                     else
                     {
-                        edges[y]->begin->connectedEdges--;
+                        (*edgeIter)->begin->connectedEdges--;
                         for(z = 0;  z < 4; z++)
                         {
-                            if(edges[y] == edges[y]->begin->edges[z])
+                            if((*edgeIter) == (*edgeIter)->begin->edges[z])
                             {
-                                setToNull = edges[y]->begin;
+                                setToNull = (*edgeIter)->begin;
                                 break;
                             }
                         }
                     }
-                    delete edges[y];
-                    edges[y] = NULL;
-                    edges.erase(edges.begin()+y);
+                    delete (*edgeIter);
+                    (*edgeIter) = NULL;
+                    edges.erase(edgeIter);
 
-                    delete verticies[x];
-                    verticies[x] = NULL;
-                    verticies.erase(verticies.begin()+x);
+                    delete (*vertIter);
+                    (*vertIter) = NULL;
+                    verticies.erase(vertIter);
                 
                     setToNull->edges[z] = NULL;
 
@@ -351,7 +351,7 @@ Grid::~Grid()
 {
     for(int x = 0;  x < numModelEdges; x++)
     {
-        delete [] parallelEdges[x]
+        delete [] parallelEdges[x];
     }
 
     delete [] parallelEdges;
