@@ -16,10 +16,11 @@ public:
     ~CMSModel();    ///< Deallocates verticies and edges
 
     ///Fills in the data members.
-    void init(int _numVerticies, Vertex *_verticies);
+    void init(int _numFaces, int _numVerticies, Vertex *_verticies);
    
     int        numVerticies;      ///< The number of verticies of the model
-    int        numEdges;
+    int        numEdges;          ///< The number of edges of the model
+    int        numFaces;          ///< The number of faces of the model
     Vertex    *verticies;         ///< The verticies of the model
     Edge      *edges;             ///< The edges of the model
 };

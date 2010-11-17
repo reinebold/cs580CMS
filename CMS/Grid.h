@@ -14,16 +14,18 @@ class Grid
 {
 public:
     Grid();
-    ~Grid();    ///< Deallocates parallelEdges and numEdges
+    ~Grid();    ///< Deallocates parallelEdges, numEdges, verticies, and edges
     
-    void init(const CMSModel &model,const Cuboid &boundingbox);             ///< End result will get all the verticies and edges needed
+    void init3D(const CMSModel &model,const Cuboid &boundingbox);
+    void init2D(const CMSModel &model,const Cuboid &boundingbox);
+    void init(const CMSModel &model,const Cuboid &boundingbox);             ///< Will call either 2d or 3d depending on the number of faces of the input model
     void sortVerticies(vector<Vertex*> &verticies, int left, int right);    ///< Simple quicksort
 
     vector<Vertex*> verticies;          ///< The verticies of the intersections of the parallelEdges
     vector<Edge*>   edges;              ///< The split up edges of the parallel lines
     Edge          **parallelEdges;      ///< Keeps track of the parallel lines that intersect the bounding box
     int            *numEdges;           ///< Keeps track of how many edges there are per set of parallel edges
-    int             numModelEdges;         ///< Number of edges the model has.  Need for deallocation of resources.
+    int             numModelEdges;      ///< Number of edges the model has.  Need for deallocation of resources.
     float           spacing;            ///< The spacing between the parallel lines
 };
 

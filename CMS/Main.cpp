@@ -51,7 +51,14 @@ void display()
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     }
     
-    cms.display();
+    if(cms.input.numFaces == 1)
+    {
+         cms.display2D();
+    }
+    else
+    {
+         cms.display3D();
+    }
 
     camera.printInfo();
     glutSwapBuffers();

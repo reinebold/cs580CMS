@@ -12,6 +12,23 @@
 
 void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
 {
+    if(model.numFaces == 1)
+    {
+        init2D(model, boundingbox);
+    }
+    else
+    {
+        init3D(model,boundingbox);
+    }
+}
+
+void Grid::init3D(const CMSModel &model, const Cuboid &boundingbox)
+{
+
+}
+
+void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
+{
     enum SlopeType {VERTICAL = 0, HORIZONTAL, POSITIVE, NEGATIVE, UNASSIGNED};
     float topy = boundingbox.edges[TOP].end->val[Y];
     float bottomy = boundingbox.edges[BOTTOM].end->val[Y];
@@ -24,7 +41,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
     numModelEdges = model.numEdges;
     parallelEdges = new Edge*[model.numEdges];
     numEdges      = new int[model.numEdges];
-    
+
     for(int set = 0; set < model.numEdges; ++set)
     {
         Fraction slope = model.edges[set].edgestate.slope;
@@ -191,7 +208,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
             if(verticiesOnEdge.size() > 1)
             {
                 sortVerticies(verticiesOnEdge,0,verticiesOnEdge.size()-1);                
-                
+
 #ifdef _DEBUG
                 //Sanity check: Make sure the verticies are in order.
                 for(int a = 0; a < (int)verticiesOnEdge.size()-1; a++)
@@ -204,7 +221,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                     }
                 }
 #endif
-                
+
                 for(unsigned int j = 0; j < verticiesOnEdge.size()-1; j++)
                 {
                     Edge *edge = new Edge(verticiesOnEdge[j],verticiesOnEdge[j+1]);
@@ -260,12 +277,12 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                     }
                     delete (*edgeIter);
                     (*edgeIter) = NULL;
-                    edges.erase(edgeIter);
+                    edgeIter = edges.erase(edgeIter);
 
                     delete (*vertIter);
                     (*vertIter) = NULL;
-                    verticies.erase(vertIter);
-                
+                    vertIter = verticies.erase(vertIter);
+
                     setToNull->edges[z] = NULL;
 
                     break;
@@ -281,7 +298,7 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
         int count = 0;
         for(int y = 0; y < 4; y++)
         {
-            
+
             if(verticies[x]->edges[y] != NULL)
             {
                 count++;
@@ -356,4 +373,16 @@ Grid::~Grid()
 
     delete [] parallelEdges;
     delete [] numEdges;
+
+    for(unsigned int x = 0; x < verticies.size(); x++)
+    {
+        delete verticies[x];
+    }
+    verticies.clear();
+
+    for(unsigned int x = 0; x < edges.size(); x++)
+    {
+        delete edges[x];
+    }
+    edges.clear();
 }
