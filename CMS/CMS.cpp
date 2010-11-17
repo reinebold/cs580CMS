@@ -12,6 +12,7 @@
 #include "Geometry.h"
 #include "Grid.h"
 #include "Camera.h"
+#include "Parser.h"
 #include <time.h>
 using namespace Geometry;
 
@@ -126,21 +127,13 @@ void CMS::init()
     //srand((unsigned int)time(NULL));
     srand(1289895057);
 
-    //Bounding box info (will get from text file)
-    Vertex bbverticies[4];
-    bbverticies[0] = Vertex(0.0f,  0.0f,  0.0f);
-    bbverticies[1] = Vertex(50.0f, 0.0f,  0.0f);
-    bbverticies[2] = Vertex(50.0f, 50.0f, 0.0f);
-    bbverticies[3] = Vertex(0.0f,  50.0f, 0.0f);
+	//Bounding box info
+	Vertex bbverticies[4];
+	parser.boundingBox(bbverticies);
 
-    //Input file info (will get from text file)
-    int numVerticies = 3;
-    Vertex *verticies = new Vertex[numVerticies];
-
-    //Must be specified in a counter-clockwise order?
-    verticies[0] = Vertex(0.0f, 0.0f);
-    verticies[1] = Vertex(5.0f, 0.0f);
-    verticies[2] = Vertex(3.0f, 2.0f);
+	//vertex info: Must be specified in a counter-clockwise order?
+	int numVerticies;
+	Vertex *verticies = parser.vertexArray(&num);
 
     //Figure out the edges of the bounding box
     boundingbox.init(bbverticies);

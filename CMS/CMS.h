@@ -7,6 +7,7 @@
 #include "CMSModel.h"
 #include "Geometry.h"
 #include "Grid.h"
+#include "Parser.h"
 
 class CMS
 {
@@ -19,6 +20,7 @@ public:
     void continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &verticies);
 
     CMSModel input;
+	Parser parser;
     Cuboid boundingbox;
     Cuboid world;
     Grid grid;
