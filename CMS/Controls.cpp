@@ -7,12 +7,14 @@
 #include "Camera.h"
 #include "State.h"
 #include "Defines.h"
+#include "CMS.h"
 #include <GL/freeglut.h>
 #include <math.h>       //for fmod()
 
 extern Camera camera;
 extern State state;
 extern Controls controls;
+extern CMS cms;
 
 void Controls::mousePressHandler(int button, int state, int x, int y) 
 {
@@ -117,6 +119,14 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
         {
             state.setTest(state.getTest() + 1);
         }
+        glutPostRedisplay();
+        break;
+    case 'b':
+        cms.showBoundingBox = !cms.showBoundingBox;
+        glutPostRedisplay();
+        break;
+    case 'v':
+        cms.showGridVerticies = !cms.showGridVerticies;
         glutPostRedisplay();
         break;
     }

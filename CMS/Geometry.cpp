@@ -116,16 +116,16 @@ Cuboid::Cuboid()
 
 }
 
-void Cuboid::init(Vertex *_verticies)
+void Cuboid::init(int numVerticies, Vertex *_verticies)
 {
     //Assign the verticies to the data member verticies in Cuboid.
-    for(int x = 0; x < 4; ++x)
+    for(int x = 0; x < numVerticies; ++x)
     {
         verticies[x] = _verticies[x];
     }
 
     //Assign the edges (based on the verticies)
-    for(int x = 0; x < 4; ++x)
+    for(int x = 0; x < numVerticies; ++x)
     {
         int begin = x;
         int end;
@@ -141,11 +141,7 @@ void Cuboid::init(Vertex *_verticies)
         edges[x].begin = &verticies[begin];
         edges[x].end = &verticies[end];
 
-        edges[x].edgestate.slope.num = (verticies[end].val[Y] - verticies[begin].val[Y]);
-        edges[x].edgestate.slope.den = (verticies[end].val[X] - verticies[begin].val[X]);
-        edges[x].edgestate.slope.value = edges[x].edgestate.slope.num/edges[x].edgestate.slope.den;
-        edges[x].edgestate.leftFace = UNASSIGNED;
-        edges[x].edgestate.rightFace = UNASSIGNED;
+        edges[x].updateEdgeState();
     }
 }
 

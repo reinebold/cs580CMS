@@ -1,3 +1,7 @@
+/**
+    \class Grid
+    \brief Keeps track of all the edges and vertices
+*/
 
 #ifndef _GRID_H
 #define _GRID_H
@@ -9,28 +13,20 @@ using namespace Geometry;
 class Grid
 {
 public:
-    Grid()
-        :spacing(4.0f)     //TODO: For spacing, maybe find max distance between all points then times .75?
-    {
-
-    }
-
-    ~Grid() 
-    {
-        //delete [] verticies;
-    }
+    Grid();
+    ~Grid();    ///< Deallocates parallelEdges, numEdges, verticies, and edges
     
-    void init(const CMSModel &model,const Cuboid &boundingbox);
-    void sortVerticies(vector<Vertex*> &verticies, int left, int right);
+    void init3D(const CMSModel &model,const Cuboid &boundingbox);
+    void init2D(const CMSModel &model,const Cuboid &boundingbox);
+    void init(const CMSModel &model,const Cuboid &boundingbox);             ///< Will call either 2d or 3d depending on the number of faces of the input model
+    void sortVerticies(vector<Vertex*> &verticies, int left, int right);    ///< Simple quicksort
 
-    Cuboid          boundingbox;
-    Edge          **parallelEdges;
-    vector<Vertex*> verticies;
-    vector<Edge*>   edges;
-    int             numEdges[1000];
-    int             totalVerts;
-    float           spacing;
+    vector<Vertex*> verticies;          ///< The verticies of the intersections of the parallelEdges
+    vector<Edge*>   edges;              ///< The split up edges of the parallel lines
+    Edge          **parallelEdges;      ///< Keeps track of the parallel lines that intersect the bounding box
+    int            *numEdges;           ///< Keeps track of how many edges there are per set of parallel edges
+    int             numModelEdges;      ///< Number of edges the model has.  Need for deallocation of resources.
+    float           spacing;            ///< The spacing between the parallel lines
 };
-
 
 #endif // _GRID_H

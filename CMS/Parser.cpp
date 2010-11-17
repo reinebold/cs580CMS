@@ -10,7 +10,7 @@ Parser::Parser(){
 
 }
 
-Vertex* Parser::vertexArray(int *numVerts){
+Vertex* Parser::vertexArray(int *numVerts,int *numFaces){
 	std::ifstream fin("../CMS/input.model");
 	std::string line;
 
@@ -21,8 +21,7 @@ Vertex* Parser::vertexArray(int *numVerts){
 	std::getline(fin,line);
 	std::istringstream tkn(line);
 	//gets the number of faces for future usage, but not used anywhere yet.
-	int numFaces;
-	tkn >> numFaces;
+	tkn >> *numFaces;
 
 	//grab all the verticies
 	std::getline(fin,line);

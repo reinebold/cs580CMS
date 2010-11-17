@@ -6,6 +6,9 @@
 #include "CMSModel.h"
 
 CMSModel::CMSModel()
+:numFaces(0),
+ numVerticies(0),
+ numEdges(0)
 {
 
 }
@@ -16,9 +19,11 @@ CMSModel::~CMSModel()
     delete [] edges;
 }
 
-void CMSModel::init(int _numVerticies, Vertex *_verticies)
+void CMSModel::init(int _numFaces, int _numVerticies, Vertex *_verticies)
 {
+    numFaces     = _numFaces;
     numVerticies = _numVerticies;
+    numEdges     = _numVerticies;
 
     //TODO: Lots of error checking.
 

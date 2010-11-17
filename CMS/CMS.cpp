@@ -21,28 +21,37 @@ extern State state;
 extern Camera camera;
 
 CMS::CMS()
+:showBoundingBox(true),
+ showGridVerticies(true)
 {
 
 }
-
-
 
 void CMS::continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &verticies)
 {
-    CMS2D::continuousModelSynthesis2D(edges, verticies, input, grid);
+    while(!CMS2D::continuousModelSynthesis2D(edges, verticies, input, grid))
+      std::cout << "Algorithm did not converge. Restarting" << std::endl << std::endl;
 }
 
-void CMS::display()
+void CMS::display3D()
+{
+    
+}
+
+void CMS::display2D()
 {   
     //Draw Bounding Box
-    glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-    glBegin(GL_QUADS);
-        glNormal3f(0.0f, 1.0f, 0.0f);
-        glVertex3fv(boundingbox.verticies[0].val);
-        glVertex3fv(boundingbox.verticies[1].val);
-        glVertex3fv(boundingbox.verticies[2].val);
-        glVertex3fv(boundingbox.verticies[3].val);
-    glEnd();
+    if(showBoundingBox)
+    {
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        glBegin(GL_QUADS);
+            glNormal3f(0.0f, 1.0f, 0.0f);
+            glVertex3fv(boundingBox.verticies[0].val);
+            glVertex3fv(boundingBox.verticies[1].val);
+            glVertex3fv(boundingBox.verticies[2].val);
+            glVertex3fv(boundingBox.verticies[3].val);
+        glEnd();
+    }
    
     //Draw input model (translate it over so it's not in the bounding box...)
     glTranslatef(-10.0f, 0.0f, 0.0f);
@@ -104,16 +113,19 @@ void CMS::display()
     }
 
     //Draw Verticies
-    glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
-    glPointSize(4.0f);          //Change the size of the point
-    glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
-    glBegin(GL_POINTS);
-        for(int x=0; x < (int)grid.verticies.size(); x++)
-        {
-            glVertex3fv(grid.verticies[x]->val);
-        }
-    glEnd();
-    glDisable(GL_POINT_SMOOTH);
+    if(showGridVerticies)
+    {
+        glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
+        glPointSize(4.0f);          //Change the size of the point
+        glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+        glBegin(GL_POINTS);
+            for(int x=0; x < (int)grid.verticies.size(); x++)
+            {
+                glVertex3fv(grid.verticies[x]->val);
+            }
+        glEnd();
+        glDisable(GL_POINT_SMOOTH);
+    }
 }
 
 void CMS::init()
@@ -124,8 +136,9 @@ void CMS::init()
     state.setDrawAxis(false);
     state.setPrintInfoOnScreen(true);
     
-    //srand((unsigned int)time(NULL));
-    srand(1289895057);
+    unsigned int seed = (unsigned int)time(NULL);
+    srand(seed);
+    cout << "Seed value: " << seed << endl;
 
 	//Bounding box info
 	Vertex bbverticies[4];
@@ -133,16 +146,17 @@ void CMS::init()
 
 	//vertex info: Must be specified in a counter-clockwise order?
 	int numVerticies;
-	Vertex *verticies = parser.vertexArray(&num);
+	int numFaces;
+	Vertex *verticies = parser.vertexArray(&numVerticies,&numFaces);
 
     //Figure out the edges of the bounding box
-    boundingbox.init(bbverticies);
+    boundingBox.init(4, bbverticies);
 
     //Load the verticies into the input model, find edges.
-    input.init(numVerticies, verticies);
+    input.init(numFaces, numVerticies, verticies);
 
     //Figure out edges and verticies.
-    grid.init(input, boundingbox);
+    grid.init(input, boundingBox);
 
     //Do the algorithm that changes the states.
     continuousModelSynthesis(grid.edges, grid.verticies);

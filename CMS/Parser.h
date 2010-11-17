@@ -13,7 +13,7 @@ public:
 	Parser();
 
 	void boundingBox(Vertex* bounds);
-	Vertex* vertexArray(int* numVerts);
+	Vertex* vertexArray(int* numVerts, int* numFaces);
 
 };
 #endif
