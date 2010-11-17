@@ -18,14 +18,16 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
     float rightx = boundingbox.edges[RIGHT].end->val[X];
     float leftx = boundingbox.edges[LEFT].end->val[X];
 
-    float currenty = 0.0;
+    float     currenty  = 0.0;
+    float     yincrement = 0.0;
     SlopeType slopetype = UNASSIGNED;
-    parallelEdges = new Edge*[model.numVerticies];
-    float yincrement = 0.0;
+    numModelEdges = model.numEdges;
+    parallelEdges = new Edge*[model.numEdges];
+    numEdges      = new int[model.numEdges];
     
-    for(int edgeNum = 0; edgeNum < model.numVerticies; ++edgeNum)
+    for(int set = 0; set < model.numEdges; ++set)
     {
-        Fraction slope = model.edges[edgeNum].edgestate.slope;
+        Fraction slope = model.edges[set].edgestate.slope;
         if(fabs(slope.den - 0.0) < EPSILON)
         {
             slopetype = VERTICAL;
@@ -51,13 +53,13 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
         }
 
         //TODO: Only allocate for DISTINCT edges
-        int numberofedges = int(topy-currenty/float(spacing));
-        parallelEdges[edgeNum] = new Edge[numberofedges];
-        numEdges[edgeNum] = numberofedges;
-        int currentedge = 0;
+        int maxNumEdges    = int(topy-currenty/float(spacing));
+        parallelEdges[set] = new Edge[maxNumEdges];
+        numEdges[set]      = maxNumEdges;
+        int edgeCount      = 0;
         while(currenty <= topy)
         {
-            if(slopetype == POSITIVE)   //This means it can only intersect TOP or RIGHT
+            if(slopetype == POSITIVE)   //This means it can only intersect TOP or RIGHT of the bounding box
             {
                 //Check to see if it intersects TOP
                 float tempx = ((topy-currenty)+slope.value*leftx)/slope.value;
@@ -65,9 +67,8 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                 {
                     Vertex *begin = new Vertex(leftx, currenty);
                     Vertex *end  = new Vertex(tempx, topy);
-                    //Edge *edge = new Edge(begin, end);
-                    parallelEdges[edgeNum][currentedge] = Edge(begin, end);
-                    currentedge++;
+                    parallelEdges[set][edgeCount] = Edge(begin, end);
+                    edgeCount++;
                 }
                 //Check to see if it intersects RIGHT
                 else
@@ -86,13 +87,12 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                             begin = new Vertex(leftx, currenty);
                         }
                         Vertex *end  = new Vertex(rightx, tempy);
-                        //Edge *edge = new Edge(begin, end);
-                        parallelEdges[edgeNum][currentedge] = Edge(begin, end);
-                        currentedge++;
+                        parallelEdges[set][edgeCount] = Edge(begin, end);
+                        edgeCount++;
                     }
                 }
             }
-            else if(slopetype == NEGATIVE) //Check to see if it intersects TOP OR LEFT
+            else if(slopetype == NEGATIVE) //Check to see if it intersects TOP OR LEFT of the bounding box
             {
                 //First see if it intersects TOP
                 float tempx = ((topy-currenty)+slope.value*rightx)/slope.value;
@@ -100,9 +100,8 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                 {
                     Vertex *begin = new Vertex(rightx, currenty);
                     Vertex *end  = new Vertex(tempx, topy);
-                    //Edge *edge = new Edge(begin, end);
-                    parallelEdges[edgeNum][currentedge] = Edge(begin, end);
-                    currentedge++;
+                    parallelEdges[set][edgeCount] = Edge(begin, end);
+                    edgeCount++;
                 }
                 else
                 {
@@ -121,9 +120,8 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                             begin = new Vertex(rightx, currenty);
                         }
                         Vertex *end  = new Vertex(leftx, tempy);
-                        //Edge *edge = new Edge(begin, end);
-                        parallelEdges[edgeNum][currentedge] = Edge(begin, end);
-                        currentedge++;
+                        parallelEdges[set][edgeCount] = Edge(begin, end);
+                        edgeCount++;
                     }
                 }
             }
@@ -131,8 +129,8 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
             {
                 Vertex *begin = new Vertex(leftx, currenty);
                 Vertex *end  = new Vertex(rightx, currenty);
-                parallelEdges[edgeNum][currentedge] = Edge(begin, end);
-                currentedge++;
+                parallelEdges[set][edgeCount] = Edge(begin, end);
+                edgeCount++;
             }
             else if(slopetype == VERTICAL)
             {
@@ -147,19 +145,16 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
             }
             currenty += yincrement;
         }
-        numEdges[edgeNum] = currentedge;
-
+        numEdges[set] = edgeCount;
     }
 
-    int currentVert = 0;
-
     //Find vertex intersections
-    for(int x = 0; x < model.numVerticies; x++)
+    for(int x = 0; x < model.numEdges; x++)
     {
         for(int y = 0; y < numEdges[x]; y++)
         {
             int start = 0;
-            for(int i = x+1; i < model.numVerticies; i++)
+            for(int i = x+1; i < model.numEdges; i++)
             {
                 for(int j = 0; j < numEdges[i]; j++)
                 {
@@ -167,16 +162,13 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                     if(parallelEdges[x][y].intersect(parallelEdges[i][j],temp) == INTERESECTING)
                     {
                         verticies.push_back(temp);
-                        currentVert++;
                         start++;
                     }
                 }
             }
         }
     }
-    totalVerts = currentVert;
 
-    //BRUTE FORCE
     //Separate the edges, assign verticies to edges, and edges to verticies.
     int currentEdge = 0;
     for(int x = 0; x < model.numVerticies; x++)
@@ -244,7 +236,6 @@ void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
                     int z = 0;
                     if((verticies[x] != NULL) && (edges[y]->begin == verticies[x]))
                     {
-
                         edges[y]->end->connectedEdges--;
                         for(z = 0;  z < 4; z++)
                         {
@@ -348,4 +339,21 @@ void Grid::sortVerticies(vector<Vertex*> &verticies, int left, int right)
     verticies[middle] = temp;
     sortVerticies(verticies,left,middle-1);
     sortVerticies(verticies,middle+1,right);
+}
+
+Grid::Grid()
+    :spacing(4.0f)     //TODO: For spacing, maybe find max distance between all points then times .75?
+{
+
+}
+
+Grid::~Grid()
+{
+    for(int x = 0;  x < numModelEdges; x++)
+    {
+        delete [] parallelEdges[x]
+    }
+
+    delete [] parallelEdges;
+    delete [] numEdges;
 }

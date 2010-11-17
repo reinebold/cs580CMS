@@ -18,7 +18,8 @@ public:
     ///Fills in the data members.
     void init(int _numVerticies, Vertex *_verticies);
    
-    int         numVerticies;      ///< The number of verticies of the model
+    int        numVerticies;      ///< The number of verticies of the model
+    int        numEdges;
     Vertex    *verticies;         ///< The verticies of the model
     Edge      *edges;             ///< The edges of the model
 };

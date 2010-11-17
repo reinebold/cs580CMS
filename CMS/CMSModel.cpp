@@ -19,6 +19,7 @@ CMSModel::~CMSModel()
 void CMSModel::init(int _numVerticies, Vertex *_verticies)
 {
     numVerticies = _numVerticies;
+    numEdges     = _numVerticies;
 
     //TODO: Lots of error checking.
 
