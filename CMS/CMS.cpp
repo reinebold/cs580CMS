@@ -123,8 +123,8 @@ void CMS::init()
     state.setDrawAxis(false);
     state.setPrintInfoOnScreen(true);
     
-    //srand((unsigned int)time(NULL));
-    srand(1289895057);
+    srand((unsigned int)time(NULL));
+    //srand(1289977101);
 
     //Bounding box info (will get from text file)
     Vertex bbverticies[4];
