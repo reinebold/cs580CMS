@@ -125,5 +125,9 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
         cms.showBoundingBox = !cms.showBoundingBox;
         glutPostRedisplay();
         break;
+    case 'v':
+        cms.showGridVerticies = !cms.showGridVerticies;
+        glutPostRedisplay();
+        break;
     }
 }

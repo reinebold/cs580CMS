@@ -25,7 +25,7 @@ namespace CMS2D
       relativeCounters[i] = 0;
     generateValid(sourceValidStates, input, grid);
     generateStates( verticies, sourceValidStates, validStates, relativeCounters);
-    srand(time(NULL));
+    //srand(time(NULL)); done already;
     while(validStates.size() > 0)
     {
       sort(validStates.begin(), validStates.end());
@@ -35,9 +35,9 @@ namespace CMS2D
         int size = validStates.size();
         //int randomstate = rand()%(validStates.size());
         //Sanity check, validStates should be smaller than relativesCounter
-        //if( *((*itr).relativesCounter) > validStates.size())
-        //  exit(9002);
-        int randomstate = rand() % min(*((*itr).relativesCounter), validStates.size());
+        if( *((*itr).relativesCounter) > validStates.size())
+          exit(9001);
+        int randomstate = rand() % *((*itr).relativesCounter);
         itr += randomstate;
       }
       else
@@ -45,7 +45,7 @@ namespace CMS2D
         int i = 0;
         i++;
       }
-      *((*itr).relativesCounter)--;
+      //(*((*itr).relativesCounter))--;
       VertexState state = (*itr);
       validStates.erase(itr);
       for(int i = 0; i < 4; i++)
@@ -279,6 +279,29 @@ namespace CMS2D
     for(unsigned int i = 0; i < verticies.size(); i++)
     {
       Vertex *current = *(verticies.begin() + i);
+
+      if(current->edges[0] == NULL || current->edges[1] == NULL ||
+        current->edges[2] == NULL || current->edges[3] == NULL)
+        //Force edge verticies to be empty
+      {
+        VertexStateEdges edge(0,0);
+        edge.dependentstates[0].leftFace = EXTERIOR;
+        edge.dependentstates[0].rightFace = EXTERIOR;
+        edge.dependentstates[1].leftFace = EXTERIOR;
+        edge.dependentstates[1].rightFace = EXTERIOR;
+        edge.dependentstates[2].leftFace = EXTERIOR;
+        edge.dependentstates[2].rightFace = EXTERIOR;
+        edge.dependentstates[3].leftFace = EXTERIOR;
+        edge.dependentstates[3].rightFace = EXTERIOR;
+        validStates.push_back(VertexState(&(relativesCounter[i]), edge, current));
+        relativesCounter[i]++;
+        validStates.back().dependentedges[0] = current->edges[0];
+        validStates.back().dependentedges[1] = current->edges[1];
+        validStates.back().dependentedges[2] = current->edges[2];
+        validStates.back().dependentedges[3] = current->edges[3];
+        continue;
+      }
+
       int sets[2];
       if(current->edges[0] != NULL)
         sets[0] = current->edges[0]->edgestate.set;
@@ -289,6 +312,7 @@ namespace CMS2D
       else
         sets[1] = current->edges[3]->edgestate.set;
 
+      //For everything in possible vertex states list
       for(std::vector<VertexStateEdges>::iterator source_itr = sourceValidStates.begin();
         source_itr != sourceValidStates.end(); source_itr++)
       {

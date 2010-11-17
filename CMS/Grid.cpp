@@ -43,7 +43,7 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
     numEdges      = new int[model.numEdges];
 
     //Find a random spacing between [maximumLengthVertex/2.0,maximumLengthVertex]
-    float max = 0.0;
+    float max = 0.0f;
     for(int x = 0; x < model.numVerticies; x++)
     {
         float length = sqrt(model.verticies[x].val[X]*model.verticies[x].val[X] + model.verticies[x].val[Y]*model.verticies[x].val[Y]);
@@ -52,8 +52,7 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
             max = length;
         }
     }
-    spacing = Utils::randFloat(max/2.0, max);
-    cout << "Spacing: " << spacing << endl;
+    spacing = Utils::randFloat(max/2.0f, max);
 
     for(int set = 0; set < model.numEdges; ++set)
     {
@@ -252,7 +251,7 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
 
     //Find if a vertex only has one edge.
     int x = 0;
-    for(vector<Vertex*>::iterator vertIter = verticies.begin(); vertIter < verticies.end(); vertIter++)
+    for(vector<Vertex*>::iterator vertIter = verticies.begin(); vertIter < verticies.end();)
     {
         
         if((*vertIter)->connectedEdges == 1)
@@ -292,17 +291,13 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
                         }
                     }
 
-
-
                     delete (*edgeIter);
                     (*edgeIter) = NULL;
                     edgeIter = edges.erase(edgeIter);
-                    edgeIter--;
 
                     delete (*vertIter);
                     (*vertIter) = NULL;
-                    vertIter = verticies.erase(vertIter);
-                    vertIter--;                             
+                    vertIter = verticies.erase(vertIter);                         
 
                     setToNull->edges[z] = NULL;
 
@@ -310,7 +305,10 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
                 }
             }
         }
-        x++;
+        else
+        {
+            vertIter++;
+        }
     }
 
 #ifdef _DEBUG

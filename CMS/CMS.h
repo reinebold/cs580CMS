@@ -23,5 +23,7 @@ public:
     Cuboid   boundingBox;   ///< Bounding box
     Cuboid   world;         ///< The "world", bounding box must be inside this
     Grid     grid;          ///< Grid that splits up the bounding box into edges/vertices/planes etc
-    bool     showBoundingBox; ///< True if you want the bounding box to show.  Default true.
+
+    bool     showBoundingBox;   ///< True if you want the bounding box to show.  Default true.
+    bool     showGridVerticies; ///< True if you want to see all the verticies.  Default true.
 };

@@ -20,7 +20,8 @@ extern State state;
 extern Camera camera;
 
 CMS::CMS()
-:showBoundingBox(true)
+:showBoundingBox(true),
+ showGridVerticies(true)
 {
 
 }
@@ -110,16 +111,19 @@ void CMS::display2D()
     }
 
     //Draw Verticies
-    glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
-    glPointSize(4.0f);          //Change the size of the point
-    glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
-    glBegin(GL_POINTS);
-        for(int x=0; x < (int)grid.verticies.size(); x++)
-        {
-            glVertex3fv(grid.verticies[x]->val);
-        }
-    glEnd();
-    glDisable(GL_POINT_SMOOTH);
+    if(showGridVerticies)
+    {
+        glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
+        glPointSize(4.0f);          //Change the size of the point
+        glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+        glBegin(GL_POINTS);
+            for(int x=0; x < (int)grid.verticies.size(); x++)
+            {
+                glVertex3fv(grid.verticies[x]->val);
+            }
+        glEnd();
+        glDisable(GL_POINT_SMOOTH);
+    }
 }
 
 void CMS::init()
