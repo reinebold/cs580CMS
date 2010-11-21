@@ -28,7 +28,7 @@ void Utils::printStatus()
     cout << "OpenGL Information" << endl;
     cout << "------------------" << endl;
     cout << "OpenGL version:\t" << glGetString(GL_VERSION) << endl; 
-    cout << "Shader version:\t" << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
+    //cout << "Shader version:\t" << glGetString(GL_SHADING_LANGUAGE_VERSION) << endl;
     cout << "Vendor:\t\t" << glGetString(GL_VENDOR) << endl;
     cout << "Renderer:\t" << glGetString(GL_RENDERER) << endl;
     cout << "GLEW version:\t" << glewGetString(GLEW_VERSION)<< endl; 
