@@ -54,11 +54,11 @@ void display()
     
     if(cms.input.numFaces == 1)
     {
-         cms.display2D();
+        cms.display2D();
     }
     else
     {
-         cms.display3D();
+        cms.display3D();
     }
 
     glutSwapBuffers();
