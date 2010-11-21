@@ -267,35 +267,44 @@ Face::Face(int _numVertices, Vertex* _vertices)
 	numEdges = _numVertices;
 
 
-	/*vertices = new Vertex*[numVertices];
-	edges = new Edge[numEdges];
-    for(int x = 0; x < numVertices; x++)
-    {
-        vertices[x] = &_vertices[x];
-    }
-	for(int i=0; i < numVertices; i++) 
-    {
-		Vertex* v1 = vertices[i];
-		Vertex* v2;
-		if (i == numVertices - 1) {
-			v2 = vertices[0];
-		} else {
-			v2 = vertices[i + 1];
-		}
-		Edge e(v1, v2);
-		edges[i] = e;
-	}
-	Vector a(edges[0].end->val[0] - edges[0].begin->val[0], edges[0].end->val[1] - edges[0].begin->val[1], edges[0].end->val[2] - edges[0].begin->val[2]);
-	Vector b(edges[1].end->val[0] - edges[1].begin->val[0], edges[1].end->val[1] - edges[1].begin->val[1], edges[1].end->val[2] - edges[1].begin->val[2]);
-	normal = a.crossProduct(b);*/
+
 }
 
 Face::~Face() {
 //	delete edges;
 }
 
+void Face::updateFaces()
+{
+    edges = new Edge[numEdges];
+    for(int i=0; i < numVertices; i++) 
+    {
+        Vertex* v1 = vertices[i];
+        Vertex* v2;
+        if (i == numVertices - 1) 
+        {
+            v2 = vertices[0];
+        } 
+        else 
+        {
+            v2 = vertices[i + 1];
+        }
+        
+        edges[i] = Edge(v1, v2);;
+    }
+    Vector a(edges[0].end->val[0] - edges[0].begin->val[0], edges[0].end->val[1] - edges[0].begin->val[1], edges[0].end->val[2] - edges[0].begin->val[2]);
+    Vector b(edges[1].end->val[0] - edges[1].begin->val[0], edges[1].end->val[1] - edges[1].begin->val[1], edges[1].end->val[2] - edges[1].begin->val[2]);
+    normal = a.crossProduct(b);
+}
+
 Face& Face::operator=(const Face &_face)
 {
+    numVertices = _face.numVertices;
+    numEdges = _face.numEdges;
+    normal = _face.normal;
+    
+    //Vertex** vertices;  //array of Vertex*
+    //Edge* edges;
     return *this;
 }
 
@@ -305,4 +314,16 @@ Vertex* planePlanePlaneIntersection(Plane a, Plane b, Plane c) {
 	Vector n2 = b.dir;
 	Vector n3 = c.dir;
 	return NULL;
+}
+
+bool Vertex::operator==(const Vertex &vert)
+{
+    if(vert.val[X] == val[X] && vert.val[Y] == val[Y] && vert.val[Z] == val[Z])
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }

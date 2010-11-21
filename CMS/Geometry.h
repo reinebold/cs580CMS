@@ -41,6 +41,7 @@ namespace Geometry
         Vertex(float xval, float yval, float zval = 0.0f, float wval = 1.0f);
 
         Vertex& operator=(const Vertex &vert);
+        bool operator==(const Vertex &vert);
 
         float val[4];          ///< X, Y, Z, W values
         Edge *edges[4];        ///< The maximum 4 edges the vertex is connected to
@@ -114,6 +115,7 @@ namespace Geometry
         Face(int _numVertices, Vertex* _vertices);
 		~Face();
         Face& operator=(const Face &_face);
+        void updateFaces();
 
 		int numVertices;
 		int numEdges;

@@ -36,6 +36,8 @@ void CMS::continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &vertic
 
 void CMS::display3D()
 {
+    glTranslatef(12.8f, 11.6f, 0.0f);
+    glScalef(.46f, .46f, .46f);
     if(showBoundingBox)
     {
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -79,19 +81,22 @@ void CMS::display3D()
     }
 
     //Output the model
+    
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     glTranslatef(-10.0f, 0.0f, 0.0f);
-    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);    
-    for(int numFaces = 0; numFaces < input.numFaces; ++numFaces)
+    for(int numFaces = 0; numFaces < input3D.numFaces; ++numFaces)
     {
         glBegin(GL_POLYGON);
-        for(int numVertices = 0; numVertices < input.numVertices; ++numVertices)
-        {
-            glColor4fv(Utils::randColor(0.5f).val);
-        //    glVertex3fv(input.faces[numFaces].vertices[numVertices].val);  
-        }
+            glColor4fv(input3D.colors[numFaces].val);    
+            for(int numVertices = 0; numVertices < input3D.faces[numFaces].numVertices; ++numVertices)
+            {
+                glVertex3fv((*input3D.faces[numFaces].vertices[numVertices]).val);  
+            }
         glEnd();
     }
-    
     glTranslatef(10.0f,0.0f,0.0f);
    
     /*for(int x = 0; x < (int)grid.edges.size(); x++)
@@ -284,9 +289,9 @@ void CMS::init()
     else
     {
         input3D.init(numVertices, vertices, numFaces, faces);
-        delete [] faces->vertices;
-        delete [] faces;
-        delete [] vertices;
+        //delete [] faces->vertices;
+        //delete [] faces;
+        //delete [] vertices;
     }
 
     //Do the algorithm that changes the states.

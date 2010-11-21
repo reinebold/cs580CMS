@@ -50,6 +50,7 @@ void Parser::vertexArray(int &numVerts, Vertex* &vertices, int &numFaces, Face* 
 		for(int j = 0; j < numFaceVerts; j++)
         {
             faces[i].numVertices = numFaceVerts;
+            faces[i].numEdges = numFaceVerts;
             
 			float x,y,z;
 			std::getline(fin,line);
@@ -74,11 +75,25 @@ void Parser::vertexArray(int &numVerts, Vertex* &vertices, int &numFaces, Face* 
 				z = 0.0;
             }
 
-			vertices[totalVerts] = Vertex(x,y,z);
-            faces[i].vertices[j] = &vertices[totalVerts];
-			totalVerts++;
+            int k;
+            Vertex temp(x,y,z,0.5f);
+            for(k = 0; k < totalVerts; k++)     //Find out if the vertex was already assigned.
+            {
+                if(vertices[k] == temp)
+                {
+                    break;
+                }
+            }
+
+            if(k == totalVerts) //If not, assign it.
+            {
+                vertices[k] = temp;
+                vertices[k].faces[vertices[k].connectedFaces++] = &faces[i];
+                totalVerts++;
+            }
+            faces[i].vertices[j] = &vertices[k];
 		}
-		faces[i] = Face(numFaceVerts, faceVerts);
+		faces[i].updateFaces();
 	}
 	fin.close();
 
