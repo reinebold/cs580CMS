@@ -18,6 +18,7 @@ namespace Geometry
     enum EdgePosition    {BOTTOM   = 0, RIGHT, TOP, LEFT};
 
     class Edge;
+    class Face;
 
     class Fraction
     {
@@ -37,13 +38,15 @@ namespace Geometry
     {
     public:
         Vertex();
-        Vertex(float xval, float yval, float zval = 0.0f);
+        Vertex(float xval, float yval, float zval = 0.0f, float wval = 1.0f);
 
         Vertex& operator=(const Vertex &vert);
 
-        float val[3];          ///< X, Y, and Z values
+        float val[4];          ///< X, Y, Z, W values
         Edge *edges[4];        ///< The maximum 4 edges the vertex is connected to
         int   connectedEdges;  ///< Number of edges the vertex has.
+        int   connectedFaces;  ///< Number of faces the vertex has.
+        Face *faces[3];        ///< Number of faces the vertex has been intersected by
     };
 
     class EdgeState
@@ -77,14 +80,13 @@ namespace Geometry
     public:
         Cuboid();
         
-        void init(int _numVerticies, Vertex *verticies);
+        void init(int _numVertices, Vertex *vertices);
 
         //TODO: Update cuboid to 3d case
-		int	 	 numVerticies;
-        Vertex*  verticies;   ///< Bounding box verticies
+		int	 	 numVertices;
+        Vertex*  vertices;   ///< Bounding box vertices
         Edge*    edges;       ///< Bounding box edges
     };
-
 
 	class Vector {
 	public:
@@ -92,21 +94,15 @@ namespace Geometry
 		Vector(float x, float y, float z);
 		float dotProduct(Vector& other);
 		Vector crossProduct(Vector& other);
-		float getX();
-		float getY();
-		float getZ();
-		void setX(float newX);
-		void setY(float newY);
-		void setZ(float newZ);
 		Vector& operator=(const Vector& other);
-	private:
+
 		float x, y, z;
 	};
 
 	class Plane {
 	public:
 		Plane(Vertex v, Vector dir);
-	private:
+
 		Vertex v;
 		Vector dir;
 	};
@@ -114,12 +110,11 @@ namespace Geometry
 	class Face
     {
     public:
+        Face();
         Face(int numVertices, Vertex* vertices);
-		Vertex* getVertices();
-		Edge* getEdges();
-		Vector getNormal();
 		~Face();
-	private:
+        Face& operator=(const Face &_face);
+
 		int numVertices;
 		int numEdges;
 		Vertex* vertices;

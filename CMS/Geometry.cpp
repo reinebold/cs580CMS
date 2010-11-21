@@ -42,29 +42,43 @@ void Fraction::operator=(const Fraction &rhs)
 }
 
 Vertex::Vertex()
-    :connectedEdges(0)
+    :connectedEdges(0),
+     connectedFaces(0)
 {
     val[X] = 0.0f;
     val[Y] = 0.0f;
     val[Z] = 0.0f;
+    val[W] = 1.0f;
 
     edges[0] = NULL;
     edges[1] = NULL;
     edges[2] = NULL;
     edges[3] = NULL;
+
+    faces[0] = NULL;
+    faces[1] = NULL;
+    faces[2] = NULL;
+    faces[3] = NULL;
 }
 
-Vertex::Vertex(float xval, float yval, float zval)
-    :connectedEdges(0)
+Vertex::Vertex(float xval, float yval, float zval, float wval)
+    :connectedEdges(0),
+     connectedFaces(0)
 {
     val[X] = xval;
     val[Y] = yval;
     val[Z] = zval;
+    val[W] = wval;
 
     edges[0] = NULL;
     edges[1] = NULL;
     edges[2] = NULL;
     edges[3] = NULL;
+
+    faces[0] = NULL;
+    faces[1] = NULL;
+    faces[2] = NULL;
+    faces[3] = NULL;
 }
 
 Vertex& Vertex::operator=(const Vertex &vert)
@@ -72,12 +86,21 @@ Vertex& Vertex::operator=(const Vertex &vert)
     val[X] = vert.val[X];
     val[Y] = vert.val[Y];
     val[Z] = vert.val[Z];
+    val[W] = vert.val[W];
 
     connectedEdges = vert.connectedEdges;
+    connectedFaces = vert.connectedFaces;
+
     edges[0] = vert.edges[0];
     edges[1] = vert.edges[1];
     edges[2] = vert.edges[2];
     edges[3] = vert.edges[3];
+
+    faces[0] = vert.faces[0];
+    faces[1] = vert.faces[1];
+    faces[2] = vert.faces[2];
+    faces[3] = vert.faces[3];
+    
 	return *this;
 }
 
@@ -117,31 +140,31 @@ Cuboid::Cuboid()
 
 }
 
-void Cuboid::init(int _numVerticies, Vertex *_verticies)
+void Cuboid::init(int _numVertices, Vertex *_vertices)
 {
-	if(_numVerticies != 8 && _numVerticies != 4)
+	if(_numVertices != 8 && _numVertices != 4)
 	{
-		cerr << "Bounding box can only have 4 (for 2d case) or 8 (for 3d case) verticies. numVerticies: " << numVerticies << endl;
+		cerr << "Bounding box can only have 4 (for 2d case) or 8 (for 3d case) vertices. numVertices: " << numVertices << endl;
 		exit(EXIT_FAILURE);
 	}
 
-    numVerticies = _numVerticies;
+    numVertices = _numVertices;
 
-    verticies = new Vertex[numVerticies];
-    edges = new Edge[numVerticies];
+    vertices = new Vertex[numVertices];
+    edges = new Edge[numVertices];
 
-    //Assign the verticies to the data member verticies in Cuboid.
-    for(int x = 0; x < numVerticies; ++x)
+    //Assign the vertices to the data member vertices in Cuboid.
+    for(int x = 0; x < numVertices; ++x)
     {
-        verticies[x] = _verticies[x];
+        vertices[x] = _vertices[x];
     }
 
-    //Assign the edges (based on the verticies)
-    for(int x = 0; x < numVerticies; ++x)
+    //Assign the edges (based on the vertices)
+    for(int x = 0; x < numVertices; ++x)
     {
         int begin = x;
         int end;
-        if(x+1 == numVerticies)
+        if(x+1 == numVertices)
         {
             end = 0;
         }
@@ -150,8 +173,8 @@ void Cuboid::init(int _numVerticies, Vertex *_verticies)
             end = x+1;
         }
 
-        edges[x].begin = &verticies[begin];
-        edges[x].end = &verticies[end];
+        edges[x].begin = &vertices[begin];
+        edges[x].end = &vertices[end];
 
         edges[x].updateEdgeState();
     }
@@ -207,30 +230,6 @@ Vector::Vector() {
 	z = 0;
 }
 
-float Vector::getX() {
-	return x;
-}
-
-float Vector::getY() {
-	return y;
-}
-
-float Vector::getZ() {
-	return z;
-}
-
-void Vector::setX(float newX) {
-	x = newX;
-}
-
-void Vector::setY(float newY) {
-	y = newY;
-}
-
-void Vector::setZ(float newZ) {
-	z = newZ;
-}
-
 float Vector::dotProduct(Vector& other) {
 	return x * other.x + y * other.y + z * other.z;
 }
@@ -280,14 +279,15 @@ Face::~Face() {
 	delete edges;
 }
 
-Vector Face::getNormal() {
-	return normal;
+Face::Face()
+{
+
 }
 
-Vertex* Face::getVertices() {
-	return vertices;
+Face& Face::operator=(const Face &_face)
+{
+
+    return *this;
+
 }
 
-Edge* Face::getEdges() {
-	return edges;
-}

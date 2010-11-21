@@ -121,7 +121,7 @@ void Utils::printInfoOnScreen()
             count += 20;
             renderString(0,count,"-CMS-");
             count += 10;
-            renderString(0,count,"Verticies: " + numToString(cms.grid.verticies.size()));
+            renderString(0,count,"Vertices: " + numToString(cms.grid.vertices.size()));
             count += 10;
             renderString(0,count,"Edges:     " + numToString(cms.grid.edges.size()));
             count += 10;
@@ -176,4 +176,9 @@ int Utils::randInt(int low, int high)
 {
     //make sure to seed random number generator.
     return rand()%(high-low) + low;
+}
+
+Geometry::Vertex Utils::randColor(float alpha)
+{
+    return Vertex(Utils::randFloat(0.0f,1.0f),Utils::randFloat(0.0f,1.0f),Utils::randFloat(0.0f,1.0f),alpha);
 }

@@ -10,21 +10,21 @@ namespace CMS2D
 {
   /* Continuous model synthesis main function
   */
-  bool continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &verticies,
+  bool continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &vertices,
     CMSModel &input,  Grid &grid)
   {
-    for( std::vector<Vertex*>::iterator vertex_itr = verticies.begin();
-      vertex_itr != verticies.end(); vertex_itr++)
+    for( std::vector<Vertex*>::iterator vertex_itr = vertices.begin();
+      vertex_itr != vertices.end(); vertex_itr++)
       sortEdges(*vertex_itr);
 
     int *relativeCounters;
     std::vector<VertexStateEdges> sourceValidStates;
     std::vector<VertexState> validStates;
-    relativeCounters = new int[verticies.size()];
-    for(unsigned int i = 0; i < verticies.size(); i++)
+    relativeCounters = new int[vertices.size()];
+    for(unsigned int i = 0; i < vertices.size(); i++)
       relativeCounters[i] = 0;
     generateValid(sourceValidStates, input, grid);
-    generateStates( verticies, sourceValidStates, validStates, relativeCounters);
+    generateStates( vertices, sourceValidStates, validStates, relativeCounters);
     //srand(time(NULL)); done already;
     while(validStates.size() > 0)
     {
@@ -59,7 +59,7 @@ namespace CMS2D
       }
     }
     bool result = true;
-    for(unsigned int i = 0; i < verticies.size(); i++)
+    for(unsigned int i = 0; i < vertices.size(); i++)
     {
       std::cout << relativeCounters[i];
       if( relativeCounters[i] == 0)
@@ -78,7 +78,7 @@ namespace CMS2D
   */
   void generateValid(vector<VertexStateEdges> &stateList,  CMSModel &input,
     Grid &grid)
-    //inputmodel is a counterclockwise list of verticies
+    //inputmodel is a counterclockwise list of vertices
   {
     stateList.clear();
     int numsets = 3;
@@ -110,9 +110,9 @@ namespace CMS2D
 
       }
 
-      for(int itr = 0; itr < input.numVerticies; itr++)
+      for(int itr = 0; itr < input.numVertices; itr++)
       {
-        Vertex *curr = &(input.verticies[itr]);
+        Vertex *curr = &(input.vertices[itr]);
         float inboundslope = curr->edges[0]->edgestate.slope.value;
         float outboundslope = curr->edges[1]->edgestate.slope.value;
         float inbounddiff = numeric_limits<float>::infinity();
@@ -120,7 +120,7 @@ namespace CMS2D
         int inboundbestset = -1;
         int outboundbestset = -1;
         //Find best matching set for each inbound and outbound edges
-        for(int itrg = 0; itrg < input.numVerticies; itrg++)
+        for(int itrg = 0; itrg < input.numVertices; itrg++)
         {
           if(abs(inboundslope-grid.parallelEdges[itrg]->edgestate.slope.value) < inbounddiff)
           {
@@ -273,24 +273,24 @@ namespace CMS2D
     return( (ax*by - ay*bx) < 0.0f);
   }
 
-  /* Takes in a list of verticies,
+  /* Takes in a list of vertices,
   * a list of valid states from source,
   * and an empty list to put state in,
   * and populates the empty list with
   * all possible valid states for all vertecies.
   */
-  void generateStates(vector<Vertex*> &verticies,
+  void generateStates(vector<Vertex*> &vertices,
     vector<VertexStateEdges> &sourceValidStates,
     vector<VertexState> &validStates, int *relativesCounter)
   {
     validStates.clear();
-    for(unsigned int i = 0; i < verticies.size(); i++)
+    for(unsigned int i = 0; i < vertices.size(); i++)
     {
-      Vertex *current = *(verticies.begin() + i);
+      Vertex *current = *(vertices.begin() + i);
 
       if(current->edges[0] == NULL || current->edges[1] == NULL ||
         current->edges[2] == NULL || current->edges[3] == NULL)
-        //Force edge verticies to be empty
+        //Force edge vertices to be empty
       {
         VertexStateEdges edge(0,0);
         edge.dependentstates[0].leftFace = EXTERIOR;

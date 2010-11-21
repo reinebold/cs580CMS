@@ -10,7 +10,7 @@ Parser::Parser(){
 
 }
 
-void Parser::vertexArray(int &numVerts, Vertex* &verticies, int &numFaces, Face* &faces){
+void Parser::vertexArray(int &numVerts, Vertex* &vertices, int &numFaces, Face* &faces){
 	std::ifstream fin("../CMS/input.model");
 	std::string line;
 	std::string numfaces("numfaces");
@@ -27,14 +27,14 @@ void Parser::vertexArray(int &numVerts, Vertex* &verticies, int &numFaces, Face*
 	tkn >> numFaces;
 	std::cout << numFaces << std::endl;
 
-	//grab all the verticies
+	//grab all the vertices
 	std::getline(fin,line);
 	std::getline(fin,line);
 	std::istringstream int_num(line);
 	int_num >> numVerts;
 	std::cout << numVerts << std::endl;
 
-    verticies = new Vertex[numVerts];
+    vertices = new Vertex[numVerts];
 	
 	for(int i = 0; i < numVerts; i++){
 		float x,y;
@@ -52,7 +52,7 @@ void Parser::vertexArray(int &numVerts, Vertex* &verticies, int &numFaces, Face*
 		float_y >> y;
 		std::cout << y << std::endl;
 
-		verticies[i] = Vertex(x,y);
+		vertices[i] = Vertex(x,y);
 	}
 	fin.close();
 

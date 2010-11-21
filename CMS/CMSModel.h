@@ -13,15 +13,15 @@ class CMSModel
 {
 public:
     CMSModel();     
-    ~CMSModel();    ///< Deallocates verticies and edges
+    ~CMSModel();    ///< Deallocates vertices and edges
 
     ///Fills in the data members.
-    void init(int _numFaces, int _numVerticies, Vertex *_verticies);
+    void init(int _numFaces, int _numVertices, Vertex *_vertices);
    
-    int        numVerticies;      ///< The number of verticies of the model
+    int        numVertices;      ///< The number of vertices of the model
     int        numEdges;          ///< The number of edges of the model
     int        numFaces;          ///< The number of faces of the model
-    Vertex    *verticies;         ///< The verticies of the model
+    Vertex    *vertices;         ///< The vertices of the model
     Edge      *edges;             ///< The edges of the model
 };
 

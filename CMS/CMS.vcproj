@@ -319,6 +319,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\CMSModel3D.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\CMSModel3D.h"
+				>
+			</File>
+			<File
 				RelativePath=".\Geometry.cpp"
 				>
 			</File>

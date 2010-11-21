@@ -13,6 +13,7 @@
 #include "Grid.h"
 #include "Camera.h"
 #include "Parser.h"
+#include "Utilities.h"
 #include <time.h>
 using namespace Geometry;
 
@@ -22,14 +23,14 @@ extern Camera camera;
 
 CMS::CMS()
 :showBoundingBox(true),
- showGridVerticies(true)
+ showGridVertices(true)
 {
 
 }
 
-void CMS::continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &verticies)
+void CMS::continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &vertices)
 {
-    while(!CMS2D::continuousModelSynthesis2D(edges, verticies, input, grid))
+    while(!CMS2D::continuousModelSynthesis2D(edges, vertices, input, grid))
       std::cout << "Algorithm did not converge. Restarting" << std::endl << std::endl;
 }
 
@@ -40,40 +41,40 @@ void CMS::display3D()
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glBegin(GL_QUADS);
             glNormal3f(0.0f, -1.0f, 0.0f);
-            glVertex3fv(boundingBox.verticies[0].val);
-            glVertex3fv(boundingBox.verticies[1].val);
-            glVertex3fv(boundingBox.verticies[2].val);
-            glVertex3fv(boundingBox.verticies[3].val);
+            glVertex3fv(boundingBox.vertices[0].val);
+            glVertex3fv(boundingBox.vertices[1].val);
+            glVertex3fv(boundingBox.vertices[2].val);
+            glVertex3fv(boundingBox.vertices[3].val);
 
             glNormal3f(0.0f, 0.0f, 1.0f);
-            glVertex3fv(boundingBox.verticies[0].val); 
-            glVertex3fv(boundingBox.verticies[1].val);
-            glVertex3fv(boundingBox.verticies[5].val);
-            glVertex3fv(boundingBox.verticies[4].val);
+            glVertex3fv(boundingBox.vertices[0].val); 
+            glVertex3fv(boundingBox.vertices[1].val);
+            glVertex3fv(boundingBox.vertices[5].val);
+            glVertex3fv(boundingBox.vertices[4].val);
 
             glNormal3f(1.0f, 0.0f, 0.0f);
-            glVertex3fv(boundingBox.verticies[1].val);
-            glVertex3fv(boundingBox.verticies[2].val);
-            glVertex3fv(boundingBox.verticies[6].val);
-            glVertex3fv(boundingBox.verticies[5].val);
+            glVertex3fv(boundingBox.vertices[1].val);
+            glVertex3fv(boundingBox.vertices[2].val);
+            glVertex3fv(boundingBox.vertices[6].val);
+            glVertex3fv(boundingBox.vertices[5].val);
 
             glNormal3f(0.0f, 0.0f, -1.0f);
-            glVertex3fv(boundingBox.verticies[2].val);
-            glVertex3fv(boundingBox.verticies[3].val);
-            glVertex3fv(boundingBox.verticies[7].val);
-            glVertex3fv(boundingBox.verticies[6].val);
+            glVertex3fv(boundingBox.vertices[2].val);
+            glVertex3fv(boundingBox.vertices[3].val);
+            glVertex3fv(boundingBox.vertices[7].val);
+            glVertex3fv(boundingBox.vertices[6].val);
 
             glNormal3f(-1.0f, 0.0f, 0.0f);
-            glVertex3fv(boundingBox.verticies[3].val);
-            glVertex3fv(boundingBox.verticies[0].val);
-            glVertex3fv(boundingBox.verticies[4].val);
-            glVertex3fv(boundingBox.verticies[7].val);
+            glVertex3fv(boundingBox.vertices[3].val);
+            glVertex3fv(boundingBox.vertices[0].val);
+            glVertex3fv(boundingBox.vertices[4].val);
+            glVertex3fv(boundingBox.vertices[7].val);
 
             glNormal3f(0.0f, 1.0f, 0.0f);
-            glVertex3fv(boundingBox.verticies[4].val);
-            glVertex3fv(boundingBox.verticies[5].val);
-            glVertex3fv(boundingBox.verticies[6].val);
-            glVertex3fv(boundingBox.verticies[7].val);
+            glVertex3fv(boundingBox.vertices[4].val);
+            glVertex3fv(boundingBox.vertices[5].val);
+            glVertex3fv(boundingBox.vertices[6].val);
+            glVertex3fv(boundingBox.vertices[7].val);
         glEnd();
     }
 
@@ -82,22 +83,13 @@ void CMS::display3D()
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);    
     for(int numFaces = 0; numFaces < input.numFaces; ++numFaces)
     {
-       /* glBegin(GL_POLYGON);
-        for(int numVerticies = 0; numVerticies < input.numVerticies; ++numVerticies)
+        glBegin(GL_POLYGON);
+        for(int numVertices = 0; numVertices < input.numVertices; ++numVertices)
         {
-            glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
-            glVertex3fv(input.verticies[numFaces][numVerticies].val);  
-            glVertex3fv(input.verticies[numFaces][numVerticies].val);
-            
-            glColor4f(0.25f, 0.25f, 1.0f, 0.5f);
-            glVertex3fv(input.verticies[numFaces][numVerticies].val);
-            glVertex3fv(input.verticies[2].val);
-            
-            glColor4f(0.0f, 1.0f, 0.0f, 0.5f);
-            glVertex3fv(input.verticies[2].val);
-            glVertex3fv(input.verticies[0].val);
+            glColor4fv(Utils::randColor(0.5f).val);
+        //    glVertex3fv(input.faces[numFaces].vertices[numVertices].val);  
         }
-        glEnd();*/
+        glEnd();
     }
     
     glTranslatef(10.0f,0.0f,0.0f);
@@ -143,16 +135,16 @@ void CMS::display3D()
         glEnd();
     }
 
-    //Draw Verticies
-    if(showGridVerticies)
+    //Draw Vertices
+    if(showGridVertices)
     {
         glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
         glPointSize(4.0f);          //Change the size of the point
         glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
         glBegin(GL_POINTS);
-            for(int x=0; x < (int)grid.verticies.size(); x++)
+            for(int x=0; x < (int)grid.vertices.size(); x++)
             {
-                glVertex3fv(grid.verticies[x]->val);
+                glVertex3fv(grid.vertices[x]->val);
             }
         glEnd();
         glDisable(GL_POINT_SMOOTH);
@@ -167,10 +159,10 @@ void CMS::display2D()
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glBegin(GL_QUADS);
             glNormal3f(0.0f, 1.0f, 0.0f);
-            glVertex3fv(boundingBox.verticies[0].val);
-            glVertex3fv(boundingBox.verticies[1].val);
-            glVertex3fv(boundingBox.verticies[2].val);
-            glVertex3fv(boundingBox.verticies[3].val);
+            glVertex3fv(boundingBox.vertices[0].val);
+            glVertex3fv(boundingBox.vertices[1].val);
+            glVertex3fv(boundingBox.vertices[2].val);
+            glVertex3fv(boundingBox.vertices[3].val);
         glEnd();
     }
    
@@ -179,16 +171,16 @@ void CMS::display2D()
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
     glBegin(GL_LINES);
         glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-        glVertex3fv(input.verticies[0].val);  
-        glVertex3fv(input.verticies[1].val);
+        glVertex3fv(input.vertices[0].val);  
+        glVertex3fv(input.vertices[1].val);
         
         glColor4f(0.25f, 0.25f, 1.0f, 1.0f);
-        glVertex3fv(input.verticies[1].val);
-        glVertex3fv(input.verticies[2].val);
+        glVertex3fv(input.vertices[1].val);
+        glVertex3fv(input.vertices[2].val);
         
         glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-        glVertex3fv(input.verticies[2].val);
-        glVertex3fv(input.verticies[0].val);
+        glVertex3fv(input.vertices[2].val);
+        glVertex3fv(input.vertices[0].val);
     glEnd();
     glTranslatef(10.0f,0.0f,0.0f);
    
@@ -233,16 +225,16 @@ void CMS::display2D()
         glEnd();
     }
 
-    //Draw Verticies
-    if(showGridVerticies)
+    //Draw Vertices
+    if(showGridVertices)
     {
         glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
         glPointSize(4.0f);          //Change the size of the point
         glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
         glBegin(GL_POINTS);
-            for(int x=0; x < (int)grid.verticies.size(); x++)
+            for(int x=0; x < (int)grid.vertices.size(); x++)
             {
-                glVertex3fv(grid.verticies[x]->val);
+                glVertex3fv(grid.vertices[x]->val);
             }
         glEnd();
         glDisable(GL_POINT_SMOOTH);
@@ -262,29 +254,36 @@ void CMS::init()
     cout << "Seed value: " << seed << endl;
 
 	//Bounding box info
-	int bbnumVerticies;
-	Vertex* bbverticies = NULL;
-	parser.boundingBox(bbnumVerticies, bbverticies);
+	int bbnumVertices;
+	Vertex* bbvertices = NULL;
+	parser.boundingBox(bbnumVertices, bbvertices);
 
 	//Figure out the edges of the bounding box
-    boundingBox.init(bbnumVerticies, bbverticies);
+    boundingBox.init(bbnumVertices, bbvertices);
 
 	//vertex info: Must be specified in a counter-clockwise order
-	int numVerticies;
+	int numVertices;
 	int numFaces;
 	Face* faces = NULL;
-	Vertex *verticies = NULL;
-	parser.vertexArray(numVerticies, verticies, numFaces, faces);
+	Vertex *vertices = NULL;
+	parser.vertexArray(numVertices, vertices, numFaces, faces);
 
     //Figure out the edges of the bounding box
-    boundingBox.init(bbnumVerticies, bbverticies);
+    boundingBox.init(bbnumVertices, bbvertices);
 
-    //Load the verticies into the input model, find edges.
-    input.init(numFaces, numVerticies, verticies);
+    if(numFaces == 1)
+    {   
+        //Load the vertices into the input model, find edges.
+        input.init(numFaces, numVertices, vertices);
 
-    //Figure out edges and verticies.
-    grid.init(input, boundingBox);
+        //Figure out edges and vertices.
+        grid.init(input, boundingBox);
+    }
+    else
+    {
+        input3D.init(numVertices, vertices, numFaces, faces);
+    }
 
     //Do the algorithm that changes the states.
-    continuousModelSynthesis(grid.edges, grid.verticies);
+    //continuousModelSynthesis(grid.edges, grid.vertices);
 }

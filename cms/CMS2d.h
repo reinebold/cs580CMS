@@ -30,11 +30,11 @@ namespace CMS2D
     Vertex *parent;
   };
 
-  bool continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &verticies,
+  bool continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &vertices,
     CMSModel &input, Grid &grid);
   void generateValid(vector<VertexStateEdges> &stateList,  CMSModel &input, Grid &grid);
   bool concaveTest(Edge *a, Edge *b);
-  void generateStates(vector<Vertex*> &verticies, vector<VertexStateEdges> &source,
+  void generateStates(vector<Vertex*> &vertices, vector<VertexStateEdges> &source,
     vector<VertexState> &stateList, int *relativesCounter);
   void sortEdges(Vertex *v);
   void constrainEdge(Edge *edge, FaceState left, FaceState right,

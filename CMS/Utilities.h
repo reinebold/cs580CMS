@@ -6,6 +6,7 @@
 #ifndef _UTILITIES_H
 #define _UTILITIES_H
 
+#include "Geometry.h"
 #include <string>
 #include <GL/glew.h>
 
@@ -38,6 +39,8 @@ namespace Utils
     int randInt(int low, int high);
 
     void quicksortWithInsertion(int *a, int left, int right);
+
+    Geometry::Vertex randColor(float alpha = 1.0f);
 }
 
 #endif // _UTILITIES_H

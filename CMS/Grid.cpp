@@ -44,9 +44,9 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
 
     //Find a random spacing between [maximumLengthVertex/2.0,maximumLengthVertex]
     float max = 0.0f;
-    for(int x = 0; x < model.numVerticies; x++)
+    for(int x = 0; x < model.numVertices; x++)
     {
-        float length = sqrt(model.verticies[x].val[X]*model.verticies[x].val[X] + model.verticies[x].val[Y]*model.verticies[x].val[Y]);
+        float length = sqrt(model.vertices[x].val[X]*model.vertices[x].val[X] + model.vertices[x].val[Y]*model.vertices[x].val[Y]);
         if(length > max)
         {
             max = length;
@@ -190,7 +190,7 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
                     Vertex *temp = NULL;
                     if(parallelEdges[x][y].intersect(parallelEdges[i][j],temp) == INTERESECTING)
                     {
-                        verticies.push_back(temp);
+                        vertices.push_back(temp);
                         start++;
                     }
                 }
@@ -198,52 +198,52 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
         }
     }
 
-    //Separate the edges, assign verticies to edges, and edges to verticies.
+    //Separate the edges, assign vertices to edges, and edges to vertices.
     int currentEdge = 0;
-    for(int x = 0; x < model.numVerticies; x++)
+    for(int x = 0; x < model.numVertices; x++)
     {
         for(int y = 0; y < numEdges[x]; y++)
         {
-            vector<Vertex*> verticiesOnEdge;
+            vector<Vertex*> verticesOnEdge;
             Vertex *vert = parallelEdges[x][y].begin;
             float slope = parallelEdges[x][y].edgestate.slope.value;
-            for(unsigned int i = 0; i < verticies.size(); i++)
+            for(unsigned int i = 0; i < vertices.size(); i++)
             {
                 //y-y1 = m(x-x1)
-                if(fabs((vert->val[Y]-verticies[i]->val[Y]) - (slope*vert->val[X] - slope*verticies[i]->val[X])) < EPSILON)
+                if(fabs((vert->val[Y]-vertices[i]->val[Y]) - (slope*vert->val[X] - slope*vertices[i]->val[X])) < EPSILON)
                 {
-                    verticiesOnEdge.push_back(verticies[i]);
+                    verticesOnEdge.push_back(vertices[i]);
                 }
             }
 
             //We don't want to include any edges that only have one vertex
-            if(verticiesOnEdge.size() > 1)
+            if(verticesOnEdge.size() > 1)
             {
-                sortVerticies(verticiesOnEdge,0,verticiesOnEdge.size()-1);                
+                sortVertices(verticesOnEdge,0,verticesOnEdge.size()-1);                
 
 #ifdef _DEBUG
-                //Sanity check: Make sure the verticies are in order.
-                for(int a = 0; a < (int)verticiesOnEdge.size()-1; a++)
+                //Sanity check: Make sure the vertices are in order.
+                for(int a = 0; a < (int)verticesOnEdge.size()-1; a++)
                 {
-                    if(!(verticiesOnEdge[a]->val[X] < verticiesOnEdge[a+1]->val[X]))
+                    if(!(verticesOnEdge[a]->val[X] < verticesOnEdge[a+1]->val[X]))
                     {
-                        cout << "SANITY ERROR: Verticies are not sorted." << endl;
-                        cout << verticiesOnEdge[a]->val[X] << " " <<  verticiesOnEdge[a+1]->val[X] << endl;
+                        cout << "SANITY ERROR: Vertices are not sorted." << endl;
+                        cout << verticesOnEdge[a]->val[X] << " " <<  verticesOnEdge[a+1]->val[X] << endl;
                         exit(EXIT_FAILURE);
                     }
                 }
 #endif
 
-                for(unsigned int j = 0; j < verticiesOnEdge.size()-1; j++)
+                for(unsigned int j = 0; j < verticesOnEdge.size()-1; j++)
                 {
-                    Edge *edge = new Edge(verticiesOnEdge[j],verticiesOnEdge[j+1]);
+                    Edge *edge = new Edge(verticesOnEdge[j],verticesOnEdge[j+1]);
                     edge->edgestate.set = x;
                     edges.push_back(edge);
 
-                    verticiesOnEdge[j]->edges[verticiesOnEdge[j]->connectedEdges] = edge;
-                    verticiesOnEdge[j+1]->edges[verticiesOnEdge[j+1]->connectedEdges] = edge;
-                    verticiesOnEdge[j]->connectedEdges++;
-                    verticiesOnEdge[j+1]->connectedEdges++;
+                    verticesOnEdge[j]->edges[verticesOnEdge[j]->connectedEdges] = edge;
+                    verticesOnEdge[j+1]->edges[verticesOnEdge[j+1]->connectedEdges] = edge;
+                    verticesOnEdge[j]->connectedEdges++;
+                    verticesOnEdge[j+1]->connectedEdges++;
                 } 
             }
         }
@@ -251,14 +251,14 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
 
     //Find if a vertex only has one edge.
     int x = 0;
-    for(vector<Vertex*>::iterator vertIter = verticies.begin(); vertIter < verticies.end();)
+    for(vector<Vertex*>::iterator vertIter = vertices.begin(); vertIter < vertices.end();)
     {
         
         if((*vertIter)->connectedEdges == 1)
         {
             for(vector<Edge*>::iterator edgeIter = edges.begin(); edgeIter < edges.end(); edgeIter++)
             {
-                //Find the edge in 'edges' that corresponds to the one edge in verticies.
+                //Find the edge in 'edges' that corresponds to the one edge in vertices.
                 if(((*edgeIter) != NULL) && ((*edgeIter) == (*vertIter)->edges[0]) )
                 {
                     //Make sure that we decrement the number of edges of the other vertex it is connected to,
@@ -297,7 +297,7 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
 
                     delete (*vertIter);
                     (*vertIter) = NULL;
-                    vertIter = verticies.erase(vertIter);                         
+                    vertIter = vertices.erase(vertIter);                         
 
                     setToNull->edges[z] = NULL;
 
@@ -314,20 +314,20 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
 #ifdef _DEBUG
     //Sanity check: Make sure all currentEdge counts are correct and everything else is null.
     //Sanity check: Make sure all vertices have more than 1 edge.
-    for(int x = 0; x < (int)verticies.size(); x++)
+    for(int x = 0; x < (int)vertices.size(); x++)
     {
         int count = 0;
         for(int y = 0; y < 4; y++)
         {
 
-            if(verticies[x]->edges[y] != NULL)
+            if(vertices[x]->edges[y] != NULL)
             {
                 count++;
             }
         }
-        if(count != verticies[x]->connectedEdges)
+        if(count != vertices[x]->connectedEdges)
         {
-            cout << "SANITY ERROR: currentEdge count is incorrect for some verticies (or some edges don't point to NULL like they should" << endl;
+            cout << "SANITY ERROR: currentEdge count is incorrect for some vertices (or some edges don't point to NULL like they should" << endl;
             exit(EXIT_FAILURE);
         }
 
@@ -365,24 +365,24 @@ void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
 #endif
 }
 
-void Grid::sortVerticies(vector<Vertex*> &verticies, int left, int right)
+void Grid::sortVertices(vector<Vertex*> &vertices, int left, int right)
 {
     if(left>=right)
         return;
     int middle = left;
     for(int i = left+1; i <= right; i++){
-        if(verticies[i]->val[X] < verticies[left]->val[X])
+        if(vertices[i]->val[X] < vertices[left]->val[X])
         {
-            Vertex *temp = verticies[++middle];
-            verticies[middle] = verticies[i];
-            verticies[i] = temp;  
+            Vertex *temp = vertices[++middle];
+            vertices[middle] = vertices[i];
+            vertices[i] = temp;  
         }
     }
-    Vertex *temp = verticies[left];
-    verticies[left] = verticies[middle];
-    verticies[middle] = temp;
-    sortVerticies(verticies,left,middle-1);
-    sortVerticies(verticies,middle+1,right);
+    Vertex *temp = vertices[left];
+    vertices[left] = vertices[middle];
+    vertices[middle] = temp;
+    sortVertices(vertices,left,middle-1);
+    sortVertices(vertices,middle+1,right);
 }
 
 Grid::Grid()
@@ -401,11 +401,11 @@ Grid::~Grid()
     delete [] parallelEdges;
     delete [] numEdges;
 
-    for(unsigned int x = 0; x < verticies.size(); x++)
+    for(unsigned int x = 0; x < vertices.size(); x++)
     {
-        delete verticies[x];
+        delete vertices[x];
     }
-    verticies.clear();
+    vertices.clear();
 
     for(unsigned int x = 0; x < edges.size(); x++)
     {

@@ -126,7 +126,7 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
         glutPostRedisplay();
         break;
     case 'v':
-        cms.showGridVerticies = !cms.showGridVerticies;
+        cms.showGridVertices = !cms.showGridVertices;
         glutPostRedisplay();
         break;
     }
