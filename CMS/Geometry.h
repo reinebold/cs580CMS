@@ -84,10 +84,40 @@ namespace Geometry
         Edge    edges[4];       ///< Bounding box edges
     };
 
-    class Face
+
+	class Vector {
+	public:
+		Vector();
+		Vector(float x, float y, float z);
+		float dotProduct(Vector& other);
+		Vector crossProduct(Vector& other);
+		float getX();
+		float getY();
+		float getZ();
+		void setX(float newX);
+		void setY(float newY);
+		void setZ(float newZ);
+		Vector& operator=(const Vector& other);
+	private:
+		float x, y, z;
+	};
+
+	class Plane {
+	public:
+		Plane(Vertex v, Vector dir);
+	private:
+		Vertex v;
+		Vector dir;
+	};
+
+	class Face
     {
     public:
         Face();
+	private:
+		Vertex* vertices;
+		Edge* edges;
+		Vector normal;
     };
 }
 

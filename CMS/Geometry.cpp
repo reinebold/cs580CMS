@@ -181,3 +181,64 @@ IntersectResult Edge::intersect(const Edge& otheredge, Vertex* &intersection)
 
     return NOT_INTERESECTING;
 }
+
+
+Vector::Vector(float inX, float inY, float inZ) {
+	x = inX;
+	y = inY;
+	z = inZ;
+}
+
+Vector::Vector() {
+	x = 0;
+	y = 0;
+	z = 0;
+}
+
+float Vector::getX() {
+	return x;
+}
+
+float Vector::getY() {
+	return y;
+}
+
+float Vector::getZ() {
+	return z;
+}
+
+void Vector::setX(float newX) {
+	x = newX;
+}
+
+void Vector::setY(float newY) {
+	y = newY;
+}
+
+void Vector::setZ(float newZ) {
+	z = newZ;
+}
+
+float Vector::dotProduct(Vector& other) {
+	return x * other.x + y * other.y + z * other.z;
+}
+
+Vector& Vector::operator=(const Vector& other) {
+	x = other.x;
+	y = other.y;
+	z = other.z;
+	return *this;
+}
+
+Vector Vector::crossProduct(Vector& other) {
+	Vector answer(0, 0, 0);
+	answer.x = (y * other.z) - (z * other.y);
+	answer.y = (z * other.x) - (x * other.z);
+	answer.z = (x * other.y) - (y * other.x);
+	return answer;
+}
+
+Plane::Plane(Vertex vIn, Vector dirIn) {
+	v = vIn;
+	dir = dirIn;
+}

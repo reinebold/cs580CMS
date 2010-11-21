@@ -14,6 +14,7 @@ Description:
 #include "State.h"
 #include "CMS.h"
 #include "City.h"
+#include "Geometry.h"
 
 Camera      camera;
 Lights      lights;
@@ -101,6 +102,12 @@ void main(int argc, char **argv)
 		delete grid[i];
 	}
 	delete grid;*/
+
+	//Geometry::Vector a(1, 2, 3);
+	//Geometry::Vector b(0, -1, 2);
+	//Geometry::Vector c;
+	//c = a.crossProduct(b);
+	//std::cout << a.dotProduct(b) << std::endl;
 
     //Initialize GLUT
     glutInit(&argc, argv);
