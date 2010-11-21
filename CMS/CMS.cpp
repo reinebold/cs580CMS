@@ -243,33 +243,37 @@ void CMS::display2D()
 
 void CMS::init()
 {
+
+   //_crtBreakAlloc = 183;
+
     state.setWireFrame(true);
     state.setLighting(false);
     state.setDrawLights(false);
     state.setDrawAxis(false);
     state.setPrintInfoOnScreen(true);
     
-    unsigned int seed = (unsigned int)time(NULL);
+    //unsigned int seed = (unsigned int)time(NULL);
+    unsigned int seed = 1290323082;
     srand(seed);
     cout << "Seed value: " << seed << endl;
 
 	//Bounding box info
 	int bbnumVertices;
-	Vertex* bbvertices = NULL;
-	parser.boundingBox(bbnumVertices, bbvertices);
+	Vertex* bbvertices = NULL;  //Should be deleted in boundingbox.init
 
-	//Figure out the edges of the bounding box
+	parser.boundingBox(bbnumVertices, bbvertices);
     boundingBox.init(bbnumVertices, bbvertices);
 
-	//vertex info: Must be specified in a counter-clockwise order
+    delete [] bbvertices;
+
+	//Vertex info: Must be specified in a counter-clockwise order
 	int numVertices;
 	int numFaces;
 	Face* faces = NULL;
 	Vertex *vertices = NULL;
 	parser.vertexArray(numVertices, vertices, numFaces, faces);
-
-    //Figure out the edges of the bounding box
-    boundingBox.init(bbnumVertices, bbvertices);
+    delete [] faces;
+    delete [] vertices;
 
     if(numFaces == 1)
     {   
@@ -278,6 +282,8 @@ void CMS::init()
 
         //Figure out edges and vertices.
         grid.init(input, boundingBox);
+
+        continuousModelSynthesis(grid.edges, grid.vertices);
     }
     else
     {

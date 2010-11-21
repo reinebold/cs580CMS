@@ -15,19 +15,17 @@ void Parser::vertexArray(int &numVerts, Vertex* &vertices, int &numFaces, Face* 
 	std::string line;
 	std::string numfaces("numfaces");
 
-	for(;;){
+	while(line.compare(numfaces) != 0)
 		std::getline(fin,line);
-		if(line.compare(numfaces) == 0)
-			break;
-	}
 	
 	std::getline(fin,line);
 	std::istringstream tkn(line);
-	//gets the number of faces for future usage, but not used anywhere yet.
+	//gets the number of faces
 	tkn >> numFaces;
 	std::cout << numFaces << std::endl;
+	//faces = new Face[numFaces];
 
-	//grab all the vertices
+	//grab all the verticies
 	std::getline(fin,line);
 	std::getline(fin,line);
 	std::istringstream int_num(line);
@@ -35,24 +33,45 @@ void Parser::vertexArray(int &numVerts, Vertex* &vertices, int &numFaces, Face* 
 	std::cout << numVerts << std::endl;
 
     vertices = new Vertex[numVerts];
-	
-	for(int i = 0; i < numVerts; i++){
-		float x,y;
+	int totalVerts = 0;
+	for(int i = 0; i < numFaces; i++){
+		std::getline(fin,line); //"face"
+		std::getline(fin,line); //"numVerts"
+		int numFaceVerts;
 		std::getline(fin,line);
-		std::istringstream tokenizer(line);
-		std::string token;
+		std::istringstream faceV(line);
+		faceV >> numFaceVerts;
 
-		std::getline(tokenizer,token,',');
-		std::istringstream float_x(token);
-		float_x >> x;
-		std::cout << x << std::endl;
+		Vertex *faceVerts = new Vertex[numFaceVerts];
 
-		std::getline(tokenizer,token,',');
-		std::istringstream float_y(token);
-		float_y >> y;
-		std::cout << y << std::endl;
+		for(int j = 0; j < numFaceVerts; j++){
+			float x,y,z;
+			std::getline(fin,line);
+			std::istringstream tokenizer(line);
+			std::string token;
 
-		vertices[i] = Vertex(x,y);
+			std::getline(tokenizer,token,',');
+			std::istringstream float_x(token);
+			float_x >> x;
+
+
+			std::getline(tokenizer,token,',');
+			std::istringstream float_y(token);
+			float_y >> y;
+
+			if(numFaces > 1){
+				std::getline(tokenizer,token,',');
+				std::istringstream float_z(token);
+				float_z >> z;
+			}
+			else
+				z = 0.0;
+
+			vertices[totalVerts] = Vertex(x,y,z);
+           // faceVerts[j] = &vertices[totalVerts];
+			totalVerts++;
+		}
+		//faces[i] = Face(numFaceVerts, faceVerts);
 	}
 	fin.close();
 
@@ -73,21 +92,24 @@ void Parser::boundingBox(int &numBoundVerts, Vertex* &bounds){
 	bounds = new Vertex[numBoundVerts];
 	//obtain bounding box
 	for(int i = 0; i < numBoundVerts; i++){
+        float x,y,z;
 		std::getline(fin,line);
 	    std::istringstream tokenizer(line);
 		std::string token;
 
 		std::getline(tokenizer,token,',');
 		std::istringstream float_x(token);
-		float_x >> bounds[i].val[X];
+		float_x >> x;
 
 		std::getline(tokenizer,token,',');
 		std::istringstream float_y(token);
-		float_y >> bounds[i].val[Y];
+		float_y >> y;
 
 		std::getline(tokenizer,token,',');
 		std::istringstream float_z(token);
-		float_z >> bounds[i].val[Z];
+		float_z >> z;
+
+        bounds[i] = Vertex(x,y,z);
 	}
 	fin.close();
 }

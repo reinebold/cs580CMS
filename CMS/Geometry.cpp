@@ -55,10 +55,10 @@ Vertex::Vertex()
     edges[2] = NULL;
     edges[3] = NULL;
 
-    faces[0] = NULL;
-    faces[1] = NULL;
-    faces[2] = NULL;
-    faces[3] = NULL;
+    //faces[0] = NULL;
+    //faces[1] = NULL;
+    //faces[2] = NULL;
+    //faces[3] = NULL;
 }
 
 Vertex::Vertex(float xval, float yval, float zval, float wval)
@@ -75,10 +75,10 @@ Vertex::Vertex(float xval, float yval, float zval, float wval)
     edges[2] = NULL;
     edges[3] = NULL;
 
-    faces[0] = NULL;
-    faces[1] = NULL;
-    faces[2] = NULL;
-    faces[3] = NULL;
+    //faces[0] = NULL;
+    //faces[1] = NULL;
+    //faces[2] = NULL;
+    //faces[3] = NULL;
 }
 
 Vertex& Vertex::operator=(const Vertex &vert)
@@ -96,10 +96,10 @@ Vertex& Vertex::operator=(const Vertex &vert)
     edges[2] = vert.edges[2];
     edges[3] = vert.edges[3];
 
-    faces[0] = vert.faces[0];
-    faces[1] = vert.faces[1];
-    faces[2] = vert.faces[2];
-    faces[3] = vert.faces[3];
+    //faces[0] = vert.faces[0];
+    //faces[1] = vert.faces[1];
+    //faces[2] = vert.faces[2];
+    //faces[3] = vert.faces[3];
     
 	return *this;
 }
@@ -140,7 +140,7 @@ Cuboid::Cuboid()
 
 }
 
-void Cuboid::init(int _numVertices, Vertex *_vertices)
+void Cuboid::init(int _numVertices, Vertex* _vertices)
 {
 	if(_numVertices != 8 && _numVertices != 4)
 	{
@@ -254,20 +254,26 @@ Plane::Plane(Vertex vIn, Vector dirIn) {
 	dir = dirIn;
 }
 
-Face::Face(int inNumVertices, Vertex* inVertices) {
-	numVertices = inNumVertices;
-	numEdges = inNumVertices;
-	vertices = inVertices;
+Face::Face()
+{
+
+}
+
+Face::Face(int _numVertices, Vertex** _vertices)
+{
+	numVertices = _numVertices;
+	numEdges = _numVertices;
+	vertices = _vertices;
 	edges = new Edge[numEdges];
 	for(int i=0; i < numVertices; i++) {
-		Vertex v1 = vertices[i];
-		Vertex v2;
+		Vertex* v1 = vertices[i];
+		Vertex* v2;
 		if (i == numVertices - 1) {
 			v2 = vertices[0];
 		} else {
 			v2 = vertices[i + 1];
 		}
-		Edge e(&v1, &v2);
+		Edge e(v1, v2);
 		edges[i] = e;
 	}
 	Vector a(edges[0].end->val[0] - edges[0].begin->val[0], edges[0].end->val[1] - edges[0].begin->val[1], edges[0].end->val[2] - edges[0].begin->val[2]);
@@ -276,18 +282,18 @@ Face::Face(int inNumVertices, Vertex* inVertices) {
 }
 
 Face::~Face() {
-	delete edges;
-}
-
-Face::Face()
-{
-
+//	delete edges;
 }
 
 Face& Face::operator=(const Face &_face)
 {
-
     return *this;
-
 }
 
+//Return null if the three planes don't intersect
+Vertex* planePlanePlaneIntersection(Plane a, Plane b, Plane c) {
+	Vector n1 = a.dir;
+	Vector n2 = b.dir;
+	Vector n3 = c.dir;
+	return NULL;
+}
