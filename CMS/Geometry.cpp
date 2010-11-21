@@ -67,7 +67,7 @@ Vertex::Vertex(float xval, float yval, float zval)
     edges[3] = NULL;
 }
 
-void Vertex::operator=(const Vertex &vert)
+Vertex& Vertex::operator=(const Vertex &vert)
 {
     val[X] = vert.val[X];
     val[Y] = vert.val[Y];
@@ -78,6 +78,7 @@ void Vertex::operator=(const Vertex &vert)
     edges[1] = vert.edges[1];
     edges[2] = vert.edges[2];
     edges[3] = vert.edges[3];
+	return *this;
 }
 
 Edge::Edge() 
@@ -118,13 +119,17 @@ Cuboid::Cuboid()
 
 void Cuboid::init(int _numVerticies, Vertex *_verticies)
 {
-	if(_numVerticies != 8 || _numVerticies != 4)
+	if(_numVerticies != 8 && _numVerticies != 4)
 	{
 		cerr << "Bounding box can only have 4 (for 2d case) or 8 (for 3d case) verticies. numVerticies: " << numVerticies << endl;
 		exit(EXIT_FAILURE);
 	}
 
     numVerticies = _numVerticies;
+
+    verticies = new Vertex[numVerticies];
+    edges = new Edge[numVerticies];
+
     //Assign the verticies to the data member verticies in Cuboid.
     for(int x = 0; x < numVerticies; ++x)
     {

@@ -82,8 +82,8 @@ void CMS::display3D()
     glColor4f(1.0f, 0.0f, 0.0f, 1.0f);    
     for(int numFaces = 0; numFaces < input.numFaces; ++numFaces)
     {
-        glBegin(GL_POLYGON);
-        for(int numVertices = 0; numVertices < input.numVerticies; ++numVerticies)
+       /* glBegin(GL_POLYGON);
+        for(int numVerticies = 0; numVerticies < input.numVerticies; ++numVerticies)
         {
             glColor4f(1.0f, 0.0f, 0.0f, 0.5f);
             glVertex3fv(input.verticies[numFaces][numVerticies].val);  
@@ -97,7 +97,7 @@ void CMS::display3D()
             glVertex3fv(input.verticies[2].val);
             glVertex3fv(input.verticies[0].val);
         }
-        glEnd();
+        glEnd();*/
     }
     
     glTranslatef(10.0f,0.0f,0.0f);
@@ -263,7 +263,7 @@ void CMS::init()
 
 	//Bounding box info
 	int bbnumVerticies;
-	Vertex* bbverticies;
+	Vertex* bbverticies = NULL;
 	parser.boundingBox(bbnumVerticies, bbverticies);
 
 	//Figure out the edges of the bounding box
@@ -272,9 +272,12 @@ void CMS::init()
 	//vertex info: Must be specified in a counter-clockwise order
 	int numVerticies;
 	int numFaces;
-	Face* faces;
-	Vertex *verticies;
+	Face* faces = NULL;
+	Vertex *verticies = NULL;
 	parser.vertexArray(numVerticies, verticies, numFaces, faces);
+
+    //Figure out the edges of the bounding box
+    boundingBox.init(bbnumVerticies, bbverticies);
 
     //Load the verticies into the input model, find edges.
     input.init(numFaces, numVerticies, verticies);
