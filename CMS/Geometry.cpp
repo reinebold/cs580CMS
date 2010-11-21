@@ -255,6 +255,10 @@ Plane::Plane(Vertex vIn, Vector dirIn) {
 	dir = dirIn;
 }
 
+Face::Face(){
+
+}
+
 Face::Face(int inNumVertices, Vertex* inVertices) {
 	numVertices = inNumVertices;
 	numEdges = inNumVertices;
