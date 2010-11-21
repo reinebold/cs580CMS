@@ -67,7 +67,7 @@ Vertex::Vertex(float xval, float yval, float zval)
     edges[3] = NULL;
 }
 
-void Vertex::operator=(const Vertex &vert)
+Vertex& Vertex::operator=(const Vertex &vert)
 {
     val[X] = vert.val[X];
     val[Y] = vert.val[Y];
@@ -78,6 +78,7 @@ void Vertex::operator=(const Vertex &vert)
     edges[1] = vert.edges[1];
     edges[2] = vert.edges[2];
     edges[3] = vert.edges[3];
+	return *this;
 }
 
 Edge::Edge() 

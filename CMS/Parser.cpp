@@ -10,27 +10,32 @@ Parser::Parser(){
 
 }
 
-Vertex* Parser::vertexArray(int *numVerts,int *numFaces){
+Vertex* Parser::vertexArray(int &numVerts,int &numFaces){
 	std::ifstream fin("../CMS/input.model");
 	std::string line;
+	std::string numfaces("numfaces");
 
-	for(int i = 0; i < 5; i++)
+	for(;;){
 		std::getline(fin,line);
-
-	std::getline(fin,line);
+		if(line.compare(numfaces) == 0)
+			break;
+	}
+	
 	std::getline(fin,line);
 	std::istringstream tkn(line);
 	//gets the number of faces for future usage, but not used anywhere yet.
-	tkn >> *numFaces;
+	tkn >> numFaces;
+	std::cout << numFaces << std::endl;
 
 	//grab all the verticies
 	std::getline(fin,line);
 	std::getline(fin,line);
 	std::istringstream int_num(line);
-	int_num >> *numVerts;
-	std::cout << *numVerts << std::endl;
-	Vertex* verticies = new Vertex[*numVerts];
-	for(int i = 0; i < *numVerts; i++){
+	int_num >> numVerts;
+	std::cout << numVerts << std::endl;
+	
+	Vertex* verticies = new Vertex[numVerts];
+	for(int i = 0; i < numVerts; i++){
 		float x,y;
 		std::getline(fin,line);
 		std::istringstream tokenizer(line);
@@ -39,25 +44,35 @@ Vertex* Parser::vertexArray(int *numVerts,int *numFaces){
 		std::getline(tokenizer,token,',');
 		std::istringstream float_x(token);
 		float_x >> x;
+		std::cout << x << std::endl;
 
 		std::getline(tokenizer,token,',');
 		std::istringstream float_y(token);
 		float_y >> y;
+		std::cout << y << std::endl;
 
 		verticies[i] = Vertex(x,y);
 	}
 	fin.close();
+
 	return verticies;
 }
 
-void Parser::boundingBox(Vertex* bounds){
+
+void Parser::boundingBox(int &numBoundVerts, Vertex *bounds){
 	std::ifstream fin("../CMS/input.model");
 	std::string line;
 
-	std::getline(fin,line);
-	
+	std::getline(fin,line); //bound
+	std::getline(fin,line); //bound size
+	std::istringstream bnds(line);
+	int temp;
+	bnds >> temp;
+	numBoundVerts = temp;
+
+	bounds = new Vertex[numBoundVerts];
 	//obtain bounding box
-	for(int i = 0; i < 4; i++){
+	for(int i = 0; i < numBoundVerts; i++){
 		float x,y,z;
 		std::getline(fin,line);
 		std::istringstream tokenizer(line);

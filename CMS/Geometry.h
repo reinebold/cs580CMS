@@ -39,7 +39,7 @@ namespace Geometry
         Vertex();
         Vertex(float xval, float yval, float zval = 0.0f);
 
-        void operator=(const Vertex &vert);
+        Vertex& operator=(const Vertex &vert);
 
         float val[3];          ///< X, Y, and Z values
         Edge *edges[4];        ///< The maximum 4 edges the vertex is connected to

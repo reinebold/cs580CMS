@@ -141,16 +141,17 @@ void CMS::init()
     cout << "Seed value: " << seed << endl;
 
 	//Bounding box info
-	Vertex bbverticies[4];
-	parser.boundingBox(bbverticies);
+	int bbnumVerticies;
+	Vertex *bbVerticies = 0;
+	parser.boundingBox(bbnumVerticies, bbVerticies);
 
 	//vertex info: Must be specified in a counter-clockwise order?
 	int numVerticies;
 	int numFaces;
-	Vertex *verticies = parser.vertexArray(&numVerticies,&numFaces);
+	Vertex *verticies = parser.vertexArray(numVerticies,numFaces);
 
     //Figure out the edges of the bounding box
-    boundingBox.init(4, bbverticies);
+    boundingBox.init(bbnumVerticies, bbVerticies);
 
     //Load the verticies into the input model, find edges.
     input.init(numFaces, numVerticies, verticies);
