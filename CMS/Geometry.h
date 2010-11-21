@@ -77,11 +77,12 @@ namespace Geometry
     public:
         Cuboid();
         
-        void init(int numVerticies, Vertex *verticies);
+        void init(int _numVerticies, Vertex *verticies);
 
         //TODO: Update cuboid to 3d case
-        Vertex  verticies[4];   ///< Bounding box verticies
-        Edge    edges[4];       ///< Bounding box edges
+		int	 	 numVerticies;
+        Vertex*  verticies;   ///< Bounding box verticies
+        Edge*    edges;       ///< Bounding box edges
     };
 
 

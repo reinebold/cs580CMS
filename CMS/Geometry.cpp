@@ -116,8 +116,15 @@ Cuboid::Cuboid()
 
 }
 
-void Cuboid::init(int numVerticies, Vertex *_verticies)
+void Cuboid::init(int _numVerticies, Vertex *_verticies)
 {
+	if(_numVerticies != 8 || _numVerticies != 4)
+	{
+		cerr << "Bounding box can only have 4 (for 2d case) or 8 (for 3d case) verticies. numVerticies: " << numVerticies << endl;
+		exit(EXIT_FAILURE);
+	}
+
+    numVerticies = _numVerticies;
     //Assign the verticies to the data member verticies in Cuboid.
     for(int x = 0; x < numVerticies; ++x)
     {
@@ -129,7 +136,7 @@ void Cuboid::init(int numVerticies, Vertex *_verticies)
     {
         int begin = x;
         int end;
-        if(x+1 == 4)
+        if(x+1 == numVerticies)
         {
             end = 0;
         }
