@@ -291,3 +291,11 @@ Vertex* Face::getVertices() {
 Edge* Face::getEdges() {
 	return edges;
 }
+
+//Return null if the three planes don't intersect
+Vertex* planePlanePlaneIntersection(Plane a, Plane b, Plane c) {
+	Vector n1 = a.dir;
+	Vector n2 = b.dir;
+	Vector n3 = c.dir;
+	return NULL;
+}

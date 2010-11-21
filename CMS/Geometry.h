@@ -126,6 +126,8 @@ namespace Geometry
 		Edge* edges;
 		Vector normal;
     };
+
+	Vertex* planePlanePlaneIntersection(Plane a, Plane b, Plane c);
 }
 
 #endif // _GEOMETRY_H
