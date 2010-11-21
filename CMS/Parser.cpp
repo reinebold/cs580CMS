@@ -15,18 +15,15 @@ void Parser::vertexArray(int &numVerts, Vertex* &verticies, int &numFaces, Face*
 	std::string line;
 	std::string numfaces("numfaces");
 
-	for(;;){
+	while(line.compare(numfaces) != 0)
 		std::getline(fin,line);
-		if(line.compare(numfaces) == 0)
-			break;
-	}
 	
 	std::getline(fin,line);
 	std::istringstream tkn(line);
-	//gets the number of faces for future usage, but not used anywhere yet.
+	//gets the number of faces
 	tkn >> numFaces;
 	std::cout << numFaces << std::endl;
-
+	faces = new Face[numFaces];
 	//grab all the verticies
 	std::getline(fin,line);
 	std::getline(fin,line);
@@ -35,24 +32,45 @@ void Parser::vertexArray(int &numVerts, Vertex* &verticies, int &numFaces, Face*
 	std::cout << numVerts << std::endl;
 
     verticies = new Vertex[numVerts];
-	
-	for(int i = 0; i < numVerts; i++){
-		float x,y;
+	int totalVerts = 0;
+	for(int i = 0; i < numFaces; i++){
+		std::getline(fin,line); //"face"
+		std::getline(fin,line); //"numVerts"
+		int numFaceVerts;
 		std::getline(fin,line);
-		std::istringstream tokenizer(line);
-		std::string token;
+		std::istringstream faceV(line);
+		faceV >> numFaceVerts;
 
-		std::getline(tokenizer,token,',');
-		std::istringstream float_x(token);
-		float_x >> x;
-		std::cout << x << std::endl;
+		Vertex *faceVerts = new Vertex[numFaceVerts];
 
-		std::getline(tokenizer,token,',');
-		std::istringstream float_y(token);
-		float_y >> y;
-		std::cout << y << std::endl;
+		for(int j = 0; j < numFaceVerts; j++){
+			float x,y,z;
+			std::getline(fin,line);
+			std::istringstream tokenizer(line);
+			std::string token;
 
-		verticies[i] = Vertex(x,y);
+			std::getline(tokenizer,token,',');
+			std::istringstream float_x(token);
+			float_x >> x;
+
+
+			std::getline(tokenizer,token,',');
+			std::istringstream float_y(token);
+			float_y >> y;
+
+			if(numFaces > 1){
+				std::getline(tokenizer,token,',');
+				std::istringstream float_z(token);
+				float_z >> z;
+			}
+			else
+				z = 0.0;
+
+			faceVerts[j] = Vertex(x,y,z);
+			verticies[totalVerts] = Vertex(x,y,z);
+			totalVerts++;
+		}
+		faces[i] = Face(numFaceVerts, faceVerts);
 	}
 	fin.close();
 
