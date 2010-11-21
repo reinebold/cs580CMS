@@ -22,7 +22,7 @@ CMSModel::~CMSModel()
 void CMSModel::init(int _numFaces, int _numVertices, Vertex *_vertices)
 {
     numFaces     = _numFaces;
-    numVertices = _numVertices;
+    numVertices  = _numVertices;
     numEdges     = _numVertices;
 
     //TODO: Lots of error checking.

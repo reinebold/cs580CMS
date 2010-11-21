@@ -243,9 +243,6 @@ void CMS::display2D()
 
 void CMS::init()
 {
-
-   //_crtBreakAlloc = 183;
-
     state.setWireFrame(true);
     state.setLighting(false);
     state.setDrawLights(false);
@@ -253,17 +250,15 @@ void CMS::init()
     state.setPrintInfoOnScreen(true);
     
     //unsigned int seed = (unsigned int)time(NULL);
-    unsigned int seed = 1290323082;
+    unsigned int seed = 1290329136;
     srand(seed);
     cout << "Seed value: " << seed << endl;
 
 	//Bounding box info
 	int bbnumVertices;
 	Vertex* bbvertices = NULL;  //Should be deleted in boundingbox.init
-
 	parser.boundingBox(bbnumVertices, bbvertices);
     boundingBox.init(bbnumVertices, bbvertices);
-
     delete [] bbvertices;
 
 	//Vertex info: Must be specified in a counter-clockwise order
@@ -272,13 +267,14 @@ void CMS::init()
 	Face* faces = NULL;
 	Vertex *vertices = NULL;
 	parser.vertexArray(numVertices, vertices, numFaces, faces);
-    delete [] faces;
-    delete [] vertices;
 
     if(numFaces == 1)
     {   
         //Load the vertices into the input model, find edges.
         input.init(numFaces, numVertices, vertices);
+        delete [] faces->vertices;
+        delete [] faces;
+        delete [] vertices;
 
         //Figure out edges and vertices.
         grid.init(input, boundingBox);
@@ -288,6 +284,9 @@ void CMS::init()
     else
     {
         input3D.init(numVertices, vertices, numFaces, faces);
+        delete [] faces->vertices;
+        delete [] faces;
+        delete [] vertices;
     }
 
     //Do the algorithm that changes the states.

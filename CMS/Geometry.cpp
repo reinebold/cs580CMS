@@ -55,10 +55,10 @@ Vertex::Vertex()
     edges[2] = NULL;
     edges[3] = NULL;
 
-    //faces[0] = NULL;
-    //faces[1] = NULL;
-    //faces[2] = NULL;
-    //faces[3] = NULL;
+    faces[0] = NULL;
+    faces[1] = NULL;
+    faces[2] = NULL;
+    faces[3] = NULL;
 }
 
 Vertex::Vertex(float xval, float yval, float zval, float wval)
@@ -75,10 +75,10 @@ Vertex::Vertex(float xval, float yval, float zval, float wval)
     edges[2] = NULL;
     edges[3] = NULL;
 
-    //faces[0] = NULL;
-    //faces[1] = NULL;
-    //faces[2] = NULL;
-    //faces[3] = NULL;
+    faces[0] = NULL;
+    faces[1] = NULL;
+    faces[2] = NULL;
+    faces[3] = NULL;
 }
 
 Vertex& Vertex::operator=(const Vertex &vert)
@@ -96,10 +96,10 @@ Vertex& Vertex::operator=(const Vertex &vert)
     edges[2] = vert.edges[2];
     edges[3] = vert.edges[3];
 
-    //faces[0] = vert.faces[0];
-    //faces[1] = vert.faces[1];
-    //faces[2] = vert.faces[2];
-    //faces[3] = vert.faces[3];
+    faces[0] = vert.faces[0];
+    faces[1] = vert.faces[1];
+    faces[2] = vert.faces[2];
+    faces[3] = vert.faces[3];
     
 	return *this;
 }
@@ -255,17 +255,26 @@ Plane::Plane(Vertex vIn, Vector dirIn) {
 }
 
 Face::Face()
+:numVertices(0),
+ numEdges(0)
 {
 
 }
 
-Face::Face(int _numVertices, Vertex** _vertices)
+Face::Face(int _numVertices, Vertex* _vertices)
 {
 	numVertices = _numVertices;
 	numEdges = _numVertices;
-	vertices = _vertices;
+
+
+	/*vertices = new Vertex*[numVertices];
 	edges = new Edge[numEdges];
-	for(int i=0; i < numVertices; i++) {
+    for(int x = 0; x < numVertices; x++)
+    {
+        vertices[x] = &_vertices[x];
+    }
+	for(int i=0; i < numVertices; i++) 
+    {
 		Vertex* v1 = vertices[i];
 		Vertex* v2;
 		if (i == numVertices - 1) {
@@ -278,7 +287,7 @@ Face::Face(int _numVertices, Vertex** _vertices)
 	}
 	Vector a(edges[0].end->val[0] - edges[0].begin->val[0], edges[0].end->val[1] - edges[0].begin->val[1], edges[0].end->val[2] - edges[0].begin->val[2]);
 	Vector b(edges[1].end->val[0] - edges[1].begin->val[0], edges[1].end->val[1] - edges[1].begin->val[1], edges[1].end->val[2] - edges[1].begin->val[2]);
-	normal = a.crossProduct(b);
+	normal = a.crossProduct(b);*/
 }
 
 Face::~Face() {

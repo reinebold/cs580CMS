@@ -46,7 +46,7 @@ namespace Geometry
         Edge *edges[4];        ///< The maximum 4 edges the vertex is connected to
         int   connectedEdges;  ///< Number of edges the vertex has.
         int   connectedFaces;  ///< Number of faces the vertex has.
-        //Face *faces[3];        ///< Number of faces the vertex has been intersected by
+        Face *faces[4];        ///< Number of faces the vertex has been intersected by
     };
 
     class EdgeState
@@ -111,7 +111,7 @@ namespace Geometry
     {
     public:
         Face();
-        Face(int _numVertices, Vertex** _vertices);
+        Face(int _numVertices, Vertex* _vertices);
 		~Face();
         Face& operator=(const Face &_face);
 
