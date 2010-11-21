@@ -249,3 +249,40 @@ Plane::Plane(Vertex vIn, Vector dirIn) {
 	v = vIn;
 	dir = dirIn;
 }
+
+Face::Face(int inNumVertices, Vertex* inVertices) {
+	numVertices = inNumVertices;
+	numEdges = inNumVertices;
+	vertices = inVertices;
+	edges = new Edge[numEdges];
+	for(int i=0; i < numVertices; i++) {
+		Vertex v1 = vertices[i];
+		Vertex v2;
+		if (i == numVertices - 1) {
+			v2 = vertices[0];
+		} else {
+			v2 = vertices[i + 1];
+		}
+		Edge e(&v1, &v2);
+		edges[i] = e;
+	}
+	Vector a(edges[0].end->val[0] - edges[0].begin->val[0], edges[0].end->val[1] - edges[0].begin->val[1], edges[0].end->val[2] - edges[0].begin->val[2]);
+	Vector b(edges[1].end->val[0] - edges[1].begin->val[0], edges[1].end->val[1] - edges[1].begin->val[1], edges[1].end->val[2] - edges[1].begin->val[2]);
+	normal = a.crossProduct(b);
+}
+
+Face::~Face() {
+	delete edges;
+}
+
+Vector Face::getNormal() {
+	return normal;
+}
+
+Vertex* Face::getVertices() {
+	return vertices;
+}
+
+Edge* Face::getEdges() {
+	return edges;
+}

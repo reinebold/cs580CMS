@@ -114,8 +114,14 @@ namespace Geometry
 	class Face
     {
     public:
-        Face();
+        Face(int numVertices, Vertex* vertices);
+		Vertex* getVertices();
+		Edge* getEdges();
+		Vector getNormal();
+		~Face();
 	private:
+		int numVertices;
+		int numEdges;
 		Vertex* vertices;
 		Edge* edges;
 		Vector normal;
