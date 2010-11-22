@@ -43,6 +43,15 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingbox)
     cout << distinctNormals.size() << endl;
 
 
+    for(unsigned int x = 0; x < distinctNormals.size(); x++)
+    {
+       // int currenty = 0;
+        //while()
+    }
+
+
+
+
 
 
 
