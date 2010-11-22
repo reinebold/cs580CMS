@@ -36,33 +36,4 @@ void CMSModel3D::init(int _numVertices, Vertex *_vertices, int _numFaces, Face *
     {
         colors[x] = Utils::randColor(0.5f);
     }
-    
-
-    //Allocate memory
-   // vertices  = new Vertex[numVertices];
-   // faces     = new Face[numFaces];
-
-    //Assign the vertices
-    /*for(int x = 0; x < numVertices; ++x)
-    {
-        vertices[x] = _vertices[x];
-    }
-
-    for(int x = 0; x < numFaces; ++x)
-    {
-        faces[x] = _faces[x];
-        for(int y = 0; y < faces[x].numVertices; ++y)
-        {
-           faces[x].vertices = _faces[x]
-            //vertices[begin].faces[vertices->connectedFaces++] = 
-
-           // edges[y].begin = &vertices[begin];
-           // vertices[begin].edges[1] = &edges[y];
-
-          //  edges[y].end = &vertices[end];
-           // vertices[end].edges[0] = &edges[y];
-
-          //  edges[y].updateEdgeState();
-        }
-    }*/
 }

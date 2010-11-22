@@ -85,8 +85,10 @@ namespace Geometry
 
         //TODO: Update cuboid to 3d case
 		int	 	 numVertices;
+        int      numFaces;
         Vertex  *vertices;   ///< Bounding box vertices
         Edge    *edges;       ///< Bounding box edges
+        Face    *faces;
     };
 
 	class Vector {

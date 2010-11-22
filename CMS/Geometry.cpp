@@ -136,6 +136,11 @@ void Edge::updateEdgeState()
 }
 
 Cuboid::Cuboid()
+:faces(NULL),
+vertices(NULL),
+edges(NULL),
+numVertices(0),
+numFaces(0)
 {
 
 }
@@ -150,33 +155,91 @@ void Cuboid::init(int _numVertices, Vertex* _vertices)
 
     numVertices = _numVertices;
 
-    vertices = new Vertex[numVertices];
+    vertices = _vertices;//new Vertex[numVertices];
     edges = new Edge[numVertices];
 
-    //Assign the vertices to the data member vertices in Cuboid.
-    for(int x = 0; x < numVertices; ++x)
+    //2D Case
+    if(_numVertices == 4)
     {
-        vertices[x] = _vertices[x];
+        numFaces = 1;
+        //Assign the edges (based on the vertices)
+        for(int x = 0; x < numVertices; ++x)
+        {
+            int begin = x;
+            int end;
+            if(x+1 == numVertices)
+            {
+                end = 0;
+            }
+            else
+            {
+                end = x+1;
+            }
+
+            edges[x].begin = &vertices[begin];
+            edges[x].end = &vertices[end];
+
+            edges[x].updateEdgeState();
+        }
     }
-
-    //Assign the edges (based on the vertices)
-    for(int x = 0; x < numVertices; ++x)
+    else    //3D Case
     {
-        int begin = x;
-        int end;
-        if(x+1 == numVertices)
-        {
-            end = 0;
-        }
-        else
-        {
-            end = x+1;
-        }
+        numFaces = 6;
+        faces = new Face[numFaces];
 
-        edges[x].begin = &vertices[begin];
-        edges[x].end = &vertices[end];
+        faces[0].numVertices = 4;
+        faces[0].numEdges = 4;
+        faces[0].vertices = new Vertex*[4];
+        faces[0].vertices[0] = &vertices[0];
+        faces[0].vertices[1] = &vertices[1];
+        faces[0].vertices[2] = &vertices[2];
+        faces[0].vertices[3] = &vertices[3];
+        faces[0].updateFaces();
 
-        edges[x].updateEdgeState();
+        faces[1].numVertices = 4;
+        faces[1].numEdges = 4;
+        faces[1].vertices = new Vertex*[4];
+        faces[1].vertices[0] = &vertices[0];
+        faces[1].vertices[1] = &vertices[1];
+        faces[1].vertices[2] = &vertices[5];
+        faces[1].vertices[3] = &vertices[4];
+        faces[1].updateFaces();
+
+        faces[2].numVertices = 4;
+        faces[2].numEdges = 4;
+        faces[2].vertices = new Vertex*[4];
+        faces[2].vertices[0] = &vertices[1];
+        faces[2].vertices[1] = &vertices[2];
+        faces[2].vertices[2] = &vertices[6];
+        faces[2].vertices[3] = &vertices[5];
+        faces[2].updateFaces();
+
+        faces[3].numVertices = 4;
+        faces[3].numEdges = 4;
+        faces[3].vertices = new Vertex*[4];
+        faces[3].vertices[0] = &vertices[2];
+        faces[3].vertices[1] = &vertices[3];
+        faces[3].vertices[2] = &vertices[7];
+        faces[3].vertices[3] = &vertices[6];
+        faces[3].updateFaces();
+
+        faces[4].numVertices = 4;
+        faces[4].numEdges = 4;
+        faces[4].vertices = new Vertex*[4];
+        faces[4].vertices[0] = &vertices[3];
+        faces[4].vertices[1] = &vertices[0];
+        faces[4].vertices[2] = &vertices[4];
+        faces[4].vertices[3] = &vertices[7];
+        faces[4].updateFaces();
+
+        faces[5].numVertices = 4;
+        faces[5].numEdges = 4;
+        faces[5].vertices = new Vertex*[4];
+        faces[5].vertices[0] = &vertices[4];
+        faces[5].vertices[1] = &vertices[5];
+        faces[5].vertices[2] = &vertices[6];
+        faces[5].vertices[3] = &vertices[7];
+        faces[5].updateFaces();
     }
 }
 
@@ -218,7 +281,8 @@ IntersectResult Edge::intersect(const Edge& otheredge, Vertex* &intersection)
 }
 
 
-Vector::Vector(float inX, float inY, float inZ) {
+Vector::Vector(float inX, float inY, float inZ) 
+{
 	x = inX;
 	y = inY;
 	z = inZ;

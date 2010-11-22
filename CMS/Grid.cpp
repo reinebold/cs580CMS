@@ -10,24 +10,23 @@
 #include <iostream>
 #include <vector>
 
+
+
+void Grid::init(const CMSModel3D &model, const Cuboid &boundingbox)
+{
+    //Go through each face of the model, and look at the normal.
+    for(int x = 0; x < model.numFaces; x++)
+    {
+        //Extract the normal from the face.
+        Vector normal = model.faces[x].normal;
+
+        //Figure out what planes of the bounding box that normal can intersect.
+        
+        
+    }
+}
+
 void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
-{
-    if(model.numFaces == 1)
-    {
-        init2D(model, boundingbox);
-    }
-    else
-    {
-        init3D(model,boundingbox);
-    }
-}
-
-void Grid::init3D(const CMSModel &model, const Cuboid &boundingbox)
-{
-
-}
-
-void Grid::init2D(const CMSModel &model, const Cuboid &boundingbox)
 {
     enum SlopeType {VERTICAL = 0, HORIZONTAL, POSITIVE, NEGATIVE, UNASSIGNED};
     float topy = boundingbox.edges[TOP].end->val[Y];

@@ -7,6 +7,7 @@
 #define _GRID_H
 
 #include "Geometry.h"
+#include "CMSModel3D.h"
 #include <vector>
 using namespace Geometry;
 
@@ -16,9 +17,8 @@ public:
     Grid();
     ~Grid();    ///< Deallocates parallelEdges, numEdges, vertices, and edges
     
-    void init3D(const CMSModel &model,const Cuboid &boundingbox);
-    void init2D(const CMSModel &model,const Cuboid &boundingbox);
     void init(const CMSModel &model,const Cuboid &boundingbox);             ///< Will call either 2d or 3d depending on the number of faces of the input model
+    void init(const CMSModel3D &model,const Cuboid &boundingbox);             ///< Will call either 2d or 3d depending on the number of faces of the input model
     void sortVertices(vector<Vertex*> &vertices, int left, int right);    ///< Simple quicksort
 
     vector<Vertex*> vertices;          ///< The vertices of the intersections of the parallelEdges
