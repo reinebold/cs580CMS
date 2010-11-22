@@ -325,10 +325,11 @@ Face::Face()
 
 }
 
-Face::Face(int _numVertices, Vertex* _vertices)
+Face::Face(int _numVertices, Vertex** _vertices)
 {
 	numVertices = _numVertices;
 	numEdges = _numVertices;
+	vertices = _vertices;
 
 
 
@@ -399,8 +400,14 @@ Edge* Geometry::planeFaceIntersection(const Plane &plane, const Face &face) {
 }
 
 //Takes in four edges. Returns new (dynamically allocated Face)
-Face* createFace(Edge *edge) {
-	return NULL;
+Face* createFace(Edge *edge, const int numEdges) {
+	Vertex** vertexArray = new Vertex*[numEdges];
+	for(int i=0; i < numEdges; i++) {
+		vertexArray[i] = edge[i].begin;
+	}
+	Face* f = new Face(numEdges, vertexArray);
+	f->updateFaces();
+	return f;
 }
 
 //Returns vertex of the intersection.  Make sure you fill the 'faces' data member that points to the faces that intersected it so we can find it's normals.

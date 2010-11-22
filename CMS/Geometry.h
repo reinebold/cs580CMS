@@ -114,7 +114,7 @@ namespace Geometry
     {
     public:
         Face();
-        Face(int _numVertices, Vertex* _vertices);
+        Face(int _numVertices, Vertex** _vertices);
 		~Face();
         Face& operator=(const Face &_face);
         void updateFaces();
@@ -130,7 +130,7 @@ namespace Geometry
     Edge* planeFaceIntersection(const Plane &plane, const Face &face); 
 
     //Takes in four edges. Returns new (dynamically allocated Face)
-    Face* createFace(Edge *edge) ;
+    Face* createFace(Edge *edge, const int numEdges) ;
 
     //Returns vertex of the intersection.  Make sure you fill the 'faces' data member that points to the faces that intersected it so we can find it's normals.
     Vertex* faceFaceFaceIntersection(const Face &face1, const Face &face2, const Face &face3);
