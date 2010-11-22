@@ -14,16 +14,40 @@
 
 void Grid::init(const CMSModel3D &model, const Cuboid &boundingbox)
 {
-    //Go through each face of the model, and look at the normal.
+    cout << endl << "---Grid Progress---" << endl;
+
+    //Go through each face of the model, and extract the DISTINCT normals
+    cout << "Finding distinct edges...";
+    vector<Vector> distinctNormals;
     for(int x = 0; x < model.numFaces; x++)
     {
         //Extract the normal from the face.
         Vector normal = model.faces[x].normal;
 
-        //Figure out what planes of the bounding box that normal can intersect.
-        
-        
+        //Check to make sure it is distinct
+        bool distinct = true;
+        for(vector<Vector>::iterator i = distinctNormals.begin(); i < distinctNormals.end(); i++)
+        {
+            if(*i == normal)
+            {
+                distinct = false;
+                break;
+            }
+        }
+
+        if(distinct)
+        {
+            distinctNormals.push_back(normal);
+        }  
     }
+    cout << distinctNormals.size() << endl;
+
+
+
+
+
+
+
 }
 
 void Grid::init(const CMSModel &model, const Cuboid &boundingbox)

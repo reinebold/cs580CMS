@@ -98,6 +98,7 @@ namespace Geometry
 		float dotProduct(Vector& other);
 		Vector crossProduct(Vector& other);
 		Vector& operator=(const Vector& other);
+        bool operator==(const Vector& rhs);
 
 		float x, y, z;
 	};

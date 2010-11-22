@@ -391,3 +391,8 @@ bool Vertex::operator==(const Vertex &vert)
         return false;
     }
 }
+
+bool Vector::operator==(const Vector& rhs)
+{
+    return ((fabs(x - rhs.x) < EPSILON) && (fabs(y - rhs.y) < EPSILON) && (fabs(z - rhs.z) < EPSILON));
+}

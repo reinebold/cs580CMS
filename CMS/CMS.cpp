@@ -198,7 +198,7 @@ void CMS::init()
     state.setPrintInfoOnScreen(true);
     
     //unsigned int seed = (unsigned int)time(NULL);
-    unsigned int seed = 1290329136;
+    unsigned int seed = 1290455743;
     srand(seed);
     cout << "Seed value: " << seed << endl;
 
