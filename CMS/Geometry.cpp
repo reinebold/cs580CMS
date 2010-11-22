@@ -391,3 +391,24 @@ bool Vertex::operator==(const Vertex &vert)
         return false;
     }
 }
+
+
+/*Returns a new (dynamically allocated) Edge (with the two endpoints).*/
+Edge* Geometry::planeFaceIntersection(const Plane &plane, const Face &face) {
+	return NULL;
+}
+
+//Takes in four edges. Returns new (dynamically allocated Face)
+Face* createFace(Edge *edge) {
+	return NULL;
+}
+
+//Returns vertex of the intersection.  Make sure you fill the 'faces' data member that points to the faces that intersected it so we can find it's normals.
+Vertex* faceFaceFaceIntersection(const Face &face1, const Face &face2, const Face &face3) {
+	return NULL;
+}
+
+//Tells you if vertex is in sphere.  Simple I think....return (vert.val[X]-center.val[X])^2+(vert.val[Y] - center.val[Y])^2+(vert.val[Z] - center.val[Z])^2 <= radius^2
+bool vertexInSphere(Vertex *center, Vertex *vert, float radius) {
+	return pow(vert->val[X] - center->val[X], 2)+pow(vert->val[Y] - center->val[Y], 2)+ pow(vert->val[Z] - center->val[Z], 2) <= pow(radius, 2);
+}
