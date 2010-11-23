@@ -27,6 +27,7 @@ public:
     int            *numEdges;           ///< Keeps track of how many edges there are per set of parallel edges
     int             numModelEdges;      ///< Number of edges the model has.  Need for deallocation of resources.
     float           spacing;            ///< The spacing between the parallel lines
+    vector<vector<Face*> > parallelFaces;
 };
 
 #endif // _GRID_H

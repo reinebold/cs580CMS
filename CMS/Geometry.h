@@ -15,6 +15,7 @@ namespace Geometry
 {
     enum IntersectResult {PARALLEL = 0, COINCIDENT, NOT_INTERESECTING, INTERESECTING};
     enum FaceState       {EXTERIOR = 0, INTERIOR = 1, UNASSIGNED = -1};
+    typedef FaceState VolumeState;
     enum EdgePosition    {BOTTOM   = 0, RIGHT, TOP, LEFT};
 
     class Edge;
@@ -89,6 +90,10 @@ namespace Geometry
         Vertex  *vertices;   ///< Bounding box vertices
         Edge    *edges;       ///< Bounding box edges
         Face    *faces;
+
+        float   width;      ///< max x
+        float   height;     ///< max y
+        float   depth;      ///< max z
     };
 
 	class Vector {
@@ -99,6 +104,7 @@ namespace Geometry
 		Vector crossProduct(Vector& other);
 		Vector& operator=(const Vector& other);
         bool operator==(const Vector& rhs);
+        Vector* normalize();
 
 		float x, y, z;
 	};
@@ -110,6 +116,13 @@ namespace Geometry
 		Vertex v;
 		Vector dir;
 	};
+
+    class Volume
+    {
+    public:
+        Face       *faces;
+        VolumeState state;
+    };
 
 	class Face
     {
@@ -125,16 +138,17 @@ namespace Geometry
 		Vertex** vertices;  //array of Vertex*
 		Edge* edges;
 		Vector normal;
+        int set;
     };
 
 	/*Returns a new (dynamically allocated) Edge (with the two endpoints).*/
     Edge* planeFaceIntersection(const Plane &plane, const Face &face); 
 
     //Takes in four edges. Returns new (dynamically allocated Face)
-    Face* createFace(Edge *edge, const int numEdges) ;
+    Face* createFace(Edge *edges[], const int numEdges) ;
 
     //Returns vertex of the intersection.  Make sure you fill the 'faces' data member that points to the faces that intersected it so we can find it's normals.
-    Vertex* faceFaceFaceIntersection(const Face &face1, const Face &face2, const Face &face3);
+    Vertex* faceFaceFaceIntersection(const Face *face1, const Face *face2, const Face *face3);
 
 	//Tells you if vertex is in sphere.  Simple I think....return (vert.val[X]-center.val[X])^2+(vert.val[Y] - center.val[Y])^2+(vert.val[Z] - center.val[Z])^2 <= radius^2
 	bool vertexInSphere(Vertex *center, Vertex *vert, float radius);

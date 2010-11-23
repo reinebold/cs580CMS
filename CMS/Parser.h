@@ -12,8 +12,8 @@ class Parser
 public:
 	Parser();
 
-	void boundingBox(int &numBoundVerts, Vertex* &bounds);
-	void vertexArray(int &numVerts, Vertex* &vertices, int &numFaces, Face* &faces);
+	void boundingBox(string filename, int &numBoundVerts, Vertex* &bounds);
+	void vertexArray(string filename, int &numVerts, Vertex* &vertices, int &numFaces, Face* &faces);
 
 };
 #endif

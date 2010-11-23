@@ -10,8 +10,8 @@ Parser::Parser(){
 
 }
 
-void Parser::vertexArray(int &numVerts, Vertex* &vertices, int &numFaces, Face* &faces){
-	std::ifstream fin("../CMS/input.model");
+void Parser::vertexArray(string filename, int &numVerts, Vertex* &vertices, int &numFaces, Face* &faces){
+	std::ifstream fin(filename.c_str());
 	std::string line;
 	std::string numfaces("numfaces");
 
@@ -100,8 +100,8 @@ void Parser::vertexArray(int &numVerts, Vertex* &vertices, int &numFaces, Face* 
 }
 
 
-void Parser::boundingBox(int &numBoundVerts, Vertex* &bounds){
-	std::ifstream fin("../CMS/input.model");
+void Parser::boundingBox(string filename, int &numBoundVerts, Vertex* &bounds){
+	std::ifstream fin(filename.c_str());
 	std::string line;
 
 	std::getline(fin,line); //bound

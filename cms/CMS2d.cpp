@@ -35,7 +35,7 @@ namespace CMS2D
         int size = validStates.size();
         //int randomstate = rand()%(validStates.size());
         //Sanity check, validStates should be smaller than relativesCounter
-        if( *((*itr).relativesCounter) > validStates.size())
+        if( *((*itr).relativesCounter) > (int)validStates.size())
           exit(9001);
         int randomstate = rand() % *((*itr).relativesCounter);
         itr += randomstate;

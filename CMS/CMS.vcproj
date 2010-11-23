@@ -266,7 +266,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\input.model"
+				RelativePath=".\cube.model"
 				>
 			</File>
 			<File
@@ -275,6 +275,10 @@
 			</File>
 			<File
 				RelativePath=".\simple.vs"
+				>
+			</File>
+			<File
+				RelativePath=".\tetrahedron.model"
 				>
 			</File>
 		</Filter>

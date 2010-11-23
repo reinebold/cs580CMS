@@ -121,7 +121,7 @@ void Utils::printInfoOnScreen()
             count += 20;
             renderString(0,count,"-CMS-");
             count += 10;
-            renderString(0,count,"Vertices: " + numToString(cms.grid.vertices.size()));
+            renderString(0,count,"Vertices:  " + numToString(cms.grid.vertices.size()));
             count += 10;
             renderString(0,count,"Edges:     " + numToString(cms.grid.edges.size()));
             count += 10;

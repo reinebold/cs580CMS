@@ -205,7 +205,7 @@ void CMS::init()
 	//Bounding box info
 	int bbnumVertices;
 	Vertex* bbvertices = NULL;  //Should be deleted in boundingbox.init
-	parser.boundingBox(bbnumVertices, bbvertices);
+	parser.boundingBox("cube.model", bbnumVertices, bbvertices);
     boundingBox.init(bbnumVertices, bbvertices);
 
 	//Vertex info: Must be specified in a counter-clockwise order
@@ -213,7 +213,7 @@ void CMS::init()
 	int numFaces;
 	Face* faces = NULL;
 	Vertex *vertices = NULL;
-	parser.vertexArray(numVertices, vertices, numFaces, faces);
+	parser.vertexArray("cube.model", numVertices, vertices, numFaces, faces);
 
     if(numFaces == 1)
     {   

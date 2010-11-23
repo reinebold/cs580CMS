@@ -10,25 +10,33 @@
 #include <iostream>
 #include <vector>
 
-
-
-void Grid::init(const CMSModel3D &model, const Cuboid &boundingbox)
+void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
 {
+    /*
+    TODO:
+    1.  Only works with a cube input.
+    2.  Figure out how to get equidistant spacing between planes that are not parallel with the bounding box planes.
+    3.  
+    */
+
     cout << endl << "---Grid Progress---" << endl;
 
-    //Go through each face of the model, and extract the DISTINCT normals
+    //Go through each face of the model, and extract the DISTINCT normals (also they can't be the opposite of each other)
     cout << "Finding distinct edges...";
     vector<Vector> distinctNormals;
     for(int x = 0; x < model.numFaces; x++)
     {
         //Extract the normal from the face.
         Vector normal = model.faces[x].normal;
+        normal.normalize();
 
-        //Check to make sure it is distinct
+        //Check to make sure it is distinct and not the opposite of the normal
         bool distinct = true;
         for(vector<Vector>::iterator i = distinctNormals.begin(); i < distinctNormals.end(); i++)
         {
-            if(*i == normal)
+            if(((*i) == normal) || ( (fabs((*i).x - -normal.x) < EPSILON) &&
+                                     (fabs((*i).y - -normal.y) < EPSILON) &&
+                                     (fabs((*i).z - -normal.z) < EPSILON) ))
             {
                 distinct = false;
                 break;
@@ -38,23 +46,120 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingbox)
         if(distinct)
         {
             distinctNormals.push_back(normal);
+            parallelFaces.push_back(vector<Face*>());
         }  
     }
     cout << distinctNormals.size() << endl;
 
+    //Find a good spacing value by finding the maximum length of all edges in the model.  Then take a value between
+    //[maxLength/2.0, maxLength]
+    cout << "Finding a good spacing value...";
+    float maxLength = 0.0;
+    for(int x = 0; x < model.numFaces; x++)
+    {
+        for(int y = 0; y < model.faces[x].numEdges; y++)
+        {
+            float length = sqrt((model.faces[x].edges->begin->val[X] - model.faces[x].edges->end->val[X]) * (model.faces[x].edges->begin->val[X] - model.faces[x].edges->end->val[X]) +
+                                (model.faces[x].edges->begin->val[Y] - model.faces[x].edges->end->val[Y]) * (model.faces[x].edges->begin->val[Y] - model.faces[x].edges->end->val[Y]));
+            if(length > maxLength)
+            {
+                maxLength = length;
+            }
+        }
+    }
+    spacing = Utils::randFloat(maxLength/2.0f, maxLength);
+    cout << spacing << endl;
 
+    float increment = spacing; //Need to figure this out for planes that aren't parallel to the bounding box planes.
+    Vector position(0.0f, 0.0f, 0.0f);
     for(unsigned int x = 0; x < distinctNormals.size(); x++)
     {
-       // int currenty = 0;
-        //while()
+        cout << "Finding parallel planes of set " << x << "..." << endl;
+        float currentPosition = 0.0f;
+        float endPosition = 0.0f;
+        if( (fabs(distinctNormals[x].x) > EPSILON) && (fabs(distinctNormals[x].y) < EPSILON) && (fabs(distinctNormals[x].z) < EPSILON) )
+        {
+            cout << "\tPlane parallel to x plane." << endl;
+            position.x = 1.0f;
+            endPosition = boundingBox.width;
+        }
+        else if( (fabs(distinctNormals[x].x) < EPSILON) && (fabs(distinctNormals[x].y) > EPSILON) && (fabs(distinctNormals[x].z) < EPSILON) )
+        {
+            cout << "\tPlane parallel to y plane." << endl;
+            position.y = 1.0f;
+            endPosition = boundingBox.height;
+        }
+        else if( (fabs(distinctNormals[x].x) < EPSILON) && (fabs(distinctNormals[x].y) < EPSILON) && (fabs(distinctNormals[x].z) > EPSILON) )
+        {
+            cout << "\tPlane parallel to z plane." << endl;
+            position.z = 1.0f;
+            endPosition = boundingBox.depth;
+        }
+
+        while(currentPosition < endPosition)
+        {
+            Plane plane(Vertex(position.x*currentPosition, position.y*currentPosition, position.z*currentPosition), distinctNormals[x]);
+            Edge* edges[4];
+            int  numEdges = 0; 
+            for(int y = 0; y < boundingBox.numFaces; y++)
+            {
+                Edge *edge = planeFaceIntersection(plane, boundingBox.faces[y]);
+                if(edge != NULL)
+                {
+                    edges[numEdges++] = edge;
+                }
+            }
+/*
+#ifdef _DEBUG
+            //Sanity Check: Make sure the face has four edges.
+            if(numEdges != 4)
+            {
+                cout << endl << "Error: A face did not contain 4 edges." << endl;
+                exit(EXIT_FAILURE);
+            }
+#endif*/
+            Face *face = NULL;//createFace(edges, numEdges);
+            //face->set = x;
+            parallelFaces[x].push_back(face);
+            
+
+            currentPosition += increment;
+        }
+        cout << "\tGenerated planes..." << parallelFaces[x].size() << endl;
     }
 
+    cout << "Finding vertices of plane-plane-plane intersection...";
+    for(unsigned int x = 0; x < parallelFaces[0].size(); x++)
+    {
+        for(unsigned int y = 0; y < parallelFaces[1].size(); y++)
+        {
+            for(unsigned int z = 0; z < parallelFaces[2].size(); z++)
+            {
+                Vertex *vertex = faceFaceFaceIntersection(parallelFaces[0][x], parallelFaces[1][y], parallelFaces[2][z]);
+                vertices.push_back(vertex);
+            }
+        }
+    }
+    cout << vertices.size() << endl;
 
+    cout << "Connecting vertices...";
+    for(unsigned int x = 0; x < vertices.size(); x++)
+    {
+        for(unsigned int y = 0; y < vertices.size(); y++)
+        {
+            if(x == y)
+            {
+                continue;
+            }
 
+            //Make sure you get order correct when connecting edges...important.
+        }
+    }
+    cout << edges.size() << endl;
 
+    //Find some brute force way to get faces..
 
-
-
+    //Find some brute force way to get volumes...
 
 
 }

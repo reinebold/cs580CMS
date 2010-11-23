@@ -23,7 +23,7 @@ public:
 
     CMSModel input;         ///< The input model for 2D
     CMSModel3D input3D;     ///< The input model for 3D
-	Parser parser;
+	Parser   parser;
     Cuboid   boundingBox;   ///< Bounding box
     Cuboid   world;         ///< The "world", bounding box must be inside this
     Grid     grid;          ///< Grid that splits up the bounding box into edges/vertices/planes etc

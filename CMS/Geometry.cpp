@@ -140,7 +140,10 @@ Cuboid::Cuboid()
 vertices(NULL),
 edges(NULL),
 numVertices(0),
-numFaces(0)
+numFaces(0),
+width(0.0f),
+height(0.0f),
+depth(0.0f)
 {
 
 }
@@ -241,6 +244,30 @@ void Cuboid::init(int _numVertices, Vertex* _vertices)
         faces[5].vertices[3] = &vertices[7];
         faces[5].updateFaces();
     }
+
+    for(int x = 0; x < numFaces; x++)
+    {
+        for(int y = 0; y < faces[x].numEdges; y++)
+        {
+            float calcWidth  = fabs(faces[x].edges[y].begin->val[X]-faces[x].edges[y].end->val[X]);
+            if(calcWidth > width)
+            {
+                width = calcWidth;
+            }
+
+            float calcHeight = fabs(faces[x].edges[y].begin->val[Y]-faces[x].edges[y].end->val[Y]);
+            if(calcHeight > height)
+            {
+                height = calcHeight;
+            }
+
+            float calcDepth  = fabs(faces[x].edges[y].begin->val[Z]-faces[x].edges[y].end->val[Z]);
+            if(calcDepth > depth)
+            {
+                depth = calcDepth;
+            }
+        }
+    }
 }
 
 /// Modified from http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/ (Author: Damian Coventry)
@@ -320,7 +347,8 @@ Plane::Plane(Vertex vIn, Vector dirIn) {
 
 Face::Face()
 :numVertices(0),
- numEdges(0)
+ numEdges(0),
+ set(-1)
 {
 
 }
@@ -398,16 +426,26 @@ bool Vector::operator==(const Vector& rhs)
     return ((fabs(x - rhs.x) < EPSILON) && (fabs(y - rhs.y) < EPSILON) && (fabs(z - rhs.z) < EPSILON));
 }
 
+Vector* Vector::normalize()
+{
+    float magnitude = sqrt(x*x + y*y + z*z);
+    x = x/magnitude;
+    y = y/magnitude;
+    z = z/magnitude;
+
+    return this;
+}
+
 /*Returns a new (dynamically allocated) Edge (with the two endpoints).*/
 Edge* Geometry::planeFaceIntersection(const Plane &plane, const Face &face) {
 	return NULL;
 }
 
 //Takes in four edges. Returns new (dynamically allocated Face)
-Face* createFace(Edge *edge, const int numEdges) {
+Face* Geometry::createFace(Edge *edges[], const int numEdges) {
 	Vertex** vertexArray = new Vertex*[numEdges];
 	for(int i=0; i < numEdges; i++) {
-		vertexArray[i] = edge[i].begin;
+		vertexArray[i] = edges[i]->begin;
 	}
 	Face* f = new Face(numEdges, vertexArray);
 	f->updateFaces();
@@ -415,11 +453,11 @@ Face* createFace(Edge *edge, const int numEdges) {
 }
 
 //Returns vertex of the intersection.  Make sure you fill the 'faces' data member that points to the faces that intersected it so we can find it's normals.
-Vertex* faceFaceFaceIntersection(const Face &face1, const Face &face2, const Face &face3) {
+Vertex* Geometry::faceFaceFaceIntersection(const Face *face1, const Face *face2, const Face *face3) {
 	return NULL;
 }
 
 //Tells you if vertex is in sphere.  Simple I think....return (vert.val[X]-center.val[X])^2+(vert.val[Y] - center.val[Y])^2+(vert.val[Z] - center.val[Z])^2 <= radius^2
-bool vertexInSphere(Vertex *center, Vertex *vert, float radius) {
+bool Geometry::vertexInSphere(Vertex *center, Vertex *vert, float radius) {
 	return pow(vert->val[X] - center->val[X], 2)+pow(vert->val[Y] - center->val[Y], 2)+ pow(vert->val[Z] - center->val[Z], 2) <= pow(radius, 2);
 }
