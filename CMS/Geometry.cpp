@@ -321,7 +321,7 @@ Vector::Vector() {
 	z = 0;
 }
 
-float Vector::dotProduct(Vector& other) {
+float Vector::dotProduct(const Vector& other) const {
 	return x * other.x + y * other.y + z * other.z;
 }
 
@@ -332,7 +332,7 @@ Vector& Vector::operator=(const Vector& other) {
 	return *this;
 }
 
-Vector Vector::crossProduct(Vector& other) {
+Vector Vector::crossProduct(const Vector& other) const {
 	Vector answer(0, 0, 0);
 	answer.x = (y * other.z) - (z * other.y);
 	answer.y = (z * other.x) - (x * other.z);
@@ -426,6 +426,33 @@ bool Vector::operator==(const Vector& rhs)
     return ((fabs(x - rhs.x) < EPSILON) && (fabs(y - rhs.y) < EPSILON) && (fabs(z - rhs.z) < EPSILON));
 }
 
+Vector Vector::operator*(float f) {
+    Vector answer(this->x * f, this->y * f, this->z * f);
+	return answer;
+}
+
+Vector& Vector::operator*=(float f) {
+    this->x *= f;
+	this->y *= f;
+	this->z *= z;
+	return *this;
+}
+
+Vector& Vector::operator+=(const Vector& other) {
+	this->x += other.x;
+	this->y += other.y;
+	this->z += other.z;
+	return *this;
+}
+
+Vector& Vector::operator/=(float f) {
+	this->x /= f;
+	this->y /= f;
+	this->z /= z;
+	return *this;
+}
+
+
 Vector* Vector::normalize()
 {
     float magnitude = sqrt(x*x + y*y + z*z);
@@ -453,8 +480,41 @@ Face* Geometry::createFace(Edge *edges[], const int numEdges) {
 }
 
 //Returns vertex of the intersection.  Make sure you fill the 'faces' data member that points to the faces that intersected it so we can find it's normals.
-Vertex* Geometry::faceFaceFaceIntersection(const Face *face1, const Face *face2, const Face *face3) {
-	return NULL;
+//http://www.cgafaq.info/wiki/Intersection_of_three_planes
+//Returns NULL on a failed intersection
+Vertex* Geometry::faceFaceFaceIntersection(Face *face1, Face *face2, Face *face3) {
+	if (face1 == NULL || face2 == NULL || face3 == NULL) {
+		return NULL;
+	}
+	//need a point from each of the faces, so just use the first vertex
+	Vector p1(face1->vertices[0]->val[X], face1->vertices[0]->val[Y], face1->vertices[0]->val[Z]);
+	Vector p2(face2->vertices[0]->val[X], face2->vertices[0]->val[Y], face2->vertices[0]->val[Z]);
+	Vector p3(face3->vertices[0]->val[X], face2->vertices[0]->val[Y], face3->vertices[0]->val[Z]);
+	float d1 = face1->normal.dotProduct(p1);
+	float d2 = face2->normal.dotProduct(p2);
+	float d3 = face3->normal.dotProduct(p3);
+	Vector v1 = face2->normal.crossProduct(face3->normal);
+	v1 *= d1;
+	Vector v2 = face3->normal.crossProduct(face1->normal);
+	v2 *= d2;
+	Vector v3 = face1->normal.crossProduct(face2->normal);
+	v3 *= d3;
+	v1 += v2;
+	v1 += v3;
+	//v1 is now the numerator
+	Vector denominatorVec = face2->normal.crossProduct(face3->normal);
+	float denominator = denominatorVec.dotProduct(face1->normal);
+	if (denominator == 0) {
+		//failed intersection test
+		return NULL;
+	} else {
+		v1 /= denominator;
+		Vertex* answer = new Vertex(v1.x, v2.y, v2.z);
+		answer->faces[0] = face1;
+		answer->faces[1] = face2;
+		answer->faces[2] = face3;
+		return answer;
+	}
 }
 
 //Tells you if vertex is in sphere.  Simple I think....return (vert.val[X]-center.val[X])^2+(vert.val[Y] - center.val[Y])^2+(vert.val[Z] - center.val[Z])^2 <= radius^2

@@ -100,11 +100,15 @@ namespace Geometry
 	public:
 		Vector();
 		Vector(float x, float y, float z);
-		float dotProduct(Vector& other);
-		Vector crossProduct(Vector& other);
+		float dotProduct(const Vector& other) const ;
+		Vector crossProduct(const Vector& other) const;
 		Vector& operator=(const Vector& other);
         bool operator==(const Vector& rhs);
         Vector* normalize();
+		Vector operator*(float f);
+		Vector& operator*=(float f);
+		Vector& operator+=(const Vector& other);
+		Vector& operator/=(float f);
 
 		float x, y, z;
 	};
@@ -148,7 +152,7 @@ namespace Geometry
     Face* createFace(Edge *edges[], const int numEdges) ;
 
     //Returns vertex of the intersection.  Make sure you fill the 'faces' data member that points to the faces that intersected it so we can find it's normals.
-    Vertex* faceFaceFaceIntersection(const Face *face1, const Face *face2, const Face *face3);
+    Vertex* faceFaceFaceIntersection(Face *face1, Face *face2, Face *face3);
 
 	//Tells you if vertex is in sphere.  Simple I think....return (vert.val[X]-center.val[X])^2+(vert.val[Y] - center.val[Y])^2+(vert.val[Z] - center.val[Z])^2 <= radius^2
 	bool vertexInSphere(Vertex *center, Vertex *vert, float radius);
