@@ -109,7 +109,13 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                     edges[numEdges++] = edge;
                 }
             }
-/*
+
+            if(numEdges == 0)
+            {
+                currentPosition += increment;
+                break;
+            }
+
 #ifdef _DEBUG
             //Sanity Check: Make sure the face has four edges.
             if(numEdges != 4)
@@ -117,9 +123,9 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                 cout << endl << "Error: A face did not contain 4 edges." << endl;
                 exit(EXIT_FAILURE);
             }
-#endif*/
-            Face *face = NULL;//createFace(edges, numEdges);
-            //face->set = x;
+#endif
+            Face *face = createFace(edges, numEdges);
+            face->set = x;
             parallelFaces[x].push_back(face);
             
 

@@ -97,6 +97,39 @@ void CMS::display3D()
         glEnd();
     }
     glTranslatef(10.0f,0.0f,0.0f);
+
+    /*for(int x = 0; x < grid.parallelFaces.size(); x++)
+    { 
+        for(int y = 0; y < grid.parallelFaces[x].size(); y++)
+        {
+            glBegin(GL_QUADS);
+            for(int z = 0; z < grid.parallelFaces[x][y]->numEdges; z++)
+            {
+                glVertex3fv(grid.parallelFaces[x][y]->edges[z].begin->val);
+            }
+            glEnd();
+        }
+    }*/
+
+    //Draw Vertices
+    /*if(showGridVertices)
+    {
+        glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
+        glPointSize(4.0f);          //Change the size of the point
+        glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+        glBegin(GL_POINTS);
+            for(int x=0; x < (int)grid.vertices.size(); x++)
+            {
+                glVertex3fv(grid.vertices[x]->val);
+            }
+        glEnd();
+        glDisable(GL_POINT_SMOOTH);
+    }*/
+
+    
+
+
+
 }
 
 void CMS::display2D()
