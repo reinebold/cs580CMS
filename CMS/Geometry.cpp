@@ -389,6 +389,7 @@ void Face::updateFaces()
     Vector a(edges[0].end->val[0] - edges[0].begin->val[0], edges[0].end->val[1] - edges[0].begin->val[1], edges[0].end->val[2] - edges[0].begin->val[2]);
     Vector b(edges[1].end->val[0] - edges[1].begin->val[0], edges[1].end->val[1] - edges[1].begin->val[1], edges[1].end->val[2] - edges[1].begin->val[2]);
     normal = a.crossProduct(b);
+    normal.normalize();
 }
 
 Face& Face::operator=(const Face &_face)

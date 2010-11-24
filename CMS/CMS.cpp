@@ -89,7 +89,7 @@ void CMS::display3D()
     for(int numFaces = 0; numFaces < input3D.numFaces; ++numFaces)
     {
         glBegin(GL_POLYGON);
-            glColor4fv(input3D.colors[numFaces].val);    
+            glColor4fv(input3D.colors[numFaces].val);
             for(int numVertices = 0; numVertices < input3D.faces[numFaces].numVertices; ++numVertices)
             {
                 glVertex3fv((*input3D.faces[numFaces].vertices[numVertices]).val);  
@@ -98,10 +98,11 @@ void CMS::display3D()
     }
     glTranslatef(10.0f,0.0f,0.0f);
 
-    /*for(int x = 0; x < grid.parallelFaces.size(); x++)
+    for(int x = 0; x < grid.parallelFaces.size(); x++)
     { 
         for(int y = 0; y < grid.parallelFaces[x].size(); y++)
-        {
+        {   
+            glColor4fv(input3D.colors[x].val);
             glBegin(GL_QUADS);
             for(int z = 0; z < grid.parallelFaces[x][y]->numEdges; z++)
             {
@@ -109,7 +110,7 @@ void CMS::display3D()
             }
             glEnd();
         }
-    }*/
+    }
 
     //Draw Vertices
     /*if(showGridVertices)
