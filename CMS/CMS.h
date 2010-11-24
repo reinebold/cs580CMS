@@ -30,4 +30,5 @@ public:
 
     bool     showBoundingBox;   ///< True if you want the bounding box to show.  Default true.
     bool     showGridVertices; ///< True if you want to see all the vertices.  Default true.
+    bool     showGridEdges;
 };

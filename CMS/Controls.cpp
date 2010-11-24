@@ -129,5 +129,9 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
         cms.showGridVertices = !cms.showGridVertices;
         glutPostRedisplay();
         break;
+    case 'e':
+        cms.showGridEdges = !cms.showGridEdges;
+        glutPostRedisplay();
+        break;
     }
 }

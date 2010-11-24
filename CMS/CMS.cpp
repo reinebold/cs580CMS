@@ -23,7 +23,8 @@ extern Camera camera;
 
 CMS::CMS()
 :showBoundingBox(true),
- showGridVertices(true)
+ showGridVertices(true),
+ showGridEdges(true)
 {
 
 }
@@ -140,10 +141,17 @@ void CMS::display3D()
         glDisable(GL_POINT_SMOOTH);
     }
 
-    
-
-
-
+    if(showGridEdges)
+    {
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        for(int x = 0; x < (int)grid.edges.size(); x++)
+        {
+            glBegin(GL_LINES);
+                glVertex3fv(grid.edges[x]->begin->val);
+                glVertex3fv(grid.edges[x]->end->val);
+            glEnd();
+        }
+    }
 }
 
 void CMS::display2D()

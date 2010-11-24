@@ -10,6 +10,28 @@
 #include <iostream>
 #include <vector>
 
+bool Grid::edgeAlreadyInList(Edge *edge)
+{
+    if(edge == NULL)
+    {
+        return true;
+    }
+    bool same = false;
+    for(int g = 0; g < edges.size(); g++)
+    {
+        if((*edge) == *(edges[g]))
+        {
+            same = true;
+            break;
+        }
+    }
+    if(same)
+    {
+        delete edge;
+    }
+    return same;
+}
+
 void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
 {
     /*
@@ -154,8 +176,8 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
     }
     cout << vertices.size() << endl;
 
-    /*
-    cout << "Connecting vertices...";
+    
+    cout << "Connecting vertices to edges...";
     for(unsigned int x = 0; x < vertices.size(); x++)
     {
         int numSphereVertices = 0;
@@ -167,7 +189,7 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                 continue;
             }
 
-            if(vertexInSphere(vectices[x], vertices[y]))
+            if(vertexInSphere(vertices[x], vertices[y], spacing+EPSILON))
             {
                 sphereVertices[numSphereVertices++] = vertices[y];
             }
@@ -186,65 +208,88 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
         if(numSphereVertices < 3)
         {
             cout << "Error: Vertex is connected to less than 3 vertices." << endl;
+            exit(EXIT_FAILURE);
         }
 #endif
         //Connect the vertices with edges...in a particular order, always towards positive z, positive y, or positive x.
-        for(int z = 0; z < numSphereVertices; z++)
+       
+        for(int y = 0; y < numSphereVertices; y++)
         {   
-            if(fabs(vertices[x]->val[X] - vertices[y]->val[X]) < EPSILON)
+            Edge* edge = NULL;
+            if(fabs(vertices[x]->val[X] - sphereVertices[y]->val[X]) < EPSILON)
             {
-                if(fabs(vertices[x]->val[Y] - vertices[y]->val[Y]) < EPSILON)
+                if(fabs(vertices[x]->val[Y] - sphereVertices[y]->val[Y]) < EPSILON)
                 {
-                    if(vertices[x]->val[Z] > vertices[x]->val[Z])
+                    if(vertices[x]->val[Z] > sphereVertices[y]->val[Z])
                     {
-                        Edge* edge = new Edge(vertices[x], vertices[y]);
-                        vertices[y]->edges[vertices[y]->connectedEdges++] = edge;
-                        vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
-                        edges.push_back(edge);
+                        edge = new Edge(vertices[x], sphereVertices[y]);
+                        if(!edgeAlreadyInList(edge))
+                        {
+                            sphereVertices[y]->edges[sphereVertices[y]->connectedEdges++] = edge;
+                            vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
+                            edges.push_back(edge);
+                        }
                     }
                     else
                     {
-                        Edge* edge = new Edge(vertices[y], vertices[x]);
-                        vertices[y]->edges[vertices[y]->connectedEdges++] = edge;
+                        edge = new Edge(sphereVertices[y], vertices[x]);
+                        if(!edgeAlreadyInList(edge))
+                        {
+                            sphereVertices[y]->edges[sphereVertices[y]->connectedEdges++] = edge;
+                            vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
+                            edges.push_back(edge);
+                        }
+                    }
+                }
+                else if(vertices[x]->val[Y] > sphereVertices[y]->val[Y])
+                {
+                    edge = new Edge(vertices[x], sphereVertices[y]);
+                    if(!edgeAlreadyInList(edge))
+                    {
+                        sphereVertices[y]->edges[sphereVertices[y]->connectedEdges++] = edge;
                         vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
                         edges.push_back(edge);
                     }
                 }
-                else if(vertices[x]->val[Y] > vertices[y]->val[Y])
-                {
-                    Edge* edge = new Edge(vertices[x], vertices[y]);
-                    vertices[y]->edges[vertices[y]->connectedEdges++] = edge;
-                    vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
-                    edges.push_back(edge);
-                }
                 else
                 {
-                    Edge* edge = new Edge(vertices[y], vertices[x]);
-                    vertices[y]->edges[vertices[y]->connectedEdges++] = edge;
-                    vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
-                    edges.push_back(edge);
+                    edge = new Edge(sphereVertices[y], vertices[x]);
+                    if(!edgeAlreadyInList(edge))
+                    {
+                        sphereVertices[y]->edges[sphereVertices[y]->connectedEdges++] = edge;
+                        vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
+                        edges.push_back(edge);
+                    }
                 }
                 
             }
             else if(vertices[x]->val[X] > vertices[y]->val[X])
             {
                 //current vertex end, connected vertex begin
-                Edge* edge = new Edge(vertices[x], vertices[y]);
-                vertices[y]->edges[vertices[y]->connectedEdges++] = edge;
-                vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
-                edges.push_back(edge);
+                edge = new Edge(vertices[x], sphereVertices[y]);
+                if(!edgeAlreadyInList(edge))
+                {
+                    sphereVertices[y]->edges[sphereVertices[y]->connectedEdges++] = edge;
+                    vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
+                    edges.push_back(edge);
+                }
             }
             else
             {
-                Edge* edge = new Edge(vertices[y], vertices[x]);
-                vertices[y]->edges[vertices[y]->connectedEdges++] = edge;
-                vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
-                edges.push_back(edge);
+                edge = new Edge(sphereVertices[y], vertices[x]);
+                if(!edgeAlreadyInList(edge))
+                {
+                    sphereVertices[y]->edges[sphereVertices[y]->connectedEdges++] = edge;
+                    vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
+                    edges.push_back(edge);
+                }
             }
+        
         }
+       
     }
     cout << edges.size() << endl;
-*/
+
     //Find some brute force way to get faces..
 
     //Find some brute force way to get volumes...

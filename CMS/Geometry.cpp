@@ -768,10 +768,20 @@ Vertex* Geometry::faceFaceFaceIntersection(Face *face1, Face *face2, Face *face3
 
 //Tells you if vertex is in sphere.  Simple I think....return (vert.val[X]-center.val[X])^2+(vert.val[Y] - center.val[Y])^2+(vert.val[Z] - center.val[Z])^2 <= radius^2
 bool Geometry::vertexInSphere(Vertex *center, Vertex *vert, float radius) {
-	return pow(vert->val[X] - center->val[X], 2)+pow(vert->val[Y] - center->val[Y], 2)+ pow(vert->val[Z] - center->val[Z], 2) <= pow(radius, 2);
+	return  (((vert->val[X] - center->val[X]) * (vert->val[X] - center->val[X])) +
+             ((vert->val[Y] - center->val[Y]) * (vert->val[Y] - center->val[Y])) +
+             ((vert->val[Z] - center->val[Z]) * (vert->val[Z] - center->val[Z]))) <= (radius*radius);
 }
 
 float Vector::magnitude()
 {
     return sqrt(x*x+y*y+z*z);
+}
+
+
+bool Edge::operator==(const Edge &edge)
+{
+    return ((*begin == *(edge.begin) && *end   == *(edge.end)) ||
+            (*end   == *(edge.begin) && *begin == *(edge.end)) );
+    
 }

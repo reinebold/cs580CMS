@@ -45,7 +45,7 @@ namespace Geometry
         bool operator==(const Vertex &vert);
 
         float val[4];          ///< X, Y, Z, W values
-        Edge *edges[4];        ///< The maximum 4 edges the vertex is connected to
+        Edge *edges[6];        ///< The maximum 4 edges the vertex is connected to
         int   connectedEdges;  ///< Number of edges the vertex has.
         int   connectedFaces;  ///< Number of faces the vertex has.
         Face *faces[4];        ///< Number of faces the vertex has been intersected by
@@ -71,6 +71,7 @@ namespace Geometry
         void operator=(const Edge &edge);
         void updateEdgeState();                        ///< Calulates the numerator, denominator, and value of slope
         IntersectResult intersect(const Edge& otheredge, Vertex* &intersection);  ///< Returns intersection vertex in given parameter
+        bool operator==(const Edge &edge);
 
         Vertex*   begin;        ///< Begin vertex (counter-clockwise direction)
         Vertex*   end;          ///< End vertex (counter-clockwise direction)

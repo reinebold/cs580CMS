@@ -21,6 +21,8 @@ public:
     void init(const CMSModel3D &model,const Cuboid &boundingbox);             ///< Will call either 2d or 3d depending on the number of faces of the input model
     void sortVertices(vector<Vertex*> &vertices, int left, int right);    ///< Simple quicksort
 
+    bool edgeAlreadyInList(Edge *edge);
+
     vector<Vertex*> vertices;          ///< The vertices of the intersections of the parallelEdges
     vector<Edge*>   edges;              ///< The split up edges of the parallel lines
     Edge          **parallelEdges;      ///< Keeps track of the parallel lines that intersect the bounding box
