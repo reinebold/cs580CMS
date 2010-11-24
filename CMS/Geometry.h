@@ -75,6 +75,9 @@ namespace Geometry
         Vertex*   begin;        ///< Begin vertex (counter-clockwise direction)
         Vertex*   end;          ///< End vertex (counter-clockwise direction)
         EdgeState edgestate;    ///< Keeps track of facestates, slope, and set
+
+		Face* leftFace;
+		Face* rightFace;
     };
 
     class Cuboid
@@ -149,6 +152,9 @@ namespace Geometry
 		Edge* edges;
 		Vector normal;
         int set;
+
+		Volume* leftVolume;
+		Volume* rightVolume;
     };
 
 	/*Returns a new (dynamically allocated) Edge (with the two endpoints).*/
