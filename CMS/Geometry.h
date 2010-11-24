@@ -102,13 +102,17 @@ namespace Geometry
 		Vector(float x, float y, float z);
 		float dotProduct(const Vector& other) const ;
 		Vector crossProduct(const Vector& other) const;
+
 		Vector& operator=(const Vector& other);
         bool operator==(const Vector& rhs);
         Vector* normalize();
+        float magnitude();
 		Vector operator*(float f);
 		Vector& operator*=(float f);
 		Vector& operator+=(const Vector& other);
 		Vector& operator/=(float f);
+        Vector operator-(const Vector &rhs);
+
 
 		float x, y, z;
 	};
@@ -136,6 +140,8 @@ namespace Geometry
 		~Face();
         Face& operator=(const Face &_face);
         void updateFaces();
+        void sortVertices();
+        float calcAngle(const Vector &v1, const Vector &v2, const Vector &normal);
 
 		int numVertices;
 		int numEdges;

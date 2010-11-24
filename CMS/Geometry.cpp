@@ -368,6 +368,82 @@ Face::~Face() {
 //	delete edges;
 }
 
+float Face::calcAngle(const Vector &v1, const Vector &v2, const Vector &normal)
+{
+    Vector c;
+    c = v1.crossProduct(v2);
+    float angle = atan2(c.magnitude(), v1.dotProduct(v2));
+    return (c.dotProduct(normal) < 0.0f) ? -angle : angle;
+}
+
+void Face::sortVertices()
+{
+    //MUST HAVE NORMAL CALCULATED!
+    Vector average(0,0,0);
+    for(int i = 0; i < numVertices; i++)
+    {
+	    average.x += vertices[i]->val[X];
+        average.y += vertices[i]->val[Y];
+        average.z += vertices[i]->val[Z];
+    }
+    average.x /= numVertices;
+    average.y /= numVertices;
+    average.z /= numVertices;
+
+    float *angles = new float[numVertices];
+    angles[0] = 0.0f;
+    Vector vec1;
+    vec1.x = vertices[0]->val[X];
+    vec1.y = vertices[0]->val[Y];
+    vec1.z = vertices[0]->val[Z];
+
+    for (int i = 1; i < numVertices; ++i) 
+    {
+        Vector vec2;
+        vec2.x = vertices[i]->val[X];
+        vec2.y = vertices[i]->val[Y];
+        vec2.z = vertices[i]->val[Z];
+        angles[i] = calcAngle(vec1 - average, vec2 - average, normal);
+    }
+
+    //Vertex **verts = new Vertex*[numVertices];
+    float smallest = 100000;                //TODO: FIND BETTER;
+    int order[4] = {0};
+    int current = 0;
+    int smallestindex = 0;
+    for(int y = 0; y < numVertices; y++)
+    {
+        for(int x = 0; x < numVertices; x++)
+        {
+            if(angles[x] < smallest)
+            {
+                smallest = angles[x];
+                smallestindex = x;
+            }
+           
+        }
+        order[current++] = smallestindex;
+        angles[smallestindex] = 1000000;
+        smallest = 100000;
+    }
+
+    for(int x = 0; x < numVertices; x++)
+    {
+        Vertex *temp = vertices[x];
+        vertices[x] = vertices[order[x]];
+        vertices[order[x]] = temp;
+    }
+}
+
+Vector Vector::operator-(const Vector &rhs)
+{
+    Vector result;
+    result.x = x - rhs.x;
+    result.y = y - rhs.y;
+    result.z = z - rhs.z;
+    return result;
+}
+
 void Face::updateFaces()
 {
     edges = new Edge[numEdges];
@@ -378,14 +454,15 @@ void Face::updateFaces()
         if (i == numVertices - 1) 
         {
             v2 = vertices[0];
-        } 
+        }
         else 
         {
             v2 = vertices[i + 1];
         }
         
-        edges[i] = Edge(v1, v2);;
+        edges[i] = Edge(v1, v2);
     }
+
     Vector a(edges[0].end->val[0] - edges[0].begin->val[0], edges[0].end->val[1] - edges[0].begin->val[1], edges[0].end->val[2] - edges[0].begin->val[2]);
     Vector b(edges[1].end->val[0] - edges[1].begin->val[0], edges[1].end->val[1] - edges[1].begin->val[1], edges[1].end->val[2] - edges[1].begin->val[2]);
     normal = a.crossProduct(b);
@@ -512,9 +589,27 @@ Edge* Geometry::planeFaceIntersection(const Plane &plane, const Face &face) {
 //Takes in four edges. Returns new (dynamically allocated Face)
 Face* Geometry::createFace(Edge *edges[], const int numEdges) {
 	Vertex** vertexArray = new Vertex*[numEdges];
-	for(int i=0; i < numEdges; i++) {
+	for(int i=0; i < numEdges; i++) 
+    {
 		vertexArray[i] = edges[i]->begin;
 	}
+#ifdef _DEBUG
+    //Sanity Check: Make sure vertices are different;
+    for(int x = 0; x < numEdges; x++)
+    {
+        for(int y = 0; y < numEdges; y++)
+        {
+            if(x == y)
+            {
+                continue;
+            }
+            if(vertexArray[x] == vertexArray[y])
+            {
+                cout << "Error: Vertices are the same when trying to create a face." << endl;
+            }
+        }
+    }
+#endif
 	Face* f = new Face(numEdges, vertexArray);
 	f->updateFaces();
 	return f;
@@ -561,4 +656,9 @@ Vertex* Geometry::faceFaceFaceIntersection(Face *face1, Face *face2, Face *face3
 //Tells you if vertex is in sphere.  Simple I think....return (vert.val[X]-center.val[X])^2+(vert.val[Y] - center.val[Y])^2+(vert.val[Z] - center.val[Z])^2 <= radius^2
 bool Geometry::vertexInSphere(Vertex *center, Vertex *vert, float radius) {
 	return pow(vert->val[X] - center->val[X], 2)+pow(vert->val[Y] - center->val[Y], 2)+ pow(vert->val[Z] - center->val[Z], 2) <= pow(radius, 2);
+}
+
+float Vector::magnitude()
+{
+    return sqrt(x*x+y*y+z*z);
 }

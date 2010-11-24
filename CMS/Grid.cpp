@@ -80,19 +80,19 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
         if( (fabs(distinctNormals[x].x) > EPSILON) && (fabs(distinctNormals[x].y) < EPSILON) && (fabs(distinctNormals[x].z) < EPSILON) )
         {
             cout << "\tPlane parallel to x plane." << endl;
-            position.x = 1.0f;
+            (distinctNormals[x].z > 0) ? position.z = 1.0f : position.x = -1.0f;
             endPosition = boundingBox.width;
         }
         else if( (fabs(distinctNormals[x].x) < EPSILON) && (fabs(distinctNormals[x].y) > EPSILON) && (fabs(distinctNormals[x].z) < EPSILON) )
         {
             cout << "\tPlane parallel to y plane." << endl;
-            position.y = 1.0f;
+            (distinctNormals[x].y > 0) ? position.y = 1.0f : position.y = -1.0f;
             endPosition = boundingBox.height;
         }
         else if( (fabs(distinctNormals[x].x) < EPSILON) && (fabs(distinctNormals[x].y) < EPSILON) && (fabs(distinctNormals[x].z) > EPSILON) )
         {
             cout << "\tPlane parallel to z plane." << endl;
-            position.z = 1.0f;
+            (distinctNormals[x].z > 0) ? position.z = 1.0f : position.z = -1.0f;
             endPosition = boundingBox.depth;
         }
 
@@ -113,7 +113,7 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
             if(numEdges == 0)
             {
                 currentPosition += increment;
-                break;
+                continue;
             }
 
 #ifdef _DEBUG
@@ -124,10 +124,11 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                 exit(EXIT_FAILURE);
             }
 #endif
+
             Face *face = createFace(edges, numEdges);
             face->set = x;
+            face->sortVertices();
             parallelFaces[x].push_back(face);
-            
 
             currentPosition += increment;
         }

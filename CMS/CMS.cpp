@@ -98,15 +98,19 @@ void CMS::display3D()
     }
     glTranslatef(10.0f,0.0f,0.0f);
 
-    for(int x = 0; x < grid.parallelFaces.size(); x++)
+    for(unsigned int x = 0; x < grid.parallelFaces.size(); x++)
     { 
-        for(int y = 0; y < grid.parallelFaces[x].size(); y++)
+        for(unsigned int y = 0; y < grid.parallelFaces[x].size(); y++)
         {   
             glColor4fv(input3D.colors[x].val);
             glBegin(GL_QUADS);
             for(int z = 0; z < grid.parallelFaces[x][y]->numEdges; z++)
             {
+                Vertex *vert = grid.parallelFaces[x][y]->edges[z].begin;
                 glVertex3fv(grid.parallelFaces[x][y]->edges[z].begin->val);
+                //glVertex3fv(grid.parallelFaces[x][y]->edges[1].begin->val);
+                //glVertex3fv(grid.parallelFaces[x][y]->edges[2].begin->val);
+                //glVertex3fv(grid.parallelFaces[x][y]->edges[3].begin->val);
             }
             glEnd();
         }
