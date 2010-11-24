@@ -142,9 +142,12 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
     }
     cout << vertices.size() << endl;
 
+    /*
     cout << "Connecting vertices...";
     for(unsigned int x = 0; x < vertices.size(); x++)
     {
+        int numSphereVertices = 0;
+        Vertex* sphereVertices[7];
         for(unsigned int y = 0; y < vertices.size(); y++)
         {
             if(x == y)
@@ -152,11 +155,84 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                 continue;
             }
 
-            //Make sure you get order correct when connecting edges...important.
+            if(vertexInSphere(vectices[x], vertices[y]))
+            {
+                sphereVertices[numSphereVertices++] = vertices[y];
+            }
+
+#ifdef _DEBUG
+            //Sanity Check: Make sure the vertices aren't connected to more than 6 vertices.
+            if(numSphereVertices > 6)
+            {
+                cout << "Error: Vertex is connected to more than 6 vertices." << endl;
+                exit(EXIT_FAILURE);
+            }
+#endif
+        }
+#ifdef _DEBUG
+        //Sanity Check: Make sure the vertex is connected to at least three other vertices
+        if(numSphereVertices < 3)
+        {
+            cout << "Error: Vertex is connected to less than 3 vertices." << endl;
+        }
+#endif
+        //Connect the vertices with edges...in a particular order, always towards positive z, positive y, or positive x.
+        for(int z = 0; z < numSphereVertices; z++)
+        {   
+            if(fabs(vertices[x]->val[X] - vertices[y]->val[X]) < EPSILON)
+            {
+                if(fabs(vertices[x]->val[Y] - vertices[y]->val[Y]) < EPSILON)
+                {
+                    if(vertices[x]->val[Z] > vertices[x]->val[Z])
+                    {
+                        Edge* edge = new Edge(vertices[x], vertices[y]);
+                        vertices[y]->edges[vertices[y]->connectedEdges++] = edge;
+                        vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
+                        edges.push_back(edge);
+                    }
+                    else
+                    {
+                        Edge* edge = new Edge(vertices[y], vertices[x]);
+                        vertices[y]->edges[vertices[y]->connectedEdges++] = edge;
+                        vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
+                        edges.push_back(edge);
+                    }
+                }
+                else if(vertices[x]->val[Y] > vertices[y]->val[Y])
+                {
+                    Edge* edge = new Edge(vertices[x], vertices[y]);
+                    vertices[y]->edges[vertices[y]->connectedEdges++] = edge;
+                    vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
+                    edges.push_back(edge);
+                }
+                else
+                {
+                    Edge* edge = new Edge(vertices[y], vertices[x]);
+                    vertices[y]->edges[vertices[y]->connectedEdges++] = edge;
+                    vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
+                    edges.push_back(edge);
+                }
+                
+            }
+            else if(vertices[x]->val[X] > vertices[y]->val[X])
+            {
+                //current vertex end, connected vertex begin
+                Edge* edge = new Edge(vertices[x], vertices[y]);
+                vertices[y]->edges[vertices[y]->connectedEdges++] = edge;
+                vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
+                edges.push_back(edge);
+            }
+            else
+            {
+                Edge* edge = new Edge(vertices[y], vertices[x]);
+                vertices[y]->edges[vertices[y]->connectedEdges++] = edge;
+                vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
+                edges.push_back(edge);
+            }
         }
     }
     cout << edges.size() << endl;
-
+*/
     //Find some brute force way to get faces..
 
     //Find some brute force way to get volumes...
