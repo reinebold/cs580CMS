@@ -314,6 +314,7 @@ Vector::Vector(float inX, float inY, float inZ)
 	x = inX;
 	y = inY;
 	z = inZ;
+
 }
 
 Vector::Vector() {
@@ -464,7 +465,9 @@ void Face::updateFaces()
     }
 
     Vector a(edges[0].end->val[0] - edges[0].begin->val[0], edges[0].end->val[1] - edges[0].begin->val[1], edges[0].end->val[2] - edges[0].begin->val[2]);
-    Vector b(edges[1].end->val[0] - edges[1].begin->val[0], edges[1].end->val[1] - edges[1].begin->val[1], edges[1].end->val[2] - edges[1].begin->val[2]);
+	//a.normalize();
+    Vector b(edges[numEdges - 1].begin->val[0] - edges[0].begin->val[0], edges[numEdges - 1].begin->val[1] - edges[0].begin->val[1], edges[numEdges - 1].begin->val[2] - edges[0].begin->val[2]);
+	//b.normalize();
     normal = a.crossProduct(b);
     normal.normalize();
 }
@@ -535,9 +538,11 @@ Vector& Vector::operator/=(float f) {
 Vector* Vector::normalize()
 {
     float magnitude = sqrt(x*x + y*y + z*z);
-    x = x/magnitude;
-    y = y/magnitude;
-    z = z/magnitude;
+	if (magnitude != 0) {
+		x = x/magnitude;
+		y = y/magnitude;
+		z = z/magnitude;
+	}
 
     return this;
 }
@@ -611,7 +616,9 @@ Face* Geometry::createFace(Edge *edges[], const int numEdges) {
     }
 #endif
 	Face* f = new Face(numEdges, vertexArray);
+	Vector n = f->normal;
 	f->updateFaces();
+	n = f->normal;
 	return f;
 }
 
