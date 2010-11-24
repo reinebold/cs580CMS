@@ -22,6 +22,55 @@ State       state;
 Controls    controls;
 CMS         cms;
 
+void unitTest() {
+	std::cout << "testing plane-face intersection" << std::endl;
+
+	Vertex planeV(0,0,0);
+	Vector planeN(0, 0, -1);
+	Plane p(planeV, planeN);
+
+	Vertex** vertexArray = new Vertex*[4];
+	Vertex* v1 = new Vertex(0, 0, 0);
+	Vertex* v2 = new Vertex(50, 0, 0);
+	Vertex* v3 = new Vertex(50, 50, 0);
+	Vertex* v4 = new Vertex(0, 50, 0);
+	vertexArray[0] = v1;
+	vertexArray[1] = v2;
+	vertexArray[2] = v3;
+	vertexArray[3] = v4;
+
+	Face f(4, vertexArray);
+	f.updateFaces();
+
+	Edge* answer = Geometry::planeFaceIntersection(p, f);
+	
+	if (answer == NULL) {
+		std::cout << "edge was null" << std::endl;
+	} else {
+		std::cout << "edge was:" << std::endl;
+		std::cout << answer->begin->val[X] << "," << answer->begin->val[Y] << "," << answer->begin->val[Z] << std::endl;
+		std::cout << answer->end->val[X] << "," << answer->end->val[Y] << "," << answer->end->val[Z] << std::endl;
+	}
+	std::cout << "testing createFace " << std::endl;
+
+
+	Edge* e1 = new Edge(v1, v2);
+	Edge* e2 = new Edge(v2, v3);
+	Edge* e3 = new Edge(v3, v4);
+	Edge* e4 = new Edge(v4, v1);
+
+	Edge** edges = new Edge*[4];
+	edges[0] = e1;
+	edges[1] = e2;
+	edges[2] = e3;
+	edges[3] = e4;
+
+	Face* createdFace = Geometry::createFace(edges, 4);
+
+	std::cout << "end of testing" << std::endl;
+
+}
+
 void display()
 {
 
@@ -108,6 +157,8 @@ void main(int argc, char **argv)
 	//Geometry::Vector c;
 	//c = a.crossProduct(b);
 	//std::cout << a.dotProduct(b) << std::endl;
+
+	unitTest();
 
     //Initialize GLUT
     glutInit(&argc, argv);
