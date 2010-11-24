@@ -2,6 +2,7 @@
 #include "Defines.h"
 #include "Geometry.h"
 #include <math.h>
+#include <vector>
 using namespace Geometry;
 
 EdgeState::EdgeState()
@@ -465,7 +466,46 @@ Vector* Vector::normalize()
 
 /*Returns a new (dynamically allocated) Edge (with the two endpoints).*/
 Edge* Geometry::planeFaceIntersection(const Plane &plane, const Face &face) {
-	return NULL;
+
+	//given a plane and a face
+	//face has 4 edges
+	//take each of those edges, do plane line intersection
+	//2 of edges will give intersection
+	//2 will give a null
+	//take the 2 points and combine them for an edge
+	Edge edge1 = face.edges[0];
+	Edge edge2 = face.edges[1];
+	Edge edge3 = face.edges[2];
+	Edge edge4 = face.edges[3];
+
+	std::vector<Vertex*> vertices;
+
+	for(int i=0; i < 4; i++) {
+		Edge e = face.edges[i];
+		Vector denomVector(e.end->val[X] - e.begin->val[X], e.end->val[Y] - e.begin->val[Y], e.end->val[Z] - e.begin->val[Z]);
+		Vector numVec(plane.v.val[X] - e.begin->val[X], plane.v.val[Y] - e.begin->val[Y], plane.v.val[Z] - e.begin->val[Z]);
+		float uDenom = denomVector.dotProduct(plane.dir);
+		float uNum = numVec.dotProduct(plane.dir);
+		if (uDenom != 0) {
+			float u = uNum / uDenom;
+			if (u >= 0 && u <= 1) {
+				Vertex* v1 = new Vertex(e.begin->val[X] + (u * (e.end->val[X] - e.begin->val[X])), e.begin->val[Y] + (u * (e.end->val[Y] - e.begin->val[Y])), e.begin->val[Z] + (u * (e.end->val[Z] - e.begin->val[Z])));
+				vertices.push_back(v1);
+			}
+		}
+
+	}
+
+	if (vertices.size() != 2) {
+		return NULL;
+	} else {
+		Edge* e = new Edge(vertices.at(0), vertices.at(1));
+		return e;
+	}
+
+	//http://en.wikipedia.org/wiki/Line-plane_intersection
+	//need direction vector of the line segment
+	//http://local.wasp.uwa.edu.au/~pbourke/geometry/planeline/
 }
 
 //Takes in four edges. Returns new (dynamically allocated Face)
