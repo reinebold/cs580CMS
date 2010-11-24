@@ -111,7 +111,7 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
         glutPostRedisplay();
         break;
     case 't':
-        if(state.getTest() == 2) 
+        if(state.getTest() == 4) 
         { 
             state.setTest(0); 
         }

@@ -71,16 +71,17 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
     cout << spacing << endl;
 
     float increment = spacing; //Need to figure this out for planes that aren't parallel to the bounding box planes.
-    Vector position(0.0f, 0.0f, 0.0f);
+    
     for(unsigned int x = 0; x < distinctNormals.size(); x++)
     {
+        Vector position(0.0f, 0.0f, 0.0f);
         cout << "Finding parallel planes of set " << x << "..." << endl;
         float currentPosition = 0.0f;
         float endPosition = 0.0f;
         if( (fabs(distinctNormals[x].x) > EPSILON) && (fabs(distinctNormals[x].y) < EPSILON) && (fabs(distinctNormals[x].z) < EPSILON) )
         {
             cout << "\tPlane parallel to x plane." << endl;
-            (distinctNormals[x].z > 0) ? position.z = 1.0f : position.x = -1.0f;
+            (distinctNormals[x].x > 0) ? position.x = 1.0f : position.x = -1.0f;
             endPosition = boundingBox.width;
         }
         else if( (fabs(distinctNormals[x].x) < EPSILON) && (fabs(distinctNormals[x].y) > EPSILON) && (fabs(distinctNormals[x].z) < EPSILON) )
@@ -127,7 +128,7 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
 
             Face *face = createFace(edges, numEdges);
             face->set = x;
-            face->sortVertices();
+            //face->sortVertices();
             parallelFaces[x].push_back(face);
 
             currentPosition += increment;
@@ -143,7 +144,11 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
             for(unsigned int z = 0; z < parallelFaces[2].size(); z++)
             {
                 Vertex *vertex = faceFaceFaceIntersection(parallelFaces[0][x], parallelFaces[1][y], parallelFaces[2][z]);
-                vertices.push_back(vertex);
+                
+                if(vertex != NULL)
+                {
+                    vertices.push_back(vertex);
+                }
             }
         }
     }

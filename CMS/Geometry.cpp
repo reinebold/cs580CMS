@@ -428,11 +428,17 @@ void Face::sortVertices()
         smallest = 100000;
     }
 
+    Vertex **temp = new Vertex*[numVertices];
     for(int x = 0; x < numVertices; x++)
     {
-        Vertex *temp = vertices[x];
-        vertices[x] = vertices[order[x]];
-        vertices[order[x]] = temp;
+        temp[x] = vertices[order[x]];
+        //Vertex *temp = vertices[x];
+        //vertices[x] = vertices[order[x]];
+        //vertices[order[x]] = temp;
+    }
+    for(int x = 0; x < numVertices; x++)
+    {
+        vertices[x] = temp[x];
     }
 }
 
@@ -447,6 +453,79 @@ Vector Vector::operator-(const Vector &rhs)
 
 void Face::updateFaces()
 {
+    /*edges = new Edge[numEdges];
+    for(int i=0; i < numVertices; i++) 
+    {
+        Vertex* v1 = vertices[i];
+        Vertex* v2;
+        if (i == numVertices - 1) 
+        {
+            v2 = vertices[0];
+        }
+        else 
+        {
+            v2 = vertices[i + 1];
+        }
+        
+        edges[i] = Edge(v1, v2);
+    }*/
+
+    /*int index = 0;
+    for(int z = 0; z < numVertices; z++)
+    {
+        if(!(fabs(vertices[z]->val[X]) < EPSILON && fabs(vertices[z]->val[Y]) < EPSILON && fabs(vertices[z]->val[Z]) < EPSILON))
+        {
+            index = z;
+            break;
+        }
+    }*/
+
+    
+    int largestindex = 0;
+    float largestmag = 0;
+    for(int x = 1; x < numVertices; x++)
+    {
+        Vector temp(vertices[0]->val[X] - vertices[x]->val[X], vertices[0]->val[Y] - vertices[x]->val[Y], vertices[0]->val[Z] - vertices[x]->val[Z]);
+        //Vector temp = vec1 - Vector(vertices[x]->val[X], vertices[x]->val[Y], vertices[x]->val[Z]);
+        float mag  = temp.magnitude();
+        if(mag > largestmag)
+        {
+            largestindex = x;
+            largestmag = mag;
+        }
+    }
+    
+    Vector vec2;
+    Vector vec1;
+    bool vec1found = false;
+    for(int x = 1; x < numVertices; x++)
+    {
+        if(x != largestindex && vec1found == false)
+        {
+            vec1.x = vertices[x]->val[X] - vertices[0]->val[X];
+            vec1.y = vertices[x]->val[Y] - vertices[0]->val[Y];
+            vec1.z = vertices[x]->val[Z] - vertices[0]->val[Z];
+            vec1found = true;
+            continue;
+        }
+        if(x != largestindex && vec1found == true)
+        {
+            vec2.x = vertices[x]->val[X] - vertices[0]->val[X];
+            vec2.y = vertices[x]->val[Y] - vertices[0]->val[Y];
+            vec2.z = vertices[x]->val[Z] - vertices[0]->val[Z];
+        }
+    }
+
+
+    //Vector a(edges[0].end->val[0] - edges[0].begin->val[0], edges[0].end->val[1] - edges[0].begin->val[1], edges[0].end->val[2] - edges[0].begin->val[2]);
+	//a.normalize();
+    //Vector b(edges[numEdges - 1].begin->val[0] - edges[0].begin->val[0], edges[numEdges - 1].begin->val[1] - edges[0].begin->val[1], edges[numEdges - 1].begin->val[2] - edges[0].begin->val[2]);
+	//b.normalize();
+    //normal = a.crossProduct(b);
+    normal = vec1.crossProduct(vec2);
+    normal.normalize();
+    sortVertices();
+
     edges = new Edge[numEdges];
     for(int i=0; i < numVertices; i++) 
     {
@@ -463,13 +542,6 @@ void Face::updateFaces()
         
         edges[i] = Edge(v1, v2);
     }
-
-    Vector a(edges[0].end->val[0] - edges[0].begin->val[0], edges[0].end->val[1] - edges[0].begin->val[1], edges[0].end->val[2] - edges[0].begin->val[2]);
-	//a.normalize();
-    Vector b(edges[numEdges - 1].begin->val[0] - edges[0].begin->val[0], edges[numEdges - 1].begin->val[1] - edges[0].begin->val[1], edges[numEdges - 1].begin->val[2] - edges[0].begin->val[2]);
-	//b.normalize();
-    normal = a.crossProduct(b);
-    normal.normalize();
 }
 
 Face& Face::operator=(const Face &_face)
@@ -493,7 +565,9 @@ Vertex* planePlanePlaneIntersection(Plane a, Plane b, Plane c) {
 
 bool Vertex::operator==(const Vertex &vert)
 {
-    if(vert.val[X] == val[X] && vert.val[Y] == val[Y] && vert.val[Z] == val[Z])
+    if(fabs(vert.val[X] - val[X]) < EPSILON && 
+       fabs(vert.val[Y] - val[Y]) < EPSILON && 
+       fabs(vert.val[Z] - val[Z]) < EPSILON)
     {
         return true;
     }
@@ -516,7 +590,7 @@ Vector Vector::operator*(float f) {
 Vector& Vector::operator*=(float f) {
     this->x *= f;
 	this->y *= f;
-	this->z *= z;
+	this->z *= f;
 	return *this;
 }
 
@@ -530,7 +604,7 @@ Vector& Vector::operator+=(const Vector& other) {
 Vector& Vector::operator/=(float f) {
 	this->x /= f;
 	this->y /= f;
-	this->z /= z;
+	this->z /= f;
 	return *this;
 }
 
@@ -594,9 +668,40 @@ Edge* Geometry::planeFaceIntersection(const Plane &plane, const Face &face) {
 //Takes in four edges. Returns new (dynamically allocated Face)
 Face* Geometry::createFace(Edge *edges[], const int numEdges) {
 	Vertex** vertexArray = new Vertex*[numEdges];
+    int vertSize = 0;
 	for(int i=0; i < numEdges; i++) 
     {
-		vertexArray[i] = edges[i]->begin;
+        if(i == 0)
+        {
+            vertexArray[vertSize++] = edges[i]->begin;
+            vertexArray[vertSize++] = edges[i]->end;
+            continue;
+        }
+        else
+        {
+            bool beginfound = true;
+            bool endfound = true;
+            for(int j = 0; j < vertSize; j++)
+            {
+                if(*(vertexArray[j]) == *(edges[i]->begin))
+                {
+                    beginfound = false;
+                }
+                if(*(vertexArray[j]) == *(edges[i]->end))
+                {
+                    endfound = false;
+                }
+            }
+
+            if(beginfound)
+            {
+                vertexArray[vertSize++] = edges[i]->begin;
+            }
+            if(vertSize < numEdges && endfound)
+            {
+                vertexArray[vertSize++] = edges[i]->end;
+            }
+        }
 	}
 #ifdef _DEBUG
     //Sanity Check: Make sure vertices are different;
@@ -612,6 +717,7 @@ Face* Geometry::createFace(Edge *edges[], const int numEdges) {
             {
                 cout << "Error: Vertices are the same when trying to create a face." << endl;
             }
+
         }
     }
 #endif
@@ -632,7 +738,7 @@ Vertex* Geometry::faceFaceFaceIntersection(Face *face1, Face *face2, Face *face3
 	//need a point from each of the faces, so just use the first vertex
 	Vector p1(face1->vertices[0]->val[X], face1->vertices[0]->val[Y], face1->vertices[0]->val[Z]);
 	Vector p2(face2->vertices[0]->val[X], face2->vertices[0]->val[Y], face2->vertices[0]->val[Z]);
-	Vector p3(face3->vertices[0]->val[X], face2->vertices[0]->val[Y], face3->vertices[0]->val[Z]);
+	Vector p3(face3->vertices[0]->val[X], face3->vertices[0]->val[Y], face3->vertices[0]->val[Z]);
 	float d1 = face1->normal.dotProduct(p1);
 	float d2 = face2->normal.dotProduct(p2);
 	float d3 = face3->normal.dotProduct(p3);
@@ -652,7 +758,7 @@ Vertex* Geometry::faceFaceFaceIntersection(Face *face1, Face *face2, Face *face3
 		return NULL;
 	} else {
 		v1 /= denominator;
-		Vertex* answer = new Vertex(v1.x, v2.y, v2.z);
+		Vertex* answer = new Vertex(v1.x, v1.y, v1.z);
 		answer->faces[0] = face1;
 		answer->faces[1] = face2;
 		answer->faces[2] = face3;

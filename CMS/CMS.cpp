@@ -100,24 +100,33 @@ void CMS::display3D()
 
     for(unsigned int x = 0; x < grid.parallelFaces.size(); x++)
     { 
-        for(unsigned int y = 0; y < grid.parallelFaces[x].size(); y++)
-        {   
-            glColor4fv(input3D.colors[x].val);
-            glBegin(GL_QUADS);
-            for(int z = 0; z < grid.parallelFaces[x][y]->numEdges; z++)
-            {
-                Vertex *vert = grid.parallelFaces[x][y]->edges[z].begin;
-                glVertex3fv(grid.parallelFaces[x][y]->edges[z].begin->val);
-                //glVertex3fv(grid.parallelFaces[x][y]->edges[1].begin->val);
-                //glVertex3fv(grid.parallelFaces[x][y]->edges[2].begin->val);
-                //glVertex3fv(grid.parallelFaces[x][y]->edges[3].begin->val);
+        if(state.getTest() == 0) break;
+        if(
+           state.getTest() == 1 && x == 0 ||
+           state.getTest() == 2 && x == 1 ||
+           state.getTest() == 3 && x == 2 ||
+           state.getTest() == 4)
+        {
+
+            for(unsigned int y = 0; y < grid.parallelFaces[x].size(); y++)
+            {   
+                glColor4fv(input3D.colors[x].val);
+                glBegin(GL_QUADS);
+                for(int z = 0; z < grid.parallelFaces[x][y]->numEdges; z++)
+                {
+                    Vertex *vert = grid.parallelFaces[x][y]->edges[z].begin;
+                    glVertex3fv(grid.parallelFaces[x][y]->edges[z].begin->val);
+                    //glVertex3fv(grid.parallelFaces[x][y]->edges[1].begin->val);
+                    //glVertex3fv(grid.parallelFaces[x][y]->edges[2].begin->val);
+                    //glVertex3fv(grid.parallelFaces[x][y]->edges[3].begin->val);
+                }
+                glEnd();
             }
-            glEnd();
         }
     }
 
     //Draw Vertices
-    /*if(showGridVertices)
+    if(showGridVertices)
     {
         glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
         glPointSize(4.0f);          //Change the size of the point
@@ -129,7 +138,7 @@ void CMS::display3D()
             }
         glEnd();
         glDisable(GL_POINT_SMOOTH);
-    }*/
+    }
 
     
 
@@ -234,6 +243,7 @@ void CMS::init()
     state.setDrawLights(false);
     state.setDrawAxis(false);
     state.setPrintInfoOnScreen(true);
+    state.setTest(4);
     
     //unsigned int seed = (unsigned int)time(NULL);
     unsigned int seed = 1290455743;
