@@ -28,18 +28,16 @@ namespace CMS3D
 			if((*(validVertices.begin())).states.size() < 0)
 				return false;
 			std::vector<PotentialVertex>::iterator itr = validVertices.begin();
-			PotentialVertex *currentVertex;
-			PotentialVertexState *selectedState;
+			PotentialVertexState selectedState;
 			assignedVertices.push_back(*(validVertices.begin()));
 			validVertices.erase(validVertices.begin());
-			currentVertex = &(assignedVertices.back());
-			selectedState = currentVertex->getRandomState();
+			selectedState = assignedVertices.back().getRandomState();
 			for(int i = 0; i < NUM_EDGES; i++)
 			{
-				if(currentVertex->vertex->edges[i] != NULL)
+				if(assignedVertices.back().vertex->edges[i] != NULL)
 				{
-					constrainEdge(currentVertex->vertex->edges[i],
-						selectedState->potentialEdges[i], validVertices);
+					constrainEdge(assignedVertices.back().vertex->edges[i],
+						selectedState.potentialEdges[i], validVertices);
 				}
 			}
 		}
@@ -155,39 +153,26 @@ namespace CMS3D
 				current->edges[4] == NULL || current->edges[5] == NULL)
 				//Force edge vertices to be empty
 			{
-				PotentialVertexState edge;
-				edge.sets[0] = 0;
-				edge.sets[1] = 0;
-				edge.sets[2] = 0;
-				edge.potentialEdges[0].leftFace.leftVolume = EXTERIOR;
-				edge.potentialEdges[0].leftFace.rightVolume = EXTERIOR;
-				edge.potentialEdges[0].rightFace.leftVolume = EXTERIOR;
-				edge.potentialEdges[0].rightFace.rightVolume = EXTERIOR;
-				edge.potentialEdges[1].leftFace.leftVolume = EXTERIOR;
-				edge.potentialEdges[1].leftFace.rightVolume = EXTERIOR;
-				edge.potentialEdges[1].rightFace.leftVolume = EXTERIOR;
-				edge.potentialEdges[1].rightFace.rightVolume = EXTERIOR;
-				edge.potentialEdges[2].leftFace.leftVolume = EXTERIOR;
-				edge.potentialEdges[2].leftFace.rightVolume = EXTERIOR;
-				edge.potentialEdges[2].rightFace.leftVolume = EXTERIOR;
-				edge.potentialEdges[2].rightFace.rightVolume = EXTERIOR;
-				edge.potentialEdges[3].leftFace.leftVolume = EXTERIOR;
-				edge.potentialEdges[3].leftFace.rightVolume = EXTERIOR;
-				edge.potentialEdges[3].rightFace.leftVolume = EXTERIOR;
-				edge.potentialEdges[3].rightFace.rightVolume = EXTERIOR;
-				edge.potentialEdges[4].leftFace.leftVolume = EXTERIOR;
-				edge.potentialEdges[4].leftFace.rightVolume = EXTERIOR;
-				edge.potentialEdges[4].rightFace.leftVolume = EXTERIOR;
-				edge.potentialEdges[4].rightFace.rightVolume = EXTERIOR;
-				edge.potentialEdges[5].leftFace.leftVolume = EXTERIOR;
-				edge.potentialEdges[5].leftFace.rightVolume = EXTERIOR;
-				edge.potentialEdges[5].rightFace.leftVolume = EXTERIOR;
-				edge.potentialEdges[5].rightFace.rightVolume = EXTERIOR;
-				validStates.push_back(PotentialVertex());
-				validStates.back().vertex = current;
-				validStates.back().states.push_back(edge);
-				continue;
-			}
+        PotentialVertexState edge;
+        edge.sets[0] = 0;
+        edge.sets[1] = 0;
+        edge.sets[2] = 0;
+        for(int x = 0; x < 6; x++)
+        {
+          edge.potentialEdges[0].potentialFaces[FACE1_LEFT].leftVolume = EXTERIOR;
+          edge.potentialEdges[0].potentialFaces[FACE1_LEFT].rightVolume = EXTERIOR;
+          edge.potentialEdges[0].potentialFaces[FACE1_RIGHT].leftVolume = EXTERIOR;
+          edge.potentialEdges[0].potentialFaces[FACE1_RIGHT].rightVolume = EXTERIOR;
+          edge.potentialEdges[0].potentialFaces[FACE2_LEFT].leftVolume = EXTERIOR;
+          edge.potentialEdges[0].potentialFaces[FACE2_LEFT].rightVolume = EXTERIOR;
+          edge.potentialEdges[0].potentialFaces[FACE2_RIGHT].leftVolume = EXTERIOR;
+          edge.potentialEdges[0].potentialFaces[FACE2_RIGHT].rightVolume = EXTERIOR;
+        }
+        validStates.push_back(PotentialVertex());
+        validStates.back().vertex = current;
+        validStates.back().states.push_back(edge);
+        continue;
+      }
 
 			int sets[NUM_EDGE_SETS];
 			if(current->edges[SET1IN] != NULL)
@@ -228,10 +213,14 @@ namespace CMS3D
 		vector<PotentialVertex> &vertexStates)
 	{
 		//Change the edge to the contstrained state
-		edge->leftFace->leftVolume->state = state.leftFace.leftVolume;
-		edge->leftFace->rightVolume->state = state.leftFace.rightVolume;
-		edge->rightFace->leftVolume->state = state.rightFace.leftVolume;
-		edge->rightFace->rightVolume->state = state.rightFace.rightVolume;
+    edge->faces[FACE1_LEFT]->leftVolume->state = state.potentialFaces[FACE1_LEFT].leftVolume;
+		edge->faces[FACE1_LEFT]->rightVolume->state = state.potentialFaces[FACE1_LEFT].rightVolume;
+		edge->faces[FACE1_RIGHT]->leftVolume->state = state.potentialFaces[FACE1_RIGHT].leftVolume;
+		edge->faces[FACE1_RIGHT]->rightVolume->state = state.potentialFaces[FACE1_RIGHT].rightVolume;
+		edge->faces[FACE2_LEFT]->leftVolume->state = state.potentialFaces[FACE2_LEFT].leftVolume;
+		edge->faces[FACE2_LEFT]->rightVolume->state = state.potentialFaces[FACE2_LEFT].rightVolume;
+		edge->faces[FACE2_RIGHT]->leftVolume->state = state.potentialFaces[FACE2_RIGHT].leftVolume;
+		edge->faces[FACE2_RIGHT]->rightVolume->state = state.potentialFaces[FACE2_RIGHT].rightVolume;
 
 
 		//For all vertex states
@@ -248,10 +237,7 @@ namespace CMS3D
 					if((*itr).vertex->edges[i] == edge)
 					{
 						// If so, then see if th edge does not conform to the constrained state
-						if( edge->leftFace->leftVolume->state != (*state_itr).potentialEdges[i].leftFace.leftVolume ||
-							edge->leftFace->rightVolume->state != (*state_itr).potentialEdges[i].leftFace.rightVolume ||
-							edge->rightFace->leftVolume->state != (*state_itr).potentialEdges[i].rightFace.leftVolume ||
-							edge->rightFace->rightVolume->state != (*state_itr).potentialEdges[i].rightFace.rightVolume )
+						if(!((*state_itr).potentialEdges[i] == *edge))
 						{
 							state_itr = (*itr).states.erase(state_itr);
 						}
@@ -259,25 +245,73 @@ namespace CMS3D
 				}
 			}
 		}
-	}
+  }
 
-	PotentialVertexState::PotentialVertexState(const PotentialVertexState &lhs)
+  PotentialEdgeState::PotentialEdgeState(const PotentialEdgeState &rhs)
+  {
+    *this = rhs;
+  }
+
+  PotentialEdgeState& PotentialEdgeState::operator=(const PotentialEdgeState &rhs)
+  {
+    potentialFaces[FACE1_LEFT].leftVolume = rhs.potentialFaces[FACE1_LEFT].leftVolume;
+    potentialFaces[FACE1_LEFT].rightVolume = rhs.potentialFaces[FACE1_LEFT].rightVolume;
+    potentialFaces[FACE1_RIGHT].leftVolume = rhs.potentialFaces[FACE1_RIGHT].leftVolume;
+    potentialFaces[FACE1_RIGHT].rightVolume = rhs.potentialFaces[FACE1_RIGHT].rightVolume;
+    potentialFaces[FACE2_LEFT].leftVolume = rhs.potentialFaces[FACE2_LEFT].leftVolume;
+    potentialFaces[FACE2_LEFT].rightVolume = rhs.potentialFaces[FACE2_LEFT].rightVolume;
+    potentialFaces[FACE2_RIGHT].leftVolume = rhs.potentialFaces[FACE2_RIGHT].leftVolume;
+    potentialFaces[FACE2_RIGHT].rightVolume = rhs.potentialFaces[FACE2_RIGHT].rightVolume;
+    return *this;
+  }
+
+  bool PotentialEdgeState::operator==(const PotentialEdgeState &rhs) const
+  {
+    return (
+      rhs.potentialFaces[FACE1_LEFT].leftVolume == potentialFaces[FACE1_LEFT].leftVolume &&
+      rhs.potentialFaces[FACE1_LEFT].rightVolume == potentialFaces[FACE1_LEFT].rightVolume &&
+      rhs.potentialFaces[FACE1_RIGHT].leftVolume == potentialFaces[FACE1_RIGHT].leftVolume &&
+      rhs.potentialFaces[FACE1_RIGHT].rightVolume == potentialFaces[FACE1_RIGHT].rightVolume &&
+      rhs.potentialFaces[FACE2_LEFT].leftVolume == potentialFaces[FACE2_LEFT].leftVolume &&
+      rhs.potentialFaces[FACE2_LEFT].rightVolume == potentialFaces[FACE2_LEFT].rightVolume &&
+      rhs.potentialFaces[FACE2_RIGHT].leftVolume == potentialFaces[FACE2_RIGHT].leftVolume &&
+      rhs.potentialFaces[FACE2_RIGHT].rightVolume == potentialFaces[FACE2_RIGHT].rightVolume);
+
+  }
+
+  bool PotentialEdgeState::operator==(const Edge &rhs) const
+  {
+    return (
+      rhs.faces[FACE1_LEFT]->leftVolume->state == potentialFaces[FACE1_LEFT].leftVolume &&
+      rhs.faces[FACE1_LEFT]->rightVolume->state == potentialFaces[FACE1_LEFT].rightVolume &&
+      rhs.faces[FACE1_RIGHT]->leftVolume->state == potentialFaces[FACE1_RIGHT].leftVolume &&
+      rhs.faces[FACE1_RIGHT]->rightVolume->state == potentialFaces[FACE1_RIGHT].rightVolume &&
+      rhs.faces[FACE2_LEFT]->leftVolume->state == potentialFaces[FACE2_LEFT].leftVolume &&
+      rhs.faces[FACE2_LEFT]->rightVolume->state == potentialFaces[FACE2_LEFT].rightVolume &&
+      rhs.faces[FACE2_RIGHT]->leftVolume->state == potentialFaces[FACE2_RIGHT].leftVolume &&
+      rhs.faces[FACE2_RIGHT]->rightVolume->state == potentialFaces[FACE2_RIGHT].rightVolume);
+  }
+
+	PotentialVertexState::PotentialVertexState(const PotentialVertexState &rhs)
 	{
-		*this = lhs;
+		*this = rhs;
 	}
 
-	PotentialVertexState& PotentialVertexState::operator=(const PotentialVertexState &lhs)
+	PotentialVertexState& PotentialVertexState::operator=(const PotentialVertexState &rhs)
 	{
 		for(int itr = 0; itr < NUM_EDGE_SETS; itr++)
 		{
-			sets[itr] = lhs.sets[itr];
+			sets[itr] = rhs.sets[itr];
 		}
 		for(int itr = 0; itr < NUM_EDGES; itr++)
 		{
-			potentialEdges[itr].leftFace.leftVolume = lhs.potentialEdges[itr].leftFace.leftVolume;
-			potentialEdges[itr].leftFace.rightVolume = lhs.potentialEdges[itr].leftFace.rightVolume;
-			potentialEdges[itr].rightFace.leftVolume = lhs.potentialEdges[itr].rightFace.leftVolume;
-			potentialEdges[itr].rightFace.rightVolume = lhs.potentialEdges[itr].rightFace.rightVolume;
+      for(int it2 = 0; it2 < 4; it2++)
+      {
+			potentialEdges[itr].potentialFaces[it2].leftVolume =
+        rhs.potentialEdges[itr].potentialFaces[it2].leftVolume;
+			potentialEdges[itr].potentialFaces[it2].rightVolume =
+        rhs.potentialEdges[itr].potentialFaces[it2].rightVolume;
+      }
 		}
 		return *this;
 	}
@@ -291,13 +325,7 @@ namespace CMS3D
 		}
 		for(int itr = 0; itr < NUM_EDGES; itr++)
 		{
-			if(!(potentialEdges[itr].leftFace.leftVolume == lhs.potentialEdges[itr].leftFace.leftVolume))
-				return false;
-			if(!(potentialEdges[itr].leftFace.rightVolume == lhs.potentialEdges[itr].leftFace.rightVolume))
-				return false;
-			if(!(potentialEdges[itr].rightFace.leftVolume == lhs.potentialEdges[itr].rightFace.leftVolume))
-				return false;
-			if(!(potentialEdges[itr].rightFace.rightVolume == lhs.potentialEdges[itr].rightFace.rightVolume))
+			if(!(potentialEdges[itr]== lhs.potentialEdges[itr]))
 				return false;
 		}
 		return true;
@@ -318,10 +346,10 @@ namespace CMS3D
 		return false;
 	}
 
-	PotentialVertexState* PotentialVertex::getRandomState()
+	PotentialVertexState PotentialVertex::getRandomState()
 	{
 		vector<PotentialVertexState>::iterator itr = states.begin();
 		itr +=  rand() % states.size();
-		return itr._Ptr;
+		return *itr;
 	}
 }

@@ -17,6 +17,7 @@ namespace Geometry
     enum FaceState       {EXTERIOR = 0, INTERIOR = 1, UNASSIGNED = -1};
     typedef FaceState VolumeState;
     enum EdgePosition    {BOTTOM   = 0, RIGHT, TOP, LEFT};
+    enum EdgeFace {FACE1_LEFT = 0, FACE1_RIGHT = 1, FACE2_LEFT = 2, FACE2_RIGHT = 3};
 
     class Edge;
     class Face;
@@ -51,6 +52,8 @@ namespace Geometry
         Face *faces[4];        ///< Number of faces the vertex has been intersected by
     };
 
+
+    //For use in 2D case only
     class EdgeState
     {
     public:
@@ -77,8 +80,7 @@ namespace Geometry
         Vertex*   end;          ///< End vertex (counter-clockwise direction)
         EdgeState edgestate;    ///< Keeps track of facestates, slope, and set
 
-		Face* leftFace;
-		Face* rightFace;
+		    Face* faces[4];
     };
 
     class Cuboid

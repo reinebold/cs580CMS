@@ -21,19 +21,25 @@ namespace CMS3D
 	class PotentialEdgeState
 	{
 	public:
-		PotentialFaceState leftFace;
-		PotentialFaceState rightFace;
+		PotentialFaceState potentialFaces[4];
+
+    PotentialEdgeState(){};
+    PotentialEdgeState(const PotentialEdgeState &rhs);
+    PotentialEdgeState& operator=(const PotentialEdgeState &rhs);
+    bool operator==(const PotentialEdgeState &rhs) const;
+    bool operator==(const Edge &rhs) const;
 	};
 
 	class PotentialVertexState
 	{
 	public:
-		PotentialVertexState(){};
 		int sets[NUM_EDGE_SETS];
 		PotentialEdgeState potentialEdges[NUM_EDGES];
-		PotentialVertexState(const PotentialVertexState &lhs);
-		PotentialVertexState& operator=(const PotentialVertexState &lhs);
-		bool operator==(const PotentialVertexState &lhs) const;
+
+		PotentialVertexState(){};
+		PotentialVertexState(const PotentialVertexState &rhs);
+		PotentialVertexState& operator=(const PotentialVertexState &rhs);
+		bool operator==(const PotentialVertexState &rhs) const;
 	};
 
 	class PotentialVertex
@@ -42,7 +48,7 @@ namespace CMS3D
 		PotentialVertex(){};
 		Vertex *vertex;
 		vector<PotentialVertexState> states;
-		PotentialVertexState *getRandomState();
+		PotentialVertexState getRandomState();
 		bool operator<(const PotentialVertex &lhs) const;
 	};
 
