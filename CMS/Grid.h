@@ -9,6 +9,7 @@
 #include "Geometry.h"
 #include "CMSModel3D.h"
 #include <vector>
+#include <unordered_map>
 using namespace Geometry;
 
 class Grid
@@ -21,8 +22,6 @@ public:
     void init(const CMSModel3D &model,const Cuboid &boundingbox);             ///< Will call either 2d or 3d depending on the number of faces of the input model
     void sortVertices(vector<Vertex*> &vertices, int left, int right);    ///< Simple quicksort
 
-    bool edgeAlreadyInList(Edge *edge);
-
     vector<Vertex*> vertices;          ///< The vertices of the intersections of the parallelEdges
     vector<Edge*>   edges;              ///< The split up edges of the parallel lines
     Edge          **parallelEdges;      ///< Keeps track of the parallel lines that intersect the bounding box
@@ -30,6 +29,15 @@ public:
     int             numModelEdges;      ///< Number of edges the model has.  Need for deallocation of resources.
     float           spacing;            ///< The spacing between the parallel lines
     vector<vector<Face*> > parallelFaces;
+
+    
+    typedef std::tr1::unordered_map<unsigned long long,Edge*> EdgeHash;
+    EdgeHash fastEdges;
+
+private:
+     bool edgeAlreadyInList(Edge *edge);
+     bool assignEdge(Vertex* begin, Vertex *end);
+
 };
 
 #endif // _GRID_H

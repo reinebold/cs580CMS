@@ -9,6 +9,30 @@
 #include "Utilities.h"
 #include <iostream>
 #include <vector>
+#include <unordered_map>
+
+bool Grid::assignEdge(Vertex* begin, Vertex *end)
+{
+    unsigned long long x = (int)begin;
+    unsigned long long y = (int)end;
+    unsigned long long hash1 = ((x+y)*(x+y)+x-y)/2; //We need to combine two numbers that make an edge unique...
+    unsigned long long hash2 = ((x+y)*(x+y)+y-x)/2; //Also do the opposite...because it would be the same edge...
+
+    if(fastEdges.find( hash1 ) == fastEdges.end() && fastEdges.find( hash2 ) == fastEdges.end())
+    {
+        Edge *edge = new Edge(begin, end);
+        begin->edges[begin->connectedEdges++] = edge;
+        end->edges[end->connectedEdges++] = edge;
+        edges.push_back(edge);
+        fastEdges.insert(EdgeHash::value_type( hash1 , edge));
+        fastEdges.insert(EdgeHash::value_type( hash2 , edge));
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
 
 bool Grid::edgeAlreadyInList(Edge *edge)
 {
@@ -176,7 +200,13 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
     }
     cout << vertices.size() << endl;
 
+
     
+
+ 
+
+    Utils::Timer timer;
+    timer.Start();
     cout << "Connecting vertices to edges...";
     for(unsigned int x = 0; x < vertices.size(); x++)
     {
@@ -212,7 +242,6 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
         }
 #endif
         //Connect the vertices with edges...in a particular order, always towards positive z, positive y, or positive x.
-       
         for(int y = 0; y < numSphereVertices; y++)
         {   
             Edge* edge = NULL;
@@ -222,79 +251,41 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                 {
                     if(vertices[x]->val[Z] > sphereVertices[y]->val[Z])
                     {
-                        edge = new Edge(vertices[x], sphereVertices[y]);
-                        if(!edgeAlreadyInList(edge))
-                        {
-                            sphereVertices[y]->edges[sphereVertices[y]->connectedEdges++] = edge;
-                            vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
-                            edges.push_back(edge);
-                        }
+                        assignEdge(vertices[x], sphereVertices[y]);
                     }
                     else
                     {
-                        edge = new Edge(sphereVertices[y], vertices[x]);
-                        if(!edgeAlreadyInList(edge))
-                        {
-                            sphereVertices[y]->edges[sphereVertices[y]->connectedEdges++] = edge;
-                            vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
-                            edges.push_back(edge);
-                        }
+                        assignEdge(sphereVertices[y], vertices[x]);
                     }
                 }
                 else if(vertices[x]->val[Y] > sphereVertices[y]->val[Y])
                 {
-                    edge = new Edge(vertices[x], sphereVertices[y]);
-                    if(!edgeAlreadyInList(edge))
-                    {
-                        sphereVertices[y]->edges[sphereVertices[y]->connectedEdges++] = edge;
-                        vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
-                        edges.push_back(edge);
-                    }
+                    assignEdge(vertices[x], sphereVertices[y]);
                 }
                 else
                 {
-                    edge = new Edge(sphereVertices[y], vertices[x]);
-                    if(!edgeAlreadyInList(edge))
-                    {
-                        sphereVertices[y]->edges[sphereVertices[y]->connectedEdges++] = edge;
-                        vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
-                        edges.push_back(edge);
-                    }
+                    assignEdge(sphereVertices[y], vertices[x]);
                 }
                 
             }
             else if(vertices[x]->val[X] > vertices[y]->val[X])
             {
-                //current vertex end, connected vertex begin
-                edge = new Edge(vertices[x], sphereVertices[y]);
-                if(!edgeAlreadyInList(edge))
-                {
-                    sphereVertices[y]->edges[sphereVertices[y]->connectedEdges++] = edge;
-                    vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
-                    edges.push_back(edge);
-                }
+                assignEdge(vertices[x], sphereVertices[y]);
             }
             else
             {
-                edge = new Edge(sphereVertices[y], vertices[x]);
-                if(!edgeAlreadyInList(edge))
-                {
-                    sphereVertices[y]->edges[sphereVertices[y]->connectedEdges++] = edge;
-                    vertices[x]->edges[vertices[x]->connectedEdges++] = edge;
-                    edges.push_back(edge);
-                }
+                assignEdge(sphereVertices[y], vertices[x]);
             }
-        
         }
-       
     }
+    fastEdges.clear();
     cout << edges.size() << endl;
+    timer.Stop();
+    timer.printSeconds();
 
     //Find some brute force way to get faces..
 
     //Find some brute force way to get volumes...
-
-
 }
 
 void Grid::init(const CMSModel &model, const Cuboid &boundingbox)

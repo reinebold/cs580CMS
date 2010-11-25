@@ -9,9 +9,43 @@
 #include "Geometry.h"
 #include <string>
 #include <GL/glew.h>
+#include <iostream>
+#include <windows.h>
 
 namespace Utils
 {
+    class Timer
+    {
+    public:
+        Timer()
+            :time(-1)
+        {
+            QueryPerformanceFrequency(&lFreq);
+        }
+
+        inline void Start()
+        {
+            QueryPerformanceCounter(&lStart);
+        }
+
+        inline void Stop()
+        {
+            QueryPerformanceCounter(&lEnd);
+            time = (double(lEnd.QuadPart - lStart.QuadPart) / lFreq.QuadPart);
+        }
+
+        inline void printSeconds()
+        {
+            printf("Time: %.7f seconds.\n\n",time);
+            time = -1;
+        }
+
+    private:
+        LARGE_INTEGER lFreq;
+        LARGE_INTEGER lStart;
+        LARGE_INTEGER lEnd;
+        double time;
+    };
     ///Prints OpenGL version, GLEW version, etc in the command window
     void printStatus();
 
