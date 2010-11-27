@@ -33,10 +33,19 @@ public:
     
     typedef std::tr1::unordered_map<unsigned long long,Edge*> EdgeHash;
     EdgeHash fastEdges;
+    void sortVertices3D(vector<Vertex*> &vertices, int left, int right, const Cuboid &bb);
 
 private:
      bool edgeAlreadyInList(Edge *edge);
      bool assignEdge(Vertex* begin, Vertex *end);
+     
+      //template <typename Iterator>
+      //inline bool next_combination(const Iterator first, Iterator k, const Iterator last);
+
+      template <class BidirectionalIterator>
+bool next_combination(BidirectionalIterator first, BidirectionalIterator k,
+                      BidirectionalIterator last);
+
 
 };
 

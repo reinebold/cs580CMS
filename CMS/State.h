@@ -16,7 +16,7 @@ public:
          printInfoOnScreen(true),
          drawAxis(true),
          wireFrame(false),
-         test(0)
+         test(1)
     {
     }
 

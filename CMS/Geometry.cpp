@@ -144,7 +144,13 @@ numVertices(0),
 numFaces(0),
 width(0.0f),
 height(0.0f),
-depth(0.0f)
+depth(0.0f),
+maxx(0.0f),
+minx(0.0f),
+maxy(0.0f),
+miny(0.0f),
+maxz(0.0f),
+minz(0.0f)
 {
 
 }
@@ -254,18 +260,48 @@ void Cuboid::init(int _numVertices, Vertex* _vertices)
             if(calcWidth > width)
             {
                 width = calcWidth;
+                if(faces[x].edges[y].begin->val[X] < faces[x].edges[y].end->val[X])
+                {
+                    minx = faces[x].edges[y].begin->val[X];
+                    maxx = faces[x].edges[y].end->val[X];
+                }
+                else
+                {
+                    minx = faces[x].edges[y].end->val[X];
+                    maxx = faces[x].edges[y].begin->val[X];
+                }
             }
 
             float calcHeight = fabs(faces[x].edges[y].begin->val[Y]-faces[x].edges[y].end->val[Y]);
             if(calcHeight > height)
             {
                 height = calcHeight;
+                if(faces[x].edges[y].begin->val[Y] < faces[x].edges[y].end->val[Y])
+                {
+                    miny = faces[x].edges[y].begin->val[Y];
+                    maxy = faces[x].edges[y].end->val[Y];
+                }
+                else
+                {
+                    miny = faces[x].edges[y].end->val[Y];
+                    maxy = faces[x].edges[y].begin->val[Y];
+                }
             }
 
             float calcDepth  = fabs(faces[x].edges[y].begin->val[Z]-faces[x].edges[y].end->val[Z]);
             if(calcDepth > depth)
             {
                 depth = calcDepth;
+                if(faces[x].edges[y].begin->val[Z] < faces[x].edges[y].end->val[Z])
+                {
+                    minz = faces[x].edges[y].begin->val[Z];
+                    maxz = faces[x].edges[y].end->val[Z];
+                }
+                else
+                {
+                    minz = faces[x].edges[y].end->val[Z];
+                    maxz = faces[x].edges[y].begin->val[Z];
+                }
             }
         }
     }
@@ -409,7 +445,7 @@ void Face::sortVertices()
 
     //Vertex **verts = new Vertex*[numVertices];
     float smallest = 100000;                //TODO: FIND BETTER;
-    int order[4] = {0};
+    int *order = new int[numVertices];
     int current = 0;
     int smallestindex = 0;
     for(int y = 0; y < numVertices; y++)
@@ -480,7 +516,22 @@ void Face::updateFaces()
         }
     }*/
 
-    
+    Vector vec2;
+    Vector vec1;
+    if(numVertices == 3)
+    {
+        vec1.x = vertices[1]->val[X] - vertices[0]->val[X];
+        vec1.y = vertices[1]->val[Y] - vertices[0]->val[Y];
+        vec1.z = vertices[1]->val[Z] - vertices[0]->val[Z];
+
+        vec2.x = vertices[2]->val[X] - vertices[0]->val[X];
+        vec2.y = vertices[2]->val[Y] - vertices[0]->val[Y];
+        vec2.z = vertices[2]->val[Z] - vertices[0]->val[Z];
+    }
+    else
+    {
+
+
     int largestindex = 0;
     float largestmag = 0;
     for(int x = 1; x < numVertices; x++)
@@ -495,8 +546,7 @@ void Face::updateFaces()
         }
     }
     
-    Vector vec2;
-    Vector vec1;
+
     bool vec1found = false;
     for(int x = 1; x < numVertices; x++)
     {
@@ -514,6 +564,7 @@ void Face::updateFaces()
             vec2.y = vertices[x]->val[Y] - vertices[0]->val[Y];
             vec2.z = vertices[x]->val[Z] - vertices[0]->val[Z];
         }
+    }
     }
 
 
@@ -630,6 +681,67 @@ Edge* Geometry::planeFaceIntersection(const Plane &plane, const Face &face) {
 	//2 of edges will give intersection
 	//2 will give a null
 	//take the 2 points and combine them for an edge
+	/*Edge edge1 = face.edges[0];
+	Edge edge2 = face.edges[1];
+	Edge edge3 = face.edges[2];
+	Edge edge4 = face.edges[3];*/
+
+	std::vector<Vertex*> vertices;
+
+	for(int i=0; i < face.numEdges; i++) {
+		Edge e = face.edges[i];
+		Vector denomVector(e.end->val[X] - e.begin->val[X], e.end->val[Y] - e.begin->val[Y], e.end->val[Z] - e.begin->val[Z]);
+		Vector numVec(plane.v.val[X] - e.begin->val[X], plane.v.val[Y] - e.begin->val[Y], plane.v.val[Z] - e.begin->val[Z]);
+		float uDenom = denomVector.dotProduct(plane.dir);
+		float uNum = numVec.dotProduct(plane.dir);
+		if (!(fabs(uDenom) < EPSILON)) {    //if uDenom != 0
+			float u = uNum / uDenom;
+			if (u >= (0-EPSILON) && u <= (1+EPSILON)) {
+				Vertex* v1 = new Vertex(e.begin->val[X] + (u * (e.end->val[X] - e.begin->val[X])), e.begin->val[Y] + (u * (e.end->val[Y] - e.begin->val[Y])), e.begin->val[Z] + (u * (e.end->val[Z] - e.begin->val[Z])));
+                bool same = false;
+                for(unsigned int k = 0; k < vertices.size(); k++)
+                {
+                    if(*(vertices[k]) == *v1)
+                    {
+                        same = true;
+                        delete v1;
+                        break;
+                    }
+                }
+                if(same == false)
+                {
+				    vertices.push_back(v1);
+                }
+			}
+		}
+
+	}
+
+	if (vertices.size() != 2)
+    {
+        for(unsigned int k = 0; k < vertices.size(); k++)
+        {
+            delete vertices[k];
+        }
+		return NULL;
+	} else {
+		Edge* e = new Edge(vertices.at(0), vertices.at(1));
+		return e;
+	}
+
+	//http://en.wikipedia.org/wiki/Line-plane_intersection
+	//need direction vector of the line segment
+	//http://local.wasp.uwa.edu.au/~pbourke/geometry/planeline/
+}
+
+/*Edge* Geometry::faceFaceIntersection(const Face &face1, const Face &face) {
+
+	//given a plane and a face
+	//face has 4 edges
+	//take each of those edges, do plane line intersection
+	//2 of edges will give intersection
+	//2 will give a null
+	//take the 2 points and combine them for an edge
 	Edge edge1 = face.edges[0];
 	Edge edge2 = face.edges[1];
 	Edge edge3 = face.edges[2];
@@ -643,17 +755,35 @@ Edge* Geometry::planeFaceIntersection(const Plane &plane, const Face &face) {
 		Vector numVec(plane.v.val[X] - e.begin->val[X], plane.v.val[Y] - e.begin->val[Y], plane.v.val[Z] - e.begin->val[Z]);
 		float uDenom = denomVector.dotProduct(plane.dir);
 		float uNum = numVec.dotProduct(plane.dir);
-		if (uDenom != 0) {
+		if (!(fabs(uDenom) < EPSILON)) {    //if uDenom != 0
 			float u = uNum / uDenom;
-			if (u >= 0 && u <= 1) {
+			if (u >= (0-EPSILON) && u <= (1+EPSILON)) {
 				Vertex* v1 = new Vertex(e.begin->val[X] + (u * (e.end->val[X] - e.begin->val[X])), e.begin->val[Y] + (u * (e.end->val[Y] - e.begin->val[Y])), e.begin->val[Z] + (u * (e.end->val[Z] - e.begin->val[Z])));
-				vertices.push_back(v1);
+                bool same = false;
+                for(unsigned int k = 0; k < vertices.size(); k++)
+                {
+                    if(*(vertices[k]) == *v1)
+                    {
+                        same = true;
+                        delete v1;
+                        break;
+                    }
+                }
+                if(same == false)
+                {
+				    vertices.push_back(v1);
+                }
 			}
 		}
 
 	}
 
-	if (vertices.size() != 2) {
+	if (vertices.size() != 2)
+    {
+        for(unsigned int k = 0; k < vertices.size(); k++)
+        {
+            delete vertices[k];
+        }
 		return NULL;
 	} else {
 		Edge* e = new Edge(vertices.at(0), vertices.at(1));
@@ -663,12 +793,38 @@ Edge* Geometry::planeFaceIntersection(const Plane &plane, const Face &face) {
 	//http://en.wikipedia.org/wiki/Line-plane_intersection
 	//need direction vector of the line segment
 	//http://local.wasp.uwa.edu.au/~pbourke/geometry/planeline/
-}
+}*/
 
 //Takes in four edges. Returns new (dynamically allocated Face)
-Face* Geometry::createFace(Edge *edges[], const int numEdges) {
+Face* Geometry::createFace(Edge *edges1[], int &numEdges) {
 	Vertex** vertexArray = new Vertex*[numEdges];
     int vertSize = 0;
+    
+    vector<Edge*> edges;
+    for(int x = 0; x < numEdges; x++)
+    {
+        bool same = false;
+        for(int y = 0; y < numEdges; y++)
+        {
+            if(x == y)
+            {
+                continue;
+            }
+            if(*(edges1[x]) == *(edges1[y]))
+            {
+                same = true;
+                break;
+            }
+        }
+        if(same == false)
+        {
+            edges.push_back(edges1[x]);
+        }
+    }
+    numEdges = edges.size();
+
+
+
 	for(int i=0; i < numEdges; i++) 
     {
         if(i == 0)
@@ -753,7 +909,7 @@ Vertex* Geometry::faceFaceFaceIntersection(Face *face1, Face *face2, Face *face3
 	//v1 is now the numerator
 	Vector denominatorVec = face2->normal.crossProduct(face3->normal);
 	float denominator = denominatorVec.dotProduct(face1->normal);
-	if (denominator == 0) {
+	if (fabs(denominator) < EPSILON) {
 		//failed intersection test
 		return NULL;
 	} else {
@@ -770,7 +926,7 @@ Vertex* Geometry::faceFaceFaceIntersection(Face *face1, Face *face2, Face *face3
 bool Geometry::vertexInSphere(Vertex *center, Vertex *vert, float radius) {
 	return  (((vert->val[X] - center->val[X]) * (vert->val[X] - center->val[X])) +
              ((vert->val[Y] - center->val[Y]) * (vert->val[Y] - center->val[Y])) +
-             ((vert->val[Z] - center->val[Z]) * (vert->val[Z] - center->val[Z]))) <= (radius*radius);
+             ((vert->val[Z] - center->val[Z]) * (vert->val[Z] - center->val[Z]))) <= (radius*radius+(EPSILON*EPSILON));
 }
 
 float Vector::magnitude()
@@ -784,4 +940,48 @@ bool Edge::operator==(const Edge &edge)
     return ((*begin == *(edge.begin) && *end   == *(edge.end)) ||
             (*end   == *(edge.begin) && *begin == *(edge.end)) );
     
+}
+
+bool Cuboid::inside(Vertex *vertex) const
+{
+    return (vertex->val[X] > minx && vertex->val[X] < maxx) &&
+           (vertex->val[Y] > miny && vertex->val[Y] < maxy) &&
+           (vertex->val[Z] > minz && vertex->val[Z] < maxz);
+}
+
+bool Geometry::quadraticEquation(float a, float b, float c, float totalResults[])
+{
+	if( ((b*b) - (4*a*c)) < 0 )
+	{
+		cout<< "\nSquare root can not be performed with a negative number" <<endl;
+		return false;
+	}
+	float numeratorSqrtResult = sqrt( (b*b) - (4*a*c) );
+	float denominatorResult = 2 * a;
+	float addNegativeTo_b = 0 - b;
+
+	if (denominatorResult == 0)
+	{
+		cout<<"Denominator is zero\n";
+		return false;
+	}
+	
+	totalResults[0] = (addNegativeTo_b + numeratorSqrtResult)/denominatorResult;
+	totalResults[1] = (addNegativeTo_b - numeratorSqrtResult)/denominatorResult;
+
+	return true;
+}
+
+Plane& Plane::operator=(const Plane &rhs)
+{
+   dir.x =  rhs.dir.x;
+   dir.y = rhs.dir.y;
+   dir.z = rhs.dir.z;
+
+   v.val[X] = rhs.v.val[X];
+   v.val[Y] = rhs.v.val[Y];
+   v.val[Z] = rhs.v.val[Z];
+
+   return *this;
+
 }

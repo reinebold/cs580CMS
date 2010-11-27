@@ -64,8 +64,9 @@ void unitTest() {
 	edges[1] = e2;
 	edges[2] = e3;
 	edges[3] = e4;
+    int numnumEdges = 4;
 
-	Face* createdFace = Geometry::createFace(edges, 4);
+	Face* createdFace = Geometry::createFace(edges,numnumEdges);
 
 	std::cout << "end of testing" << std::endl;
 

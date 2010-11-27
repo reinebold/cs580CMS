@@ -59,7 +59,7 @@ void CMS::display3D()
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glTranslatef(-10.0f, 0.0f, 0.0f);
+    glTranslatef(-20.0f, 0.0f, 0.0f);
 
     //The input model's edges.
     for(int numFaces = 0; numFaces < input3D.numFaces; ++numFaces)
@@ -97,8 +97,8 @@ void CMS::display3D()
             }
         glEnd();
     }
-    glTranslatef(10.0f,0.0f,0.0f);
 
+    glTranslatef(20.0f,0.0f,0.0f);
     for(unsigned int x = 0; x < grid.parallelFaces.size(); x++)
     { 
         if(state.getTest() == 0) break;
@@ -106,13 +106,14 @@ void CMS::display3D()
            state.getTest() == 1 && x == 0 ||
            state.getTest() == 2 && x == 1 ||
            state.getTest() == 3 && x == 2 ||
-           state.getTest() == 4)
+           state.getTest() == 4 && x == 3 ||
+           state.getTest() == 5)
         {
 
             for(unsigned int y = 0; y < grid.parallelFaces[x].size(); y++)
             {   
                 glColor4fv(input3D.colors[x].val);
-                glBegin(GL_QUADS);
+                glBegin(GL_POLYGON);
                 for(int z = 0; z < grid.parallelFaces[x][y]->numEdges; z++)
                 {
                     Vertex *vert = grid.parallelFaces[x][y]->edges[z].begin;
@@ -141,13 +142,17 @@ void CMS::display3D()
         glDisable(GL_POINT_SMOOTH);
     }
 
+    //Draw Edges
     if(showGridEdges)
     {
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         for(int x = 0; x < (int)grid.edges.size(); x++)
         {
             glBegin(GL_LINES);
+                glColor3f(1.0f,0.0f,0.0f);
                 glVertex3fv(grid.edges[x]->begin->val);
+
+                glColor3f(0.0f,1.0f,0.0f);
                 glVertex3fv(grid.edges[x]->end->val);
             glEnd();
         }
@@ -261,7 +266,8 @@ void CMS::init()
 	//Bounding box info
 	int bbnumVertices;
 	Vertex* bbvertices = NULL;  //Should be deleted in boundingbox.init
-	parser.boundingBox("cube.model", bbnumVertices, bbvertices);
+	parser.boundingBox("tetrahedron.model", bbnumVertices, bbvertices);
+    //parser.boundingBox("cube.model", bbnumVertices, bbvertices);
     boundingBox.init(bbnumVertices, bbvertices);
 
 	//Vertex info: Must be specified in a counter-clockwise order
@@ -269,7 +275,8 @@ void CMS::init()
 	int numFaces;
 	Face* faces = NULL;
 	Vertex *vertices = NULL;
-	parser.vertexArray("cube.model", numVertices, vertices, numFaces, faces);
+	parser.vertexArray("tetrahedron.model", numVertices, vertices, numFaces, faces);
+    //parser.vertexArray("cube.model", numVertices, vertices, numFaces, faces);
 
     if(numFaces == 1)
     {   

@@ -14,7 +14,7 @@ extern Camera camera;
 Camera::Camera()
    :znear(1.0f),
     zfar(1000.f),
-    fovy(90.0f),
+    fovy(45.0f),
     windowWidth(WINDOW_WIDTH),
     windowHeight(WINDOW_HEIGHT),
     translatex(0.0f),
