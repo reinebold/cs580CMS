@@ -98,18 +98,12 @@ void CMS::display3D()
         glEnd();
     }
 
+    //Draw the parallel faces.
     glTranslatef(20.0f,0.0f,0.0f);
     for(unsigned int x = 0; x < grid.parallelFaces.size(); x++)
     { 
-        if(state.getTest() == 0) break;
-        if(
-           state.getTest() == 1 && x == 0 ||
-           state.getTest() == 2 && x == 1 ||
-           state.getTest() == 3 && x == 2 ||
-           state.getTest() == 4 && x == 3 ||
-           state.getTest() == 5)
+        if(state.getTest() == x || state.getTest() == grid.parallelFaces.size() && state.getTest() != grid.parallelFaces.size() + 1)
         {
-
             for(unsigned int y = 0; y < grid.parallelFaces[x].size(); y++)
             {   
                 glColor4fv(input3D.colors[x].val);
@@ -118,9 +112,6 @@ void CMS::display3D()
                 {
                     Vertex *vert = grid.parallelFaces[x][y]->edges[z].begin;
                     glVertex3fv(grid.parallelFaces[x][y]->edges[z].begin->val);
-                    //glVertex3fv(grid.parallelFaces[x][y]->edges[1].begin->val);
-                    //glVertex3fv(grid.parallelFaces[x][y]->edges[2].begin->val);
-                    //glVertex3fv(grid.parallelFaces[x][y]->edges[3].begin->val);
                 }
                 glEnd();
             }
@@ -145,14 +136,14 @@ void CMS::display3D()
     //Draw Edges
     if(showGridEdges)
     {
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        glLineWidth(1.0f);
         for(int x = 0; x < (int)grid.edges.size(); x++)
         {
             glBegin(GL_LINES);
                 glColor3f(1.0f,0.0f,0.0f);
                 glVertex3fv(grid.edges[x]->begin->val);
 
-                glColor3f(0.0f,1.0f,0.0f);
+                glColor3f(0.0f,0.0f,1.0f);
                 glVertex3fv(grid.edges[x]->end->val);
             glEnd();
         }

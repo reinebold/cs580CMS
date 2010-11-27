@@ -23,12 +23,12 @@ namespace Utils
             QueryPerformanceFrequency(&lFreq);
         }
 
-        inline void Start()
+        inline void start()
         {
             QueryPerformanceCounter(&lStart);
         }
 
-        inline void Stop()
+        inline void stop()
         {
             QueryPerformanceCounter(&lEnd);
             time = (double(lEnd.QuadPart - lStart.QuadPart) / lFreq.QuadPart);
@@ -36,7 +36,7 @@ namespace Utils
 
         inline void printSeconds()
         {
-            printf("Time: %.7f seconds.\n\n",time);
+            printf("Time: %.7f seconds.\n",time);
             time = -1;
         }
 

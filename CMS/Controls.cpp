@@ -111,7 +111,7 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
         glutPostRedisplay();
         break;
     case 't':
-        if(state.getTest() == 5) 
+        if(state.getTest() == cms.grid.parallelFaces.size()+1) 
         { 
             state.setTest(0); 
         }

@@ -36,61 +36,16 @@ bool Grid::assignEdge(Vertex* begin, Vertex *end)
     }
 }
 
- /*template <typename Iterator>
- inline bool Grid::next_combination(const Iterator first, Iterator k, const Iterator last)
- {
-    if ((first == last) || (first == k) || (last == k))
-       return false;
-    Iterator itr1 = first;
-    Iterator itr2 = last;
-    ++itr1;
-    if (last == itr1)
-       return false;
-    itr1 = last;
-    --itr1;
-    itr1 = k;
-    --itr2;
-    while (first != itr1)
-    {
-       if (*--itr1 < *itr2)
-       {
-          Iterator j = k;
-          while (!(*itr1 < *j)) ++j;
-          std::iter_swap(itr1,j);
-          ++itr1;
-          ++j;
-          itr2 = k;
-          std::rotate(itr1,j,last);
-          while (last != j)
-          {
-             ++j;
-             ++itr2;
-          }
-          std::rotate(k,itr2,last);
-          return true;
-       }
-    }
-    std::rotate(first,k,last);
-    return false;
- }*/
-
+//from http://marknelson.us/attachments/next-permutation/NextCombination.tgz
 template <class BidirectionalIterator>
 bool Grid::next_combination(BidirectionalIterator first, BidirectionalIterator k,
                       BidirectionalIterator last) {
-   if ((first == last) || (k == first) || (k == last)) 
-   {
-       cout << "First==last, k == first, k == last" << endl;
-   return false;
-   }
+   if ((first == last) || (k == first) || (k == last)) return false;
    BidirectionalIterator i = first;
    BidirectionalIterator ii = last;
    
    ++i;
-   if (i == last)
-   {
-       cout << "i == last" << endl;
-   return false;
-   }
+   if (i == last) return false;
    i = last;
    --i;
    
@@ -139,11 +94,11 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
 {
     /*
     TODO:
-    1.  Only works with a cube input.
-    2.  Figure out how to get equidistant spacing between planes that are not parallel with the bounding box planes.
-    3.  
+    1.  Need to define volumes and cubes.
+    2.  Figure out how edges should be labeled.
     */
 
+    Utils::Timer timer;
     cout << endl << "---Grid Progress---" << endl;
 
     //Go through each face of the model, and extract the DISTINCT normals (also they can't be the opposite of each other)
@@ -195,34 +150,23 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
     spacing = Utils::randFloat(maxLength/2.0f, maxLength);
     cout << spacing << endl;
 
+    timer.start();
+    cout << "Finding parallel faces..." << endl;
     for(unsigned int x = 0; x < distinctNormals.size(); x++)
     {
-        float a = distinctNormals[x].x*distinctNormals[x].x + distinctNormals[x].y*distinctNormals[x].y + distinctNormals[x].z*distinctNormals[x].z;
-        float b = (distinctNormals[x].x*-distinctNormals[x].x)*2 + (distinctNormals[x].y*-distinctNormals[x].y)*2 + (distinctNormals[x].z*-distinctNormals[x].z)*2;
-        float c = a - spacing*spacing;
-        float results[2];
-        quadraticEquation(a,b,c,results);
-       // float results[2];
-        results[0] = spacing;
-        results[1] = -spacing;
-        //float result;
-        //(results[0] <= 0) ? (result = results[0]) : (result = results[1]);
-
         Vector position;
-        float increment = results[0]; //Need to figure this out for planes that aren't parallel to the bounding box planes.
+        float increment = spacing; //Need to figure this out for planes that aren't parallel to the bounding box planes.
         position.x = distinctNormals[x].x;
         position.y = distinctNormals[x].y;
         position.z = distinctNormals[x].z;
-        float currentPosition = 1.0f;
 
-        increment = results[0];
-        Plane previous(Vertex(0.0f,0.0f,0.0f),Vector(0.0f,0.0f,0.0f));
+        //Plane previous(Vertex(0.0f,0.0f,0.0f),Vector(0.0f,0.0f,0.0f));
         bool change = false;
-        int f = 0;
+        int currentPlane = 0;
         while(true)
         {
-            Plane plane( Vertex(position.x+(increment*distinctNormals[x].x*f), position.y+(f*increment*distinctNormals[x].y), position.z+(f*increment*distinctNormals[x].z)), distinctNormals[x]);
-            float distance = Vector(plane.v.val[X] - previous.v.val[X],plane.v.val[Y] - previous.v.val[Y],plane.v.val[Z] - previous.v.val[Z]).magnitude();
+            Plane plane( Vertex(position.x+(currentPlane*increment*distinctNormals[x].x), position.y+(currentPlane*increment*distinctNormals[x].y), position.z+(currentPlane*increment*distinctNormals[x].z)), distinctNormals[x]);
+            //float distance = Vector(plane.v.val[X] - previous.v.val[X],plane.v.val[Y] - previous.v.val[Y],plane.v.val[Z] - previous.v.val[Z]).magnitude();
         
             Edge* edges[6];
             int  numEdges = 0; 
@@ -240,8 +184,8 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                 if(change == false)
                 {
                     change = true;
-                    increment = results[1];
-                    f = 1;
+                    increment = -spacing;
+                    currentPlane = 1;
                     continue;
                 }
                 else
@@ -250,26 +194,18 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                 }
             }
 
-#ifdef _DEBUG
-            //Sanity Check: Make sure the face has four edges.
-           /* if(numEdges != 4)
-            {
-                cout << endl << "Error: A face did not contain 4 edges." << endl;
-                exit(EXIT_FAILURE);
-            }*/
-#endif
-
             Face *face = createFace(edges, numEdges);
             face->set = x;
             parallelFaces[x].push_back(face);
-
-            currentPosition += increment;
-            f++;
-            previous = plane;
+            currentPlane++;
+            //previous = plane;
         }
-        cout << "\tGenerated planes..." << parallelFaces[x].size() << endl;
+        cout << "\tGenerated planes for set " << x << "..." << parallelFaces[x].size() << endl;
     }
+    timer.stop();
+    timer.printSeconds();
     
+    timer.start();
     cout << "Finding vertices of plane-plane-plane intersection...";
     //Have to do combinations if we have more than 3 distinct normals.
     int *numberArray = new int[parallelFaces.size()];
@@ -297,9 +233,10 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
         }
     } while(next_combination(numberArray,numberArray + 3,numberArray+(int)parallelFaces.size()));
     cout << vertices.size() << endl;
+    timer.stop();
+    timer.printSeconds();
 
-    Utils::Timer timer;
-    timer.Start();
+    timer.start();
     cout << "Connecting vertices to edges...";
     do
     {
@@ -313,7 +250,7 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                 if(edge != NULL)
                 {
                     vector<Vertex *> verticesOnEdge;
-                    for(int h = 0; h < vertices.size(); h++)
+                    for(unsigned int h = 0; h < vertices.size(); h++)
                     {
                         float length  = Vector(edge->begin->val[X] - edge->end->val[X], edge->begin->val[Y] - edge->end->val[Y], edge->begin->val[Z] - edge->end->val[Z]).magnitude();
                         float length1 = Vector(vertices[h]->val[X] - edge->end->val[X], vertices[h]->val[Y] - edge->end->val[Y], vertices[h]->val[Z] - edge->end->val[Z]).magnitude();
@@ -346,130 +283,9 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
             }
         }
     } while(next_combination(numberArray,numberArray + 2,numberArray+(int)parallelFaces.size()));
-
-
-    /*for(unsigned int x = 0; x < vertices.size(); x++)
-    {
-        int numSphereVertices = 0;
-        Vertex* sphereVertices[80];
-        for(unsigned int y = 0; y < vertices.size(); y++)
-        {
-            if(x == y)
-            {
-                continue;
-            }
-
-
-            
-            if(vertexInSphere(vertices[x], vertices[y], spacing+1.1f))
-            {
-
-                if(parallelFaces.size() > 3)
-                {
-                    int count = 0;
-                    for(int j = 0; j < 3; j++)
-                    {
-                        bool same = false;
-                        for(int k = 0; k < 3; k++)
-                        {
-                            if(vertices[x]->faces[j]->normal == vertices[y]->faces[k]->normal)
-                            {
-                                same = true;
-                                break;
-                            }
-                        }
-                        if(same == true)
-                        {
-                            count++;
-                        }
-                            
-                    }
-                    if(count == 3)
-                    {
-                        continue;
-                    }
-
-                }
-
-                sphereVertices[numSphereVertices++] = vertices[y];
-            }
-
-
-#ifdef _DEBUG
-            //Sanity Check: Make sure the vertices aren't connected to more than 6 vertices.
-           // if(numSphereVertices > 6)
-           // {
-           //     cout << "Error: Vertex is connected to more than 6 vertices." << endl;
-           //     exit(EXIT_FAILURE);
-           // }
-#endif
-        }
-#ifdef _DEBUG
-        //Sanity Check: Make sure the vertex is connected to at least three other vertices
-       // if(numSphereVertices < 3)
-       // {
-      //      cout << "Error: Vertex is connected to less than 3 vertices." << endl;
-      //      exit(EXIT_FAILURE);
-      //  }
-#endif
-        //Connect the vertices with edges...in a particular order, always towards positive z, positive y, or positive x.
-        for(int y = 0; y < numSphereVertices; y++)
-        {   
-     //       bool same = false;
-     //       for(int j = 0; j < distinctNormals.size(); j++)
-     //       {
-                
-     //           Vector temp(sphereVertices[y]->val[X] - vertices[x]->val[X], sphereVertices[y]->val[Y] - vertices[x]->val[Y], sphereVertices[y]->val[Z] - vertices[x]->val[Z]);
-     //           float dotResult = temp.dotProduct(distinctNormals[j]);
-                
-     //           if(fabs(dotResult) < EPSILON)
-     //           {
-     //               same = true;
-     //               break;
-     //           }
-     //       }
-     //       if(!same)
-     //       {
-     //           continue;
-     //       }
-            Edge* edge = NULL;
-            if(fabs(vertices[x]->val[X] - sphereVertices[y]->val[X]) < EPSILON)
-            {
-                if(fabs(vertices[x]->val[Y] - sphereVertices[y]->val[Y]) < EPSILON)
-                {
-                    if(vertices[x]->val[Z] > sphereVertices[y]->val[Z])
-                    {
-                        assignEdge(vertices[x], sphereVertices[y]);
-                    }
-                    else
-                    {
-                        assignEdge(sphereVertices[y], vertices[x]);
-                    }
-                }
-                else if(vertices[x]->val[Y] > sphereVertices[y]->val[Y])
-                {
-                    assignEdge(vertices[x], sphereVertices[y]);
-                }
-                else
-                {
-                    assignEdge(sphereVertices[y], vertices[x]);
-                }
-                
-            }
-            else if(vertices[x]->val[X] > vertices[y]->val[X])
-            {
-                assignEdge(vertices[x], sphereVertices[y]);
-            }
-            else
-            {
-                assignEdge(sphereVertices[y], vertices[x]);
-            }
-        }
-    }
-    fastEdges.clear();
     cout << edges.size() << endl;
-    timer.Stop();
-    timer.printSeconds();*/
+    timer.stop();
+    timer.printSeconds();
 
     //Find some brute force way to get faces..
 
