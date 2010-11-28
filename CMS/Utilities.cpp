@@ -125,6 +125,10 @@ void Utils::printInfoOnScreen()
             count += 10;
             renderString(0,count,"Edges:     " + numToString(cms.grid.edges.size()));
             count += 10;
+            renderString(0,count,"Faces:     " + numToString(cms.grid.faces.size()));
+            count += 10;
+            renderString(0,count,"Volumes:   " + numToString(cms.grid.volumes.size()));
+            count += 10;
             renderString(0,count,"Spacing:   " + numToString(cms.grid.spacing));
             count += 10;
         glPopMatrix();

@@ -24,7 +24,9 @@ extern Camera camera;
 CMS::CMS()
 :showBoundingBox(true),
  showGridVertices(true),
- showGridEdges(true)
+ showGridEdges(true),
+ showGridFaces(true),
+ showGridVolumes(false)
 {
 
 }
@@ -150,32 +152,40 @@ void CMS::display3D()
     }
 
     //Draw Faces
-    /*for(int x = 0; x < (int)grid.faces.size(); x++)
+    if(showGridFaces)
     {
-        glColor4f(0.0f,1.0f,0.0f,0.5f);
-        glBegin(GL_POLYGON);
-        for(int z = 0; z < grid.faces[x]->numEdges; z++)
+        for(int x = 0; x < (int)grid.faces.size(); x++)
         {
-            //Vertex *vert = grid.parallelFaces[x][y]->edges[z].begin;
-            glVertex3fv(grid.faces[x]->edges[z].begin->val);
-        }
-        glEnd();
-    }*/
 
-    for(int x = 0; x < (int)grid.volumes.size(); x++)
-    {
-        for(int y = 0; y < 6; y++)
-        {
-            glColor4f(0.0f,1.0f,0.0f,0.5f);
             glBegin(GL_POLYGON);
-            for(int z = 0; z < (int)grid.volumes[x]->faces[y]->numVertices; z++)
+            for(int z = 0; z < grid.faces[x]->numEdges; z++)
             {
-                glVertex3fv(grid.volumes[x]->faces[y]->vertices[z]->val);
-
+                glColor4fv(input3D.colors[grid.faces[x]->set].val);
+                //Vertex *vert = grid.parallelFaces[x][y]->edges[z].begin;
+                glVertex3fv(grid.faces[x]->edges[z].begin->val);
             }
             glEnd();
         }
+    }
 
+    //Draw Volumes
+    if(showGridVolumes)
+    {
+        for(int x = 0; x < (int)grid.volumes.size(); x++)
+        {
+                           glColor4fv(Utils::randColor(.5f).val);
+            for(int y = 0; y < (int)grid.volumes[x]->numFaces; y++)
+            {
+ 
+                glBegin(GL_POLYGON);
+                for(int z = 0; z < (int)grid.volumes[x]->faces[y]->numVertices; z++)
+                {
+                    glVertex3fv(grid.volumes[x]->faces[y]->vertices[z]->val);
+
+                }
+                glEnd();
+            }
+        }
     }
 }
 

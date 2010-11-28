@@ -133,5 +133,14 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
         cms.showGridEdges = !cms.showGridEdges;
         glutPostRedisplay();
         break;
+    case 'f':
+        cms.showGridFaces = !cms.showGridFaces;
+        glutPostRedisplay();
+        break;
+    case 'c':
+        cms.showGridVolumes = !cms.showGridVolumes;
+        glutPostRedisplay();
+        break;
+
     }
 }

@@ -651,11 +651,11 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                     {
                         continue;
                     }
-                    if((face5 = findFace(vert1,vert2,vert5,vert6)) == NULL)
+                    if((face5 = findFace(vert2,vert4,vert6,vert8)) == NULL)
                     {
                         continue;
                     }
-                    if((face6 = findFace(vert3,vert4,vert7,vert8)) == NULL)
+                    if((face6 = findFace(vert1,vert3,vert5,vert7)) == NULL)
                     {
                         continue;
                     }
