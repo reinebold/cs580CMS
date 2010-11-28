@@ -73,8 +73,10 @@ namespace Geometry
 
         void operator=(const Edge &edge);
         void updateEdgeState();                        ///< Calulates the numerator, denominator, and value of slope
-        IntersectResult intersect(const Edge& otheredge, Vertex* &intersection);  ///< Returns intersection vertex in given parameter
+        IntersectResult intersect(const Edge& otheredge, Vertex* &intersection,int x = 0, int y = 1, int z = 2);  ///< Returns intersection vertex in given parameter
         bool operator==(const Edge &edge);
+
+        Vertex *intersect3D(const Edge& otheredge);
 
         Vertex*   begin;        ///< Begin vertex (counter-clockwise direction)
         Vertex*   end;          ///< End vertex (counter-clockwise direction)
@@ -117,6 +119,7 @@ namespace Geometry
         Vector* normalize();
         float magnitude();
 		Vector operator*(float f);
+        Vector operator+(Vector f);
 		Vector& operator*=(float f);
 		Vector& operator+=(const Vector& other);
 		Vector& operator/=(float f);
@@ -140,7 +143,9 @@ namespace Geometry
     class Volume
     {
     public:
-        Face       *faces;
+        Volume();
+        int          numFaces;
+        Face       **faces; //Array of face pointers
         VolumeState state;
     };
 

@@ -24,19 +24,28 @@ public:
 
     vector<Vertex*> vertices;          ///< The vertices of the intersections of the parallelEdges
     vector<Edge*>   edges;              ///< The split up edges of the parallel lines
+    vector<Face*>   faces;
+    vector<Volume*> volumes;
     Edge          **parallelEdges;      ///< Keeps track of the parallel lines that intersect the bounding box
     int            *numEdges;           ///< Keeps track of how many edges there are per set of parallel edges
     int             numModelEdges;      ///< Number of edges the model has.  Need for deallocation of resources.
     float           spacing;            ///< The spacing between the parallel lines
     vector<vector<Face*> > parallelFaces;
 
+
     
     typedef std::tr1::unordered_map<unsigned long long,Edge*> EdgeHash;
+    typedef std::tr1::unordered_map<unsigned long long,Vertex*> VertexHash;
     EdgeHash fastEdges;
+    VertexHash fastVertices;
+
     void sortVertices3D(vector<Vertex*> &vertices, int left, int right, const Cuboid &bb);
+    void sortFaces(vector<Face*> &faces, int left, int right);
 
 private:
      bool edgeAlreadyInList(Edge *edge);
+     Vertex *findVertex(Vertex *v);
+     Face *findFace(Vertex* v1, Vertex *v2, Vertex *v3, Vertex *v4);
      bool assignEdge(Vertex* begin, Vertex *end);
      
       //template <typename Iterator>

@@ -308,16 +308,16 @@ void Cuboid::init(int _numVertices, Vertex* _vertices)
 }
 
 /// Modified from http://local.wasp.uwa.edu.au/~pbourke/geometry/lineline2d/ (Author: Damian Coventry)
-IntersectResult Edge::intersect(const Edge& otheredge, Vertex* &intersection)
+IntersectResult Edge::intersect(const Edge& otheredge, Vertex* &intersection, int x, int y, int z)
 {
-    float denom  = ((otheredge.end->val[Y] - otheredge.begin->val[Y])*(end->val[X] - begin->val[X])) -
-                   ((otheredge.end->val[X] - otheredge.begin->val[X])*(end->val[Y] - begin->val[Y]));
+    float denom  = ((otheredge.end->val[y] - otheredge.begin->val[y])*(end->val[x] - begin->val[x])) -
+                   ((otheredge.end->val[x] - otheredge.begin->val[x])*(end->val[y] - begin->val[y]));
 
-    float nume_a = ((otheredge.end->val[X] - otheredge.begin->val[X])*(begin->val[Y] - otheredge.begin->val[Y])) -
-                   ((otheredge.end->val[Y] - otheredge.begin->val[Y])*(begin->val[X] - otheredge.begin->val[X]));
+    float nume_a = ((otheredge.end->val[x] - otheredge.begin->val[x])*(begin->val[y] - otheredge.begin->val[y])) -
+                   ((otheredge.end->val[y] - otheredge.begin->val[y])*(begin->val[x] - otheredge.begin->val[x]));
 
-    float nume_b = ((end->val[X] - begin->val[X])*(begin->val[Y] - otheredge.begin->val[Y])) -
-                   ((end->val[Y] - begin->val[Y])*(begin->val[X] - otheredge.begin->val[X]));
+    float nume_b = ((end->val[x] - begin->val[x])*(begin->val[y] - otheredge.begin->val[y])) -
+                   ((end->val[y] - begin->val[y])*(begin->val[x] - otheredge.begin->val[x]));
 
     if(denom == 0.0f)
     {
@@ -335,8 +335,9 @@ IntersectResult Edge::intersect(const Edge& otheredge, Vertex* &intersection)
     {
         // Get the intersection point.
         intersection = new Vertex();
-        intersection->val[X] = begin->val[X] + ua*(end->val[X] - begin->val[X]);
-        intersection->val[Y] = begin->val[Y] + ua*(end->val[Y] - begin->val[Y]);
+        intersection->val[x] = begin->val[x] + ua*(end->val[x] - begin->val[x]);
+        intersection->val[y] = begin->val[y] + ua*(end->val[y] - begin->val[y]);
+        intersection->val[z] = begin->val[z] + ua*(end->val[z] - begin->val[z]);
 
         return INTERESECTING;
     }
@@ -983,5 +984,97 @@ Plane& Plane::operator=(const Plane &rhs)
    v.val[Z] = rhs.v.val[Z];
 
    return *this;
+
+}
+
+Vertex *Edge::intersect3D(const Edge& otheredge)
+{
+    Vector  u(end->val[X] - begin->val[X], end->val[Y] - begin->val[Y], end->val[Z] - begin->val[Z]);
+    Vector  v(otheredge.end->val[X] - otheredge.begin->val[X], otheredge.end->val[Y] - otheredge.begin->val[Y], otheredge.end->val[Z] - otheredge.begin->val[Z]);
+    Vector  w(begin->val[X] - otheredge.begin->val[X], begin->val[Y] - otheredge.begin->val[Y], begin->val[Z] - otheredge.begin->val[Z]); 
+    float    a = u.dotProduct(u);        // always >= 0
+    float    b = u.dotProduct(v);
+    float    c = v.dotProduct(v);        // always >= 0
+    float    d = u.dotProduct(w);
+    float    e = v.dotProduct(w);
+    float    D = a*c - b*b;       // always >= 0
+
+    float    sc, sN, sD = D;      // sc = sN / sD, default sD = D >= 0
+    float    tc, tN, tD = D;      // tc = tN / tD, default tD = D >= 0
+
+    // compute the line parameters of the two closest points
+    if (D < EPSILON) { // the lines are almost parallel
+        sN = 0.0;        // force using point P0 on segment S1
+        sD = 1.0;        // to prevent possible division by 0.0 later
+        tN = e;
+        tD = c;
+    }
+    else {                // get the closest points on the infinite lines
+        sN = (b*e - c*d);
+        tN = (a*e - b*d);
+        if (sN < 0.0) {       // sc < 0 => the s=0 edge is visible
+            sN = 0.0;
+            tN = e;
+            tD = c;
+        }
+        else if (sN > sD) {  // sc > 1 => the s=1 edge is visible
+            sN = sD;
+            tN = e + b;
+            tD = c;
+        }
+    }
+
+    if (tN < 0.0) {           // tc < 0 => the t=0 edge is visible
+        tN = 0.0;
+        // recompute sc for this edge
+        if (-d < 0.0)
+            sN = 0.0;
+        else if (-d > a)
+            sN = sD;
+        else {
+            sN = -d;
+            sD = a;
+        }
+    }
+    else if (tN > tD) {      // tc > 1 => the t=1 edge is visible
+        tN = tD;
+        // recompute sc for this edge
+        if ((-d + b) < 0.0)
+            sN = 0;
+        else if ((-d + b) > a)
+            sN = sD;
+        else {
+            sN = (-d + b);
+            sD = a;
+        }
+    }
+    // finally do the division to get sc and tc
+    sc = (fabs(sN) < EPSILON ? 0.0f : sN / sD);
+    tc = (fabs(tN) < EPSILON ? 0.0f : tN / tD);
+
+    // get the difference of the two closest points
+    Vector   dP = w + ( u * sc) - (v * tc);  // = S1(sc) - S2(tc)
+
+    float distance = sqrt(dP.dotProduct(dP));
+    if(distance < 1.0f)
+    {
+        return new Vertex((u.x + v.x)/2.0f, (u.y-v.y)/2.0f, (u.z+v.z)/2.0f); 
+    }
+    else
+    {
+        return NULL;
+    }
+
+}
+
+Vector Vector::operator+(Vector f)
+{
+    return Vector(x + f.x, y + f.y, z + f.z);
+}
+
+Volume::Volume()
+:state(UNASSIGNED),
+ numFaces(0)
+{
 
 }

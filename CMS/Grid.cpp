@@ -67,6 +67,48 @@ bool Grid::next_combination(BidirectionalIterator first, BidirectionalIterator k
    return false;
 }
 
+Face *Grid::findFace(Vertex* v1, Vertex *v2, Vertex *v3, Vertex *v4)
+{
+    //if(v1 == NULL || v2 == NULL || v3 == NULL || v4 == NULL)
+   // {
+   //     return NULL;
+   // }
+
+    for(unsigned int g = 0; g < faces.size(); g++)
+    {
+        if((*(faces[g]->vertices[0]) == *v1 || *(faces[g]->vertices[0]) == *v2 ||
+           *(faces[g]->vertices[0]) == *v3 || *(faces[g]->vertices[0]) == *v4) &&
+           (*(faces[g]->vertices[1]) == *v1 || *(faces[g]->vertices[1]) == *v2 ||
+           *(faces[g]->vertices[1]) == *v3 || *(faces[g]->vertices[1]) == *v4) &&
+           (*(faces[g]->vertices[2]) == *v1 || *(faces[g]->vertices[2]) == *v2 ||
+           *(faces[g]->vertices[2]) == *v3 || *(faces[g]->vertices[2]) == *v4) &&
+           (*(faces[g]->vertices[3]) == *v1 || *(faces[g]->vertices[3]) == *v2 ||
+           *(faces[g]->vertices[3]) == *v3 || *(faces[g]->vertices[3]) == *v4))
+        {
+            return faces[g];
+        }
+    }
+    return NULL;
+}
+
+Vertex *Grid::findVertex(Vertex *v)
+{
+    if(v == NULL)
+    {
+        return NULL;
+    }
+
+    for(unsigned int g = 0; g < vertices.size(); g++)
+    {
+        if( fabs(v->val[X] - vertices[g]->val[X]) < 1.0f &&
+            fabs(v->val[Y] - vertices[g]->val[Y]) < 1.0f &&
+            fabs(v->val[Z] - vertices[g]->val[Z]) < 1.0f)
+        {
+            return vertices[g];
+        }
+    }
+    return NULL;
+}
 
 bool Grid::edgeAlreadyInList(Edge *edge)
 {
@@ -263,7 +305,6 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
 
                     if(verticesOnEdge.size() > 1)
                     {
-
                         sortVertices3D(verticesOnEdge, 0, verticesOnEdge.size()-1,boundingBox);
 
                         for(unsigned int j = 0; j < verticesOnEdge.size()-1; j++)
@@ -278,7 +319,6 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                             verticesOnEdge[j+1]->connectedEdges++;
                         } 
                     }
-
                 }
             }
         }
@@ -287,9 +327,361 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
     timer.stop();
     timer.printSeconds();
 
-    //Find some brute force way to get faces..
+    //THIS ONLY WORKS FOR CUBES RIGHT NOW
+    if(distinctNormals.size() == 3)
+    {
+        timer.start();
+        cout << "Connecting edges to faces...";
+        for(unsigned int x = 0; x < parallelFaces[0].size(); x++)
+        {
+            for(unsigned int y = 0; y < parallelFaces[2].size() - 1; y++)
+            {
+                for(unsigned int z = 0; z < parallelFaces[1].size() - 1; z++)
+                {
+                    Plane plane(*(parallelFaces[0][x]->vertices[0]),parallelFaces[0][x]->normal);
+                    Edge *edge1 = planeFaceIntersection(plane,*(parallelFaces[2][y]));
+                    Edge *edge2 = planeFaceIntersection(plane,*(parallelFaces[2][y+1]));
+                    Edge *edge3 = planeFaceIntersection(plane,*(parallelFaces[1][z]));
+                    Edge *edge4 = planeFaceIntersection(plane,*(parallelFaces[1][z+1]));
 
-    //Find some brute force way to get volumes...
+                    if(edge1 == NULL || edge2 == NULL || edge3 == NULL || edge4 == NULL)
+                    {
+                        continue;
+                    }
+                    Vertex *vert1 = NULL;
+                    Vertex *vert2 = NULL;
+                    Vertex *vert3 = NULL;
+                    Vertex *vert4 = NULL;
+                    
+                    if(edge1->intersect(*edge3, vert1) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge1->intersect(*edge4, vert2) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge2->intersect(*edge3, vert3) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge2->intersect(*edge4, vert4) != INTERESECTING)
+                    {
+                        continue;
+                    }
+                    Face *face = new Face();
+
+                    face->vertices = new Vertex*[4];
+                    if((face->vertices[0] = findVertex(vert1)) == NULL)
+                    {
+                        continue;
+                    }
+                    if((face->vertices[1] = findVertex(vert2)) == NULL)
+                    {
+                        continue;
+                    }
+                    if((face->vertices[2] = findVertex(vert3)) == NULL)
+                    {
+                        continue;
+                    }
+                    if((face->vertices[3] = findVertex(vert4)) == NULL)
+                    {
+                        continue;
+                    }   
+
+                    face->numVertices = 4;
+                    face->numEdges = 4;
+                    face->updateFaces();
+                    for(unsigned int setNum = 0; setNum < distinctNormals.size(); setNum++)
+                    {
+                        if((distinctNormals[setNum] == face->normal ) || ( (fabs(distinctNormals[setNum].x - -face->normal.x) < EPSILON) &&
+                                                                           (fabs(distinctNormals[setNum].y - -face->normal.y) < EPSILON) &&
+                                                                           (fabs(distinctNormals[setNum].z - -face->normal.z) < EPSILON) ))
+                        {
+                            face->set = setNum;
+                            break;
+                        }
+                    }
+                    faces.push_back(face);
+                }
+            }
+        }
+
+        for(unsigned int x = 0; x < parallelFaces[1].size(); x++)
+        {
+            for(unsigned int y = 0; y < parallelFaces[0].size() - 1; y++)
+            {
+                for(unsigned int z = 0; z < parallelFaces[2].size() - 1; z++)
+                {
+                    Plane plane(*(parallelFaces[1][x]->vertices[0]),parallelFaces[1][x]->normal);
+                    Edge *edge1 = planeFaceIntersection(plane,*(parallelFaces[0][y]));
+                    Edge *edge2 = planeFaceIntersection(plane,*(parallelFaces[0][y+1]));
+                    Edge *edge3 = planeFaceIntersection(plane,*(parallelFaces[2][z]));
+                    Edge *edge4 = planeFaceIntersection(plane,*(parallelFaces[2][z+1]));
+
+                    if(edge1 == NULL || edge2 == NULL || edge3 == NULL || edge4 == NULL)
+                    {
+                        continue;
+                    }
+                    Vertex *vert1 = NULL;
+                    Vertex *vert2 = NULL;
+                    Vertex *vert3 = NULL;
+                    Vertex *vert4 = NULL;
+                    
+                    if(edge1->intersect(*edge3, vert1,1,2,0) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge1->intersect(*edge4, vert2,1,2,0) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge2->intersect(*edge3, vert3,1,2,0) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge2->intersect(*edge4, vert4,1,2,0) != INTERESECTING)
+                    {
+                        continue;
+                    }
+                    Face *face = new Face();
+
+                    face->vertices = new Vertex*[4];
+                    if((face->vertices[0] = findVertex(vert1)) == NULL)
+                    {
+                        continue;
+                    }
+                    if((face->vertices[1] = findVertex(vert2)) == NULL)
+                    {
+                        continue;
+                    }
+                    if((face->vertices[2] = findVertex(vert3)) == NULL)
+                    {
+                        continue;
+                    }
+                    if((face->vertices[3] = findVertex(vert4)) == NULL)
+                    {
+                        continue;
+                    }   
+
+                    face->numVertices = 4;
+                    face->numEdges = 4;
+                    face->updateFaces();
+                    for(unsigned int setNum = 0; setNum < distinctNormals.size(); setNum++)
+                    {
+                        if((distinctNormals[setNum] == face->normal ) || ( (fabs(distinctNormals[setNum].x - -face->normal.x) < EPSILON) &&
+                                                                           (fabs(distinctNormals[setNum].y - -face->normal.y) < EPSILON) &&
+                                                                           (fabs(distinctNormals[setNum].z - -face->normal.z) < EPSILON) ))
+                        {
+                            face->set = setNum;
+                            break;
+                        }
+                    }
+                    faces.push_back(face);
+                }
+            }
+        }
+
+        for(unsigned int x = 0; x < parallelFaces[2].size(); x++)
+        {
+            for(unsigned int y = 0; y < parallelFaces[0].size() - 1; y++)
+            {
+                for(unsigned int z = 0; z < parallelFaces[1].size() - 1; z++)
+                {
+                    Plane plane(*(parallelFaces[2][x]->vertices[0]),parallelFaces[2][x]->normal);
+                    Edge *edge1 = planeFaceIntersection(plane,*(parallelFaces[0][y]));
+                    Edge *edge2 = planeFaceIntersection(plane,*(parallelFaces[0][y+1]));
+                    Edge *edge3 = planeFaceIntersection(plane,*(parallelFaces[1][z]));
+                    Edge *edge4 = planeFaceIntersection(plane,*(parallelFaces[1][z+1]));
+
+                    if(edge1 == NULL || edge2 == NULL || edge3 == NULL || edge4 == NULL)
+                    {
+                        continue;
+                    }
+                    Vertex *vert1 = NULL;
+                    Vertex *vert2 = NULL;
+                    Vertex *vert3 = NULL;
+                    Vertex *vert4 = NULL;
+                    
+                    if(edge1->intersect(*edge3, vert1,0,2,1) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge1->intersect(*edge4, vert2,0,2,1) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge2->intersect(*edge3, vert3,0,2,1) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge2->intersect(*edge4, vert4,0,2,1) != INTERESECTING)
+                    {
+                        continue;
+                    }
+                    Face *face = new Face();
+
+                    face->vertices = new Vertex*[4];
+                    if((face->vertices[0] = findVertex(vert1)) == NULL)
+                    {
+                        continue;
+                    }
+                    if((face->vertices[1] = findVertex(vert2)) == NULL)
+                    {
+                        continue;
+                    }
+                    if((face->vertices[2] = findVertex(vert3)) == NULL)
+                    {
+                        continue;
+                    }
+                    if((face->vertices[3] = findVertex(vert4)) == NULL)
+                    {
+                        continue;
+                    }   
+
+                    face->numVertices = 4;
+                    face->numEdges = 4;
+                    face->updateFaces();
+                    for(unsigned int setNum = 0; setNum < distinctNormals.size(); setNum++)
+                    {
+                        if((distinctNormals[setNum] == face->normal ) || ( (fabs(distinctNormals[setNum].x - -face->normal.x) < EPSILON) &&
+                                                                           (fabs(distinctNormals[setNum].y - -face->normal.y) < EPSILON) &&
+                                                                           (fabs(distinctNormals[setNum].z - -face->normal.z) < EPSILON) ))
+                        {
+                            face->set = setNum;
+                            break;
+                        }
+                    }
+                    faces.push_back(face);
+                }
+            }
+        }
+        cout << faces.size() << endl;
+        timer.stop();
+        timer.printSeconds();
+
+        cout << "Connecting faces to volumes...";
+        timer.start();
+        for(unsigned int x = 0; x < parallelFaces[0].size() - 1; x++)
+        {
+            for(unsigned int y = 0; y < parallelFaces[1].size() - 1; y++)
+            {
+                for(unsigned int z = 0; z < parallelFaces[2].size() - 1; z++)
+                {
+                    Plane plane1(*(parallelFaces[0][x]->vertices[0]),parallelFaces[0][x]->normal);
+                    Edge *edge1  = planeFaceIntersection(plane1,*(parallelFaces[1][y]));
+                    Edge *edge2  = planeFaceIntersection(plane1,*(parallelFaces[1][y+1]));
+                    Edge *edge3  = planeFaceIntersection(plane1,*(parallelFaces[2][z]));
+                    Edge *edge4  = planeFaceIntersection(plane1,*(parallelFaces[2][z+1]));
+
+                    Plane plane2(*(parallelFaces[0][x+1]->vertices[0]),parallelFaces[0][x+1]->normal);
+                    Edge *edge5  = planeFaceIntersection(plane2,*(parallelFaces[1][y]));
+                    Edge *edge6  = planeFaceIntersection(plane2,*(parallelFaces[1][y+1]));
+                    Edge *edge7  = planeFaceIntersection(plane2,*(parallelFaces[2][z]));
+                    Edge *edge8  = planeFaceIntersection(plane2,*(parallelFaces[2][z+1]));
+
+                    if(edge1 == NULL || edge2 == NULL || edge3 == NULL || edge4 == NULL ||
+                       edge5 == NULL || edge6 == NULL || edge7 == NULL || edge8 == NULL)
+                    {
+                        continue;
+                    }
+                    Vertex *vert1 = NULL;
+                    Vertex *vert2 = NULL;
+                    Vertex *vert3 = NULL;
+                    Vertex *vert4 = NULL;
+                    Vertex *vert5 = NULL;
+                    Vertex *vert6 = NULL;
+                    Vertex *vert7 = NULL;
+                    Vertex *vert8 = NULL;
+                    
+                    if(edge1->intersect(*edge3, vert1) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge1->intersect(*edge4, vert2) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge2->intersect(*edge3, vert3) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge2->intersect(*edge4, vert4) != INTERESECTING)
+                    {
+                        continue;
+                    }
+                    
+                    if(edge5->intersect(*edge7, vert5) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge5->intersect(*edge8, vert6) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge6->intersect(*edge7, vert7) != INTERESECTING) 
+                    {
+                        continue;
+                    }
+                    if(edge6->intersect(*edge8, vert8) != INTERESECTING)
+                    {
+                        continue;
+                    }
+
+                    Face* face1 = NULL;
+                    Face* face2 = NULL;
+                    Face* face3 = NULL;
+                    Face* face4 = NULL;
+                    Face* face5 = NULL;
+                    Face* face6 = NULL;
+
+                    if((face1 = findFace(vert1,vert2,vert3,vert4)) == NULL)
+                    {
+                        continue;
+                    }
+                    if((face2 = findFace(vert5,vert6,vert7,vert8)) == NULL)
+                    {
+                        continue;
+                    }
+                    if((face3 = findFace(vert1,vert2,vert5,vert6)) == NULL)
+                    {
+                        continue;
+                    }
+                    if((face4 = findFace(vert3,vert4,vert7,vert8)) == NULL)
+                    {
+                        continue;
+                    }
+                    if((face5 = findFace(vert1,vert2,vert5,vert6)) == NULL)
+                    {
+                        continue;
+                    }
+                    if((face6 = findFace(vert3,vert4,vert7,vert8)) == NULL)
+                    {
+                        continue;
+                    }
+
+                    Volume *volume = new Volume();
+                    volume->numFaces = 6;
+                    volume->faces = new Face*[volume->numFaces];
+                    volume->faces[0] = face1;
+                    volume->faces[1] = face2;
+                    volume->faces[2] = face3;
+                    volume->faces[3] = face4;
+                    volume->faces[4] = face5;
+                    volume->faces[5] = face6;
+                    volume->state = UNASSIGNED;
+                    volumes.push_back(volume);
+                }
+            }
+        }
+        cout << volumes.size() << endl;
+        timer.stop();
+        timer.printSeconds();
+    }
+    else
+    {
+        cout << "Warning: Faces and Volumes not found." << endl;
+    }
 }
 
 void Grid::init(const CMSModel &model, const Cuboid &boundingbox)
@@ -648,6 +1040,34 @@ void Grid::sortVertices(vector<Vertex*> &vertices, int left, int right)
     vertices[middle] = temp;
     sortVertices(vertices,left,middle-1);
     sortVertices(vertices,middle+1,right);
+}
+
+void Grid::sortFaces(vector<Face*> &faces, int left, int right)
+{
+    if(left>=right)
+        return;
+    int middle = left;
+    for(int i = left+1; i <= right; i++)
+    {
+        //Distance between parallel planes
+        float d1 = faces[i]->normal.x * -faces[i]->vertices[0]->val[X] + faces[i]->normal.y * -faces[i]->vertices[0]->val[Y] + faces[i]->normal.z * -faces[i]->vertices[0]->val[Z];
+        float d2 = faces[left]->normal.x * -faces[left]->vertices[0]->val[X] + faces[left]->normal.y * -faces[left]->vertices[0]->val[Y] + faces[left]->normal.z * -faces[left]->vertices[0]->val[Z];
+        float distance1 = fabs(d1)/sqrt(faces[i]->normal.x*faces[i]->normal.x + faces[i]->normal.y*faces[i]->normal.y + faces[i]->normal.z*faces[i]->normal.z);
+        float distance2 = fabs(d2)/sqrt(faces[left]->normal.x*faces[left]->normal.x + faces[left]->normal.y*faces[left]->normal.y + faces[left]->normal.z*faces[left]->normal.z);
+        
+        if(distance1 < distance2)
+        {
+            Face *temp = faces[++middle];
+            faces[middle] = faces[i];
+            faces[i] = temp;  
+        }
+    }
+    Face *temp = faces[left];
+    faces[left] = faces[middle];
+    faces[middle] = temp;
+    sortFaces(faces,left,middle-1);
+    sortFaces(faces,middle+1,right);
+
 }
 
 void Grid::sortVertices3D(vector<Vertex*> &vertices, int left, int right, const Cuboid &bb)
