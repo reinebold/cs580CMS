@@ -20,6 +20,7 @@ public:
     void init();        ///< Initializes everything - input, boundingbox, world, and grid.
 
     void continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &vertices);    ///< Does the actual CMS algorithm
+    void continuousModelSynthesis3D(vector<Edge*> &edges, vector<Vertex*> &vertices);
 
     CMSModel input;         ///< The input model for 2D
     CMSModel3D input3D;     ///< The input model for 3D

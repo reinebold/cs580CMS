@@ -5,6 +5,7 @@
 
 #include "CMS.h"
 #include "CMS2d.h"
+#include "CMS3d.h"
 #include "Lights.h"
 #include "State.h"
 #include "Program.h"
@@ -35,6 +36,11 @@ void CMS::continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &vertic
 {
     while(!CMS2D::continuousModelSynthesis2D(edges, vertices, input, grid))
       std::cout << "Algorithm did not converge. Restarting" << std::endl << std::endl;
+}
+
+void CMS::continuousModelSynthesis3D(vector<Edge*> &edges, vector<Vertex*> &vertices)
+{
+  CMS3D::continuousModelSynthesis(edges, vertices, input3D, grid);
 }
 
 void CMS::display3D()
@@ -389,6 +395,7 @@ void CMS::init()
         input3D.init(numVertices, vertices, numFaces, faces);
 
         grid.init(input3D, boundingBox);
+        continuousModelSynthesis3D(grid.edges, grid.vertices);
     }
 
     //Do the algorithm that changes the states.

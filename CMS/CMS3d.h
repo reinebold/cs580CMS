@@ -52,12 +52,13 @@ namespace CMS3D
     Vector edgeDirections[NUM_EDGES];
     
 		PotentialVertex(){};
+    PotentialVertex(const PotentialVertex &other);
     void findVolumes();
     PotentialVertexState getRandomState();
     bool operator<(const PotentialVertex &lhs) const;
   };
 
-  bool continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &vertices,
+  bool continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &vertices,
     CMSModel3D &input, Grid &grid);
   bool concaveTest(Edge *a, Edge *b);
   void sortEdges(Vertex *v);

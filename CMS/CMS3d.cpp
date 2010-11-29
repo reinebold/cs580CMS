@@ -10,7 +10,7 @@ namespace CMS3D
 {
 	/* Continuous model synthesis main function
 	*/
-	bool continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &vertices,
+	bool continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &vertices,
 		CMSModel3D &input,  Grid &grid)
 	{
 		for( std::vector<Vertex*>::iterator vertex_itr = vertices.begin();
@@ -34,7 +34,7 @@ namespace CMS3D
 			selectedState = assignedVertices.back().getRandomState();
 			for(int i = 0; i < NUM_VOLUMES; i++)
 			{
-				if(assignedVertices.back().vertex->edges[i] != NULL)
+				if(assignedVertices.back().volumes[i] != NULL)
 				{
           constrainVolume(assignedVertices.back().volumes[i],
             selectedState.volumes[i], validVertices);
@@ -82,17 +82,24 @@ namespace CMS3D
     }
 
     //copy edges to the temp array;
-		Edge *temps[NUM_EDGES];
-		for(int itr = 0 ; itr < NUM_EDGES; itr++)
-		{
-			temps[itr] = v->edges[itr];
+    Edge *temps[NUM_EDGES];
+    for(int itr = 0 ; itr < NUM_EDGES; itr++)
+    {
+      if(itr < v->connectedEdges)
+        temps[itr] = v->edges[itr];
+      else
+        temps[itr] = NULL;
+      v->edges[itr] = NULL;
 		}
 
     //For all edges in temp array move them back based on thier direction
     //and faces they intersect with
 		for(int itr = 0; itr < NUM_EDGES; itr++)
 		{
-      if(temps[itr] == NULL){continue;}
+      if(itr >=  v->connectedEdges)
+      {
+        continue;
+      }
 
       //Find face sets connecting to edge, there should be 2;
       int face1;
@@ -164,8 +171,8 @@ namespace CMS3D
 			std::vector<PotentialVertex>::iterator PVSitr;
 			PVSitr = vertexList.begin();
 			vector<vector<Face*>>::iterator PFitr;
-			PFitr = grid.parallelFaces.begin();
-			while(numFaces < 3)
+      numFaces = 0;
+      for(PFitr = grid.parallelFaces.begin(); PFitr != grid.parallelFaces.end(); PFitr++)
 			{
 				for(int y = 0; y < 3; y++)
 				{
@@ -176,9 +183,16 @@ namespace CMS3D
 					{
 						faces[numFaces]=(*(*PFitr).begin())->set;
 						numFaces++;
-					}
-				}
-			}
+            break;
+          }
+        }
+        if( numFaces == 3) break;
+      }
+      //Sanity Check
+      if(numFaces > 3)
+      {
+        std::cout << "Error Vertex matches too many faces\n";
+      }
 			//done finding faces connected to vertex
 
       //Check if potential vertex is being duplicated
@@ -207,14 +221,12 @@ namespace CMS3D
         for(vector<Vertex*>::iterator sitr = grid.vertices.begin();
           sitr != grid.vertices.end(); sitr++)
         {
-          if((*sitr)->faces[0]->set == faces[0] &&
-             (*sitr)->faces[1]->set == faces[1] &&
-             (*sitr)->faces[2]->set == faces[2] &&
-             (*sitr)->edges[0] != NULL && (*sitr)->edges[1] != NULL &&
-             (*sitr)->edges[2] != NULL && (*sitr)->edges[3] != NULL &&
-             (*sitr)->edges[4] != NULL && (*sitr)->edges[5] != NULL )
+          sample = (*sitr);
+          if(sample->faces[0]->set == faces[0] &&
+             sample->faces[1]->set == faces[1] &&
+             sample->faces[2]->set == faces[2] &&
+             sample->connectedEdges == 6 )
           {
-            sample = (*sitr);
             break;
           }
         }
@@ -270,12 +282,17 @@ namespace CMS3D
         for(vector<PotentialVertexState>::iterator PVSitr = vertexList.back().states.begin();
           PVSitr != vertexList.back().states.end(); PVSitr++)
         {
-          for(vector<PotentialVertexState>::iterator PVSitr2 = PVSitr;
+          for(vector<PotentialVertexState>::iterator PVSitr2 = PVSitr+1;
             PVSitr2 != vertexList.back().states.end(); PVSitr2++)
           {
             if( (*PVSitr) == (*PVSitr2) )
               PVSitr2 = vertexList.back().states.erase(PVSitr2);
           }
+        }
+        //sanity check
+        if(vertexList.back().states.size() == 0)
+        {
+          std::cout << "PotentialVertex with 0 states";
         }
 			}
 		}
@@ -370,9 +387,9 @@ namespace CMS3D
     Vector vert;
     Vector offset;
 
-    vert.x = potential.vertex->val[0];
-    vert.y = potential.vertex->val[1];
-    vert.z = potential.vertex->val[2];
+    vert.x = vertex.val[0];
+    vert.y = vertex.val[1];
+    vert.z = vertex.val[2];
 
     //IN_IN_IN
     offset =
@@ -502,27 +519,13 @@ namespace CMS3D
 				continue;
 			}
 
-			int sets[NUM_FACE_SETS];
-			if(current->edges[SET1IN] != NULL)
-				sets[SET1] = current->edges[SET1IN]->edgestate.set;
-			else
-				sets[SET1] = current->edges[SET1OUT]->edgestate.set;
-			if(current->edges[SET2IN] != NULL)
-				sets[SET2] = current->edges[SET2IN]->edgestate.set;
-			else
-				sets[SET2] = current->edges[SET2OUT]->edgestate.set;
-			if(current->edges[SET3IN] != NULL)
-				sets[SET3] = current->edges[SET3IN]->edgestate.set;
-			else
-				sets[SET3] = current->edges[SET3OUT]->edgestate.set;
-
 			//For everything in possible vertex states list
 			for(vector<PotentialVertex>::iterator PVitr = sourceStates.begin();
 				PVitr != sourceStates.end(); PVitr++)
 			{					
-				if( (*PVitr).sets[SET1] == sets[SET1] &&
-            (*PVitr).sets[SET2] == sets[SET2] &&
-            (*PVitr).sets[SET3] == sets[SET3] )
+        if( (*PVitr).sets[SET1] == current->faces[SET1]->set &&
+            (*PVitr).sets[SET2] == current->faces[SET2]->set &&
+            (*PVitr).sets[SET3] == current->faces[SET3]->set  )
 				{
 					for(std::vector<PotentialVertexState>::iterator source_itr = sourceStates.back().states.begin();
 						source_itr != sourceStates.back().states.end(); source_itr++)
@@ -561,6 +564,11 @@ namespace CMS3D
 						// If so, then see if th volume does not conform to the constrained state
             if(!((*state_itr).volumes[i] == volume->state))
 						{
+              if((*itr).states.size() == 1)
+              {
+                std::cout << "Error Couldn't Constrain A vertex Any More\n";
+                continue;
+              }
               //It it doesn't, delete it
 							state_itr = (*itr).states.erase(state_itr);
 						}
@@ -640,6 +648,16 @@ namespace CMS3D
 		return true;
 	}
 
+  PotentialVertex::PotentialVertex(const PotentialVertex &other)
+  {
+    vertex = other.vertex;
+    for(int itr = 0; itr < NUM_VOLUMES; itr++)
+      volumes[itr] = other.volumes[itr];
+    states = other.states;
+    for(int itr = 0; itr < NUM_EDGES; itr++)
+      edgeDirections[itr] = other.edgeDirections[itr];
+  }
+
 	bool PotentialVertex::operator<(const PotentialVertex &lhs) const
 	{
 		if(states.size() < lhs.states.size()) return true;
@@ -658,11 +676,11 @@ namespace CMS3D
   Volume *findCommonVolume(Edge *ea, Edge *eb, Edge *ec)
   {
     if(ea == NULL || eb == NULL || ec == NULL) return NULL;
-    for(int a = 0; a < 4; a++)
+    for(int a = 0; a < ea->connectedFaces; a++)
     {
-      for(int b = 0; b < 4; b++)
+      for(int b = 0; b < eb->connectedFaces; b++)
       {
-        for(int c = 0; c < 4; c++)
+        for(int c = 0; c < ec->connectedFaces; c++)
         {
           if( (ea->faces[a]->leftVolume == eb->faces[b]->leftVolume && ea->faces[a]->leftVolume == ec->faces[c]->leftVolume) ||
               (ea->faces[a]->leftVolume == eb->faces[b]->leftVolume && ea->faces[a]->leftVolume == ec->faces[c]->rightVolume) ||
