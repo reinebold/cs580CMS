@@ -391,7 +391,9 @@ Plane::Plane(Vertex vIn, Vector dirIn) {
 Face::Face()
 :numVertices(0),
  numEdges(0),
- set(-1)
+ set(-1),
+ leftVolume(NULL),
+ rightVolume(NULL)
 {
 
 }
