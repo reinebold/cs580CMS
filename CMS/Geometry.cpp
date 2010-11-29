@@ -685,6 +685,9 @@ Face& Face::operator=(const Face &_face)
     numVertices = _face.numVertices;
     numEdges = _face.numEdges;
     normal = _face.normal;
+    leftVolume = _face.leftVolume;
+    rightVolume = _face.rightVolume;
+
     
     //Vertex** vertices;  //array of Vertex*
     //Edge* edges;

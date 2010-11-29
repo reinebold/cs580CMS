@@ -243,6 +243,12 @@ void CMS::display3D()
         for(int x = 0; x < (int)grid.volumes.size(); x++)
         {
                            glColor4fv(Utils::randColor(.5f).val);
+                           glColor4f(((int)(grid.volumes[x]->faces[0]->edges[0]->begin->val[0]) % 50)/50.0f,
+                             ((int)(grid.volumes[x]->faces[0]->edges[0]->begin->val[1]) % 50)/50.0f,
+                             ((int)(grid.volumes[x]->faces[0]->edges[0]->begin->val[2]) % 50)/50.0f,
+                             1.0);
+                           if(grid.volumes[x]->state != INTERIOR)
+                             continue;
             for(int y = 0; y < (int)grid.volumes[x]->numFaces; y++)
             {
  

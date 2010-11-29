@@ -1,3 +1,4 @@
+#include "CMS.h"
 #include "CMS3d.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,6 +14,9 @@ namespace CMS3D
 	bool continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &vertices,
 		CMSModel3D &input,  Grid &grid)
 	{
+    unsigned int seed = (unsigned int)time(NULL);
+    std::cout<< "Seed is now:" << seed << std::endl;
+    srand(seed);
 		for( std::vector<Vertex*>::iterator vertex_itr = vertices.begin();
 			vertex_itr != vertices.end(); vertex_itr++)
 			sortEdges(*vertex_itr);
@@ -24,14 +28,26 @@ namespace CMS3D
 		assignStates( vertices, validStates, validVertices);
 		while(validVertices.size() > 0)
 		{
+      std::cout << "Assignments Remaining: " << validVertices.size() << std::endl;
 			sort(validVertices.begin(), validVertices.end());
 			if((*(validVertices.begin())).states.size() < 0)
 				return false;
 			std::vector<PotentialVertex>::iterator itr = validVertices.begin();
+      //itr += rand() % validVertices.size();
 			PotentialVertexState selectedState;
-			assignedVertices.push_back(*(validVertices.begin()));
-			validVertices.erase(validVertices.begin());
-			selectedState = assignedVertices.back().getRandomState();
+			assignedVertices.push_back(*(itr));
+      selectedState = itr->getRandomState();
+			validVertices.erase(itr);
+      std::cout << "Selected State:"
+        << " " << selectedState.volumes[0]
+        << " " << selectedState.volumes[1]
+        << " " << selectedState.volumes[2]
+        << " " << selectedState.volumes[3]
+        << " " << selectedState.volumes[4]
+        << " " << selectedState.volumes[5]
+        << " " << selectedState.volumes[6]
+        << " " << selectedState.volumes[6]
+        << std::endl;
 			for(int i = 0; i < NUM_VOLUMES; i++)
 			{
 				if(assignedVertices.back().volumes[i] != NULL)
@@ -40,6 +56,7 @@ namespace CMS3D
             selectedState.volumes[i], validVertices);
 				}
 			}
+      //break;
 		}
 		return true;
 	}
@@ -87,25 +104,18 @@ namespace CMS3D
     {
       if(itr < v->connectedEdges)
         temps[itr] = v->edges[itr];
-      else
-        temps[itr] = NULL;
       v->edges[itr] = NULL;
 		}
 
     //For all edges in temp array move them back based on thier direction
     //and faces they intersect with
-		for(int itr = 0; itr < NUM_EDGES; itr++)
+		for(int itr = 0; itr < v->connectedEdges; itr++)
 		{
-      if(itr >=  v->connectedEdges)
-      {
-        continue;
-      }
-
       //Find face sets connecting to edge, there should be 2;
       int face1;
       int face2;
       face1 = temps[itr]->faces[0]->set;
-      for(int fitr = 1; fitr < 4/*temps[itr]->connectedFaces*/; fitr++)
+      for(int fitr = 1; temps[itr]->connectedFaces; fitr++)
       {
         if(temps[itr]->faces[fitr]->set != face1)
         {
@@ -115,7 +125,7 @@ namespace CMS3D
       }
       if(face1 > face2)
       {
-        face1=face2;
+        face1 = face2;
         face2 = temps[itr]->faces[0]->set;
       }
 
@@ -139,23 +149,30 @@ namespace CMS3D
 						v->edges[SET2IN] = temps[itr];
 					}
 					else
-					{
-						v->edges[SET2OUT] = temps[itr];
-					}
-				}
-				else
+          {
+            v->edges[SET2OUT] = temps[itr];
+          }
+        }
+        else
         {
-					if(temps[itr]->end == v)
-					{
-						v->edges[SET3IN] = temps[itr];
-					}
-					else
-					{
-						v->edges[SET3OUT] = temps[itr];
-					}
+          if(face1 == v->faces[1]->set && face2 == v->faces[2]->set)
+          {
+            if(temps[itr]->end == v)
+            {
+              v->edges[SET3IN] = temps[itr];
+            }
+            else
+            {
+              v->edges[SET3OUT] = temps[itr];
+            }
+          }
+          else
+          {
+            std::cout << "Edge doesn't belong to any sets of faces!" << std::endl;
+          }
         }
       }
-		}
+    }
 	}
 
 	/* Populates stateList with a list of valid states
@@ -266,14 +283,17 @@ namespace CMS3D
         //For all elements in the input model check if the surrounding volumes are inside or outside
 				for(int iitr = 0; iitr < input.numVertices; iitr++)
 				{
+          //need to check if vertex is valid with current vertex
 					addVertexStates(vertexList.back(), input, grid, input.vertices[iitr]);
 				}
 				for(int iitr = 0; iitr < input.numFaces; iitr++)
 				{
 					for(int iiitr = 0; iiitr < input.faces[iitr].numEdges; iiitr++)
 					{
+            //need to check if edge is valid with current vertex
 						addEdgeStates(vertexList.back(), input, grid, *(input.faces[iitr].edges[iiitr]));
 					}
+          //need to check if face is valid with current vertex
 					addFaceStates(vertexList.back(), input, grid, input.faces[iitr]);
 				}
         //Done adding possible vertex states
@@ -547,36 +567,40 @@ namespace CMS3D
 	{
 		//Change the edge to the contstrained state
     volume->state = state;
+    //return;
 
-		//For all vertex states
-		for(vector<PotentialVertex>::iterator itr = potentialVertices.begin();
-			itr != potentialVertices.end(); itr++)
-		{
-			for(vector<PotentialVertexState>::iterator state_itr = (*itr).states.begin();
-				state_itr != (*itr).states.end(); itr++)
-			{
-				//For all volumes in the vertex states
-				for(int i = 0; i < NUM_VOLUMES; i++)
-				{
-					//see if the volume is the volume we are constraining
-          if((*itr).volumes[i] == volume)
-					{
-						// If so, then see if th volume does not conform to the constrained state
-            if(!((*state_itr).volumes[i] == volume->state))
-						{
+    //For all vertex states
+    for(vector<PotentialVertex>::iterator itr = potentialVertices.begin();
+      itr != potentialVertices.end(); itr++)
+    {
+      //For all volumes in the vertex states
+      for(int i = 0; i < NUM_VOLUMES; i++)
+      {
+        //see if the volume is the volume we are constraining
+        if((*itr).volumes[i] == volume)
+        {
+          //For all potential states
+          for(vector<PotentialVertexState>::iterator state_itr = (*itr).states.begin();
+            state_itr != (*itr).states.end();)
+          {
+            // If potential states state is not compatible with constraint
+            if( (*state_itr).volumes[i] != state )
+            {
               if((*itr).states.size() == 1)
               {
-                std::cout << "Error Couldn't Constrain A vertex Any More\n";
+                //std::cout << "Error Couldn't Constrain A vertex Any More\n";
+                state_itr++;
                 continue;
               }
-              //It it doesn't, delete it
-							state_itr = (*itr).states.erase(state_itr);
-						}
-					}
-				}
-			}
-		}
-	}
+              state_itr = (*itr).states.erase(state_itr);
+              continue;
+            }
+            state_itr++;
+          }
+        }
+      }
+    }
+  }
 
 	PotentialEdgeState::PotentialEdgeState(const PotentialEdgeState &rhs)
 	{
@@ -715,7 +739,9 @@ namespace CMS3D
   PotentialVertexState PotentialVertex::getRandomState()
 	{
 		vector<PotentialVertexState>::iterator itr = states.begin();
-		itr +=  rand() % states.size();
+    int random = rand() % states.size();
+    std::cout << states.size() << " , " << random << std::endl;
+		itr +=  random;
 		return *itr;
 	}
 }
