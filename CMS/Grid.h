@@ -8,6 +8,7 @@
 
 #include "Geometry.h"
 #include "CMSModel3D.h"
+#include "CMSModel.h"
 #include <vector>
 #include <unordered_map>
 using namespace Geometry;

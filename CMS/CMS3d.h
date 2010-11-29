@@ -1,7 +1,7 @@
 #ifndef _CMS3D_H
 #define _CMS3D_H
 
-#include "CMSModel.h"
+#include "CMSModel3D.h"
 #include "Geometry.h"
 #include "Grid.h"
 
@@ -9,7 +9,8 @@ namespace CMS3D
 {
 	enum VertexEdgeIndex {SET1IN = 0, SET1OUT, SET2IN, SET2OUT, SET3IN, SET3OUT};
 	enum VertexSetIndex {SET1 = 0, SET2 = 1, SET3 = 2};
-	enum VertexDefenition {NUM_EDGES = 6, NUM_EDGE_SETS = 3};
+	enum VertexDefenition {NUM_EDGES = 6, NUM_FACE_SETS = 3, NUM_VOLUMES = 8};
+  enum VertexVolumes{IN_IN_IN = 0, IN_IN_OUT = 1, IN_OUT_IN = 2, IN_OUT_OUT = 3, OUT_IN_IN = 4, OUT_IN_OUT = 5, OUT_OUT_IN = 6, OUT_OUT_OUT = 7};
 
 	class PotentialFaceState
 	{
@@ -33,8 +34,7 @@ namespace CMS3D
 	class PotentialVertexState
 	{
 	public:
-		int sets[NUM_EDGE_SETS];
-		PotentialEdgeState potentialEdges[NUM_EDGES];
+    VolumeState volumes[NUM_VOLUMES];
 
 		PotentialVertexState(){};
 		PotentialVertexState(const PotentialVertexState &rhs);
@@ -45,25 +45,35 @@ namespace CMS3D
 	class PotentialVertex
 	{
 	public:
-		PotentialVertex(){};
+		int sets[NUM_FACE_SETS];
 		Vertex *vertex;
+    Volume *volumes[NUM_VOLUMES];
 		vector<PotentialVertexState> states;
-		PotentialVertexState getRandomState();
-		bool operator<(const PotentialVertex &lhs) const;
-	};
+    Vector edgeDirections[NUM_EDGES];
+    
+		PotentialVertex(){};
+    void findVolumes();
+    PotentialVertexState getRandomState();
+    bool operator<(const PotentialVertex &lhs) const;
+  };
 
-	bool continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &vertices,
-		CMSModel &input, Grid &grid);
-	bool concaveTest(Edge *a, Edge *b);
-	void sortEdges(Vertex *v);
+  bool continuousModelSynthesis2D(vector<Edge*> &edges, vector<Vertex*> &vertices,
+    CMSModel3D &input, Grid &grid);
+  bool concaveTest(Edge *a, Edge *b);
+  void sortEdges(Vertex *v);
 
-	//The one real function
-	void generateStates(vector<PotentialVertexState> &stateList,  CMSModel &input, Grid &grid);
+  //The one real function
+  void generateStates(vector<PotentialVertex> &stateList,  CMSModel3D &input, Grid &grid);
+  void addInsideState(PotentialVertex &potential);
+  void addOutsideState(PotentialVertex &potential);
+  void addVertexStates(PotentialVertex &potential, CMSModel3D &input, Grid &grid, Vertex &vertex);
+  void addEdgeStates(PotentialVertex &potential,CMSModel3D &input, Grid &grid, Edge &edge);
+  void addFaceStates(PotentialVertex &potential,CMSModel3D &input, Grid &grid, Face &face);
 
-	void assignStates(vector<Vertex*> &vertices,
-		vector<PotentialVertexState> &source,
-		vector<PotentialVertex> &stateList);
-	void constrainEdge(Edge *edge, PotentialEdgeState &state,
-		vector<PotentialVertex> &potentialVertices);
+
+  void assignStates(vector<Vertex*> &vertices, vector<PotentialVertex> &source,
+    vector<PotentialVertex> &stateList);
+  void constrainVolume(Volume *volume, VolumeState &state,
+    vector<PotentialVertex> &potentialVertices);
 }
 #endif
