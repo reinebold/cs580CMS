@@ -28,7 +28,7 @@ namespace CMS3D
 		assignStates( vertices, validStates, validVertices);
 		while(validVertices.size() > 0)
 		{
-      std::cout << "Assignments Remaining: " << validVertices.size() << std::endl;
+      //std::cout << "Assignments Remaining: " << validVertices.size() << std::endl;
 			sort(validVertices.begin(), validVertices.end());
 			if((*(validVertices.begin())).states.size() < 0)
 				return false;
@@ -38,16 +38,16 @@ namespace CMS3D
 			assignedVertices.push_back(*(itr));
       selectedState = itr->getRandomState();
 			validVertices.erase(itr);
-      std::cout << "Selected State:"
-        << " " << selectedState.volumes[0]
-        << " " << selectedState.volumes[1]
-        << " " << selectedState.volumes[2]
-        << " " << selectedState.volumes[3]
-        << " " << selectedState.volumes[4]
-        << " " << selectedState.volumes[5]
-        << " " << selectedState.volumes[6]
-        << " " << selectedState.volumes[6]
-        << std::endl;
+      //std::cout << "Selected State:"
+      //  << " " << selectedState.volumes[0]
+      //  << " " << selectedState.volumes[1]
+      //  << " " << selectedState.volumes[2]
+      //  << " " << selectedState.volumes[3]
+      //  << " " << selectedState.volumes[4]
+      //  << " " << selectedState.volumes[5]
+      //  << " " << selectedState.volumes[6]
+      //  << " " << selectedState.volumes[6]
+      //  << std::endl;
 			for(int i = 0; i < NUM_VOLUMES; i++)
 			{
 				if(assignedVertices.back().volumes[i] != NULL)
@@ -59,15 +59,6 @@ namespace CMS3D
       //break;
 		}
 		return true;
-	}
-
-	bool concaveTest(Edge *a, Edge *b)
-	{
-		float ax = a->edgestate.slope.den;
-		float ay = a->edgestate.slope.num;
-		float bx = b->edgestate.slope.den;
-		float by = b->edgestate.slope.num;
-		return( (ax*by - ay*bx) < 0.0f);
 	}
 
 	/* 
@@ -278,6 +269,7 @@ namespace CMS3D
         for(int eitr = 0; eitr < NUM_EDGES; eitr++)
         {
           vertexList.back().edgeDirections[eitr].normalize();
+          //vertexList.back().edgeDirections[eitr] *= -1;
         }
 
         //For all elements in the input model check if the surrounding volumes are inside or outside
@@ -740,7 +732,7 @@ namespace CMS3D
 	{
 		vector<PotentialVertexState>::iterator itr = states.begin();
     int random = rand() % states.size();
-    std::cout << states.size() << " , " << random << std::endl;
+    //std::cout << states.size() << " , " << random << std::endl;
 		itr +=  random;
 		return *itr;
 	}
