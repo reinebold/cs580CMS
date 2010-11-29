@@ -181,8 +181,8 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
     {
         for(int y = 0; y < model.faces[x].numEdges; y++)
         {
-            float length = sqrt((model.faces[x].edges->begin->val[X] - model.faces[x].edges->end->val[X]) * (model.faces[x].edges->begin->val[X] - model.faces[x].edges->end->val[X]) +
-                                (model.faces[x].edges->begin->val[Y] - model.faces[x].edges->end->val[Y]) * (model.faces[x].edges->begin->val[Y] - model.faces[x].edges->end->val[Y]));
+            float length = sqrt((model.faces[x].edges[y]->begin->val[X] - model.faces[x].edges[y]->end->val[X]) * (model.faces[x].edges[y]->begin->val[X] - model.faces[x].edges[y]->end->val[X]) +
+                                (model.faces[x].edges[y]->begin->val[Y] - model.faces[x].edges[y]->end->val[Y]) * (model.faces[x].edges[y]->begin->val[Y] - model.faces[x].edges[y]->end->val[Y]));
             if(length > maxLength)
             {
                 maxLength = length;
@@ -289,6 +289,8 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                 Plane plane(*(parallelFaces[numberArray[0]][x]->vertices[0]),parallelFaces[numberArray[0]][x]->normal);
                 Edge *edge = planeFaceIntersection(plane,*(parallelFaces[numberArray[1]][y]));
 
+                
+
                 if(edge != NULL)
                 {
                     vector<Vertex *> verticesOnEdge;
@@ -296,21 +298,24 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                     {
                         float length  = Vector(edge->begin->val[X] - edge->end->val[X], edge->begin->val[Y] - edge->end->val[Y], edge->begin->val[Z] - edge->end->val[Z]).magnitude();
                         float length1 = Vector(vertices[h]->val[X] - edge->end->val[X], vertices[h]->val[Y] - edge->end->val[Y], vertices[h]->val[Z] - edge->end->val[Z]).magnitude();
-                        float length2 = Vector(vertices[h]->val[X] - edge->begin->val[X], vertices[h]->val[Y] - edge->begin->val[Y], vertices[h]->val[Z] - edge->begin->val[Z]).magnitude();
+                        float length2 = Vector(edge->begin->val[X] - vertices[h]->val[X] , edge->begin->val[Y] -vertices[h]->val[Y] , edge->begin->val[Z] -vertices[h]->val[Z] ).magnitude();
                         if(fabs(length - (length1+length2)) < EPSILON)
                         {
                             verticesOnEdge.push_back(vertices[h]);
                         }
                     }
 
+                    
+
                     if(verticesOnEdge.size() > 1)
                     {
-                        sortVertices3D(verticesOnEdge, 0, verticesOnEdge.size()-1,boundingBox);
+                        //sortVertices3D(verticesOnEdge, 0, verticesOnEdge.size()-1,boundingBox);
 
                         for(unsigned int j = 0; j < verticesOnEdge.size()-1; j++)
                         {
                             Edge *edge = new Edge(verticesOnEdge[j],verticesOnEdge[j+1]);
                             edge->edgestate.set = x;
+                            edge->connectedFaces = 0;
                             edges.push_back(edge);
 
                             verticesOnEdge[j]->edges[verticesOnEdge[j]->connectedEdges] = edge;
@@ -370,7 +375,6 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                         continue;
                     }
                     Face *face = new Face();
-
                     face->vertices = new Vertex*[4];
                     if((face->vertices[0] = findVertex(vert1)) == NULL)
                     {
@@ -389,18 +393,73 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                         continue;
                     }   
 
+
                     face->numVertices = 4;
-                    face->numEdges = 4;
-                    face->updateFaces();
+                    face->numEdges = 0;
+
+                    face->edges = new Edge*[4];
+                    //Find edges and assign the edges to the face and faces to the edge
+                    for(int u = 0; u < face->numVertices && face->numEdges != 4; u++)
+                    {
+                    for(int v = 0; v < face->vertices[u]->connectedEdges && face->numEdges != 4; v++)
+                    {
+                    Vertex *vert;
+                    if(face->vertices[u]->edges[v]->begin == face->vertices[u])
+                    {
+                    vert = face->vertices[u]->edges[v]->end;
+                    }
+                    else if(face->vertices[u]->edges[v]->end == face->vertices[u])
+                    {
+                    vert = face->vertices[u]->edges[v]->begin;
+                    }
+                    else
+                    {
+                    cout << "I should never get here." << endl;
+                    }
+
+                    for(int w = 0; w < face->numVertices; w++)
+                    {
+                    if(u == w)
+                    {
+                    continue;
+                    }
+                    if(face->vertices[w] == vert)
+                    {
+                    bool same = false;
+                    for(int z = 0; z < face->numEdges; z++)
+                    {
+                    if(face->vertices[u]->edges[v] == face->edges[z])
+                    {
+                    same = true;
+                    break;
+                    }
+                    }
+                    if(same == false)
+                    {
+                    face->edges[face->numEdges] = face->vertices[u]->edges[v];
+                    face->vertices[u]->edges[v]->faces[face->vertices[u]->edges[v]->connectedFaces] = face;
+                    face->vertices[u]->edges[v]->connectedFaces++;
+                    face->numEdges++;
+                    if(face->numEdges == 4)
+                    {
+                    break;
+                    }
+                    }
+                    }
+                    }
+                    }
+                    }
+                    face->findNormal();
+                    face->sortVertices();
                     for(unsigned int setNum = 0; setNum < distinctNormals.size(); setNum++)
                     {
-                        if((distinctNormals[setNum] == face->normal ) || ( (fabs(distinctNormals[setNum].x - -face->normal.x) < EPSILON) &&
-                                                                           (fabs(distinctNormals[setNum].y - -face->normal.y) < EPSILON) &&
-                                                                           (fabs(distinctNormals[setNum].z - -face->normal.z) < EPSILON) ))
-                        {
-                            face->set = setNum;
-                            break;
-                        }
+                    if((distinctNormals[setNum] == face->normal ) || ( (fabs(distinctNormals[setNum].x - -face->normal.x) < EPSILON) &&
+                    (fabs(distinctNormals[setNum].y - -face->normal.y) < EPSILON) &&
+                    (fabs(distinctNormals[setNum].z - -face->normal.z) < EPSILON) ))
+                    {
+                    face->set = setNum;
+                    break;
+                    }
                     }
                     faces.push_back(face);
                 }
@@ -465,8 +524,62 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                     }   
 
                     face->numVertices = 4;
-                    face->numEdges = 4;
-                    face->updateFaces();
+                    face->numEdges = 0;
+
+                    face->edges = new Edge*[4];
+                    //Find edges and assign the edges to the face and faces to the edge
+                    for(int u = 0; u < face->numVertices && face->numEdges != 4; u++)
+                    {
+                        for(int v = 0; v < face->vertices[u]->connectedEdges && face->numEdges != 4; v++)
+                        {
+                            Vertex *vert;
+                            if(face->vertices[u]->edges[v]->begin == face->vertices[u])
+                            {
+                                vert = face->vertices[u]->edges[v]->end;
+                            }
+                            else if(face->vertices[u]->edges[v]->end == face->vertices[u])
+                            {
+                                vert = face->vertices[u]->edges[v]->begin;
+                            }
+                            else
+                            {
+                                cout << "I should never get here." << endl;
+                            }
+
+                            for(int w = 0; w < face->numVertices; w++)
+                            {
+                                if(u == w)
+                                {
+                                    continue;
+                                }
+                                if(face->vertices[w] == vert)
+                                {
+                                    bool same = false;
+                                    for(int z = 0; z < face->numEdges; z++)
+                                    {
+                                        if(face->vertices[u]->edges[v] == face->edges[z])
+                                        {
+                                            same = true;
+                                            break;
+                                        }
+                                    }
+                                    if(same == false)
+                                    {
+                                        face->edges[face->numEdges] = face->vertices[u]->edges[v];
+                                        face->vertices[u]->edges[v]->faces[face->vertices[u]->edges[v]->connectedFaces] = face;
+                                        face->vertices[u]->edges[v]->connectedFaces++;
+                                        face->numEdges++;
+                                        if(face->numEdges == 4)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    face->findNormal();
+                    face->sortVertices();
                     for(unsigned int setNum = 0; setNum < distinctNormals.size(); setNum++)
                     {
                         if((distinctNormals[setNum] == face->normal ) || ( (fabs(distinctNormals[setNum].x - -face->normal.x) < EPSILON) &&
@@ -540,13 +653,67 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                     }   
 
                     face->numVertices = 4;
-                    face->numEdges = 4;
-                    face->updateFaces();
+                    face->numEdges = 0;
+
+                    face->edges = new Edge*[4];
+                    //Find edges and assign the edges to the face and faces to the edge
+                    for(int u = 0; u < face->numVertices && face->numEdges != 4; u++)
+                    {
+                        for(int v = 0; v < face->vertices[u]->connectedEdges && face->numEdges != 4; v++)
+                        {
+                            Vertex *vert;
+                            if(face->vertices[u]->edges[v]->begin == face->vertices[u])
+                            {
+                                vert = face->vertices[u]->edges[v]->end;
+                            }
+                            else if(face->vertices[u]->edges[v]->end == face->vertices[u])
+                            {
+                                vert = face->vertices[u]->edges[v]->begin;
+                            }
+                            else
+                            {
+                                cout << "I should never get here." << endl;
+                            }
+
+                            for(int w = 0; w < face->numVertices; w++)
+                            {
+                                if(u == w)
+                                {
+                                    continue;
+                                }
+                                if(face->vertices[w] == vert)
+                                {
+                                    bool same = false;
+                                    for(int z = 0; z < face->numEdges; z++)
+                                    {
+                                        if(face->vertices[u]->edges[v] == face->edges[z])
+                                        {
+                                            same = true;
+                                            break;
+                                        }
+                                    }
+                                    if(same == false)
+                                    {
+                                        face->edges[face->numEdges] = face->vertices[u]->edges[v];
+                                        face->vertices[u]->edges[v]->faces[face->vertices[u]->edges[v]->connectedFaces] = face;
+                                        face->vertices[u]->edges[v]->connectedFaces++;
+                                        face->numEdges++;
+                                        if(face->numEdges == 4)
+                                        {
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    face->findNormal();
+                    face->sortVertices();
                     for(unsigned int setNum = 0; setNum < distinctNormals.size(); setNum++)
                     {
                         if((distinctNormals[setNum] == face->normal ) || ( (fabs(distinctNormals[setNum].x - -face->normal.x) < EPSILON) &&
-                                                                           (fabs(distinctNormals[setNum].y - -face->normal.y) < EPSILON) &&
-                                                                           (fabs(distinctNormals[setNum].z - -face->normal.z) < EPSILON) ))
+                            (fabs(distinctNormals[setNum].y - -face->normal.y) < EPSILON) &&
+                            (fabs(distinctNormals[setNum].z - -face->normal.z) < EPSILON) ))
                         {
                             face->set = setNum;
                             break;

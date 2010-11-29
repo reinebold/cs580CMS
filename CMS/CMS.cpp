@@ -71,8 +71,8 @@ void CMS::display3D()
         glBegin(GL_LINES);
         for(int numEdges = 0; numEdges < input3D.faces[numFaces].numEdges; ++numEdges)
         {
-            glVertex3fv(input3D.faces[numFaces].edges[numEdges].begin->val);
-            glVertex3fv(input3D.faces[numFaces].edges[numEdges].end->val);
+            glVertex3fv(input3D.faces[numFaces].edges[numEdges]->begin->val);
+            glVertex3fv(input3D.faces[numFaces].edges[numEdges]->end->val);
         }
         glEnd();
     }
@@ -112,23 +112,87 @@ void CMS::display3D()
                 glBegin(GL_POLYGON);
                 for(int z = 0; z < grid.parallelFaces[x][y]->numEdges; z++)
                 {
-                    Vertex *vert = grid.parallelFaces[x][y]->edges[z].begin;
-                    glVertex3fv(grid.parallelFaces[x][y]->edges[z].begin->val);
+                    Vertex *vert = grid.parallelFaces[x][y]->edges[z]->begin;
+                    glVertex3fv(grid.parallelFaces[x][y]->edges[z]->begin->val);
                 }
                 glEnd();
             }
         }
     }
+    /*for(int x = 0; x < grid.vertices.size(); x++)
+    {
+        if(grid.vertices[x]->connectedEdges == 3)
+        {
+            glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
+            glPointSize(4.0f);          //Change the size of the point
+            glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+            glBegin(GL_POINTS);
+            glVertex3fv(grid.vertices[x]->val);
+            glEnd();
+            glDisable(GL_POINT_SMOOTH);
+        }
+        else if(grid.vertices[x]->connectedEdges == 4)
+        {
+            glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
+            glPointSize(4.0f);          //Change the size of the point
+            glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
+            glBegin(GL_POINTS);
+            glVertex3fv(grid.vertices[x]->val);
+            glEnd();
+            glDisable(GL_POINT_SMOOTH);
+        }
+        else if(grid.vertices[x]->connectedEdges == 5)
+        {
+            glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
+            glPointSize(4.0f);          //Change the size of the point
+            glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+            glBegin(GL_POINTS);
+            glVertex3fv(grid.vertices[x]->val);
+            glEnd();
+            glDisable(GL_POINT_SMOOTH);
+        }
+        else if(grid.vertices[x]->connectedEdges == 6)
+        {
+            glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
+            glPointSize(4.0f);          //Change the size of the point
+            glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
+            glBegin(GL_POINTS);
+            glVertex3fv(grid.vertices[x]->val);
+            glEnd();
+            glDisable(GL_POINT_SMOOTH);
+        }
+    }*/
 
     //Draw Vertices
     if(showGridVertices)
     {
         glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
         glPointSize(4.0f);          //Change the size of the point
-        glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+        
         glBegin(GL_POINTS);
             for(int x=0; x < (int)grid.vertices.size(); x++)
             {
+                if(grid.vertices[x]->connectedEdges == 3)
+                {
+                    glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
+                }
+                else if(grid.vertices[x]->connectedEdges == 4)
+                {
+                    glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+                }
+                else if(grid.vertices[x]->connectedEdges == 5)
+                {
+                    glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
+                }
+                else if(grid.vertices[x]->connectedEdges == 6)
+                {
+                    glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
+                }
+                else
+                {
+                    glColor4f(1.0f, 0.0f, 0.0f, 1.0f);  //should never get here, color red.
+                }
+                
                 glVertex3fv(grid.vertices[x]->val);
             }
         glEnd();
@@ -161,8 +225,7 @@ void CMS::display3D()
             for(int z = 0; z < grid.faces[x]->numEdges; z++)
             {
                 glColor4fv(input3D.colors[grid.faces[x]->set].val);
-                //Vertex *vert = grid.parallelFaces[x][y]->edges[z].begin;
-                glVertex3fv(grid.faces[x]->edges[z].begin->val);
+                glVertex3fv(grid.faces[x]->vertices[z]->val);
             }
             glEnd();
         }

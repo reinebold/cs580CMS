@@ -107,9 +107,13 @@ Vertex& Vertex::operator=(const Vertex &vert)
 
 Edge::Edge() 
     :begin(NULL),
-     end(NULL)
+     end(NULL),
+     connectedFaces(0)
 {
-
+    faces[0] = NULL;
+    faces[1] = NULL;
+    faces[2] = NULL;
+    faces[3] = NULL;
 }
 
 Edge::Edge(Vertex* beginval, Vertex* endval)
@@ -256,51 +260,51 @@ void Cuboid::init(int _numVertices, Vertex* _vertices)
     {
         for(int y = 0; y < faces[x].numEdges; y++)
         {
-            float calcWidth  = fabs(faces[x].edges[y].begin->val[X]-faces[x].edges[y].end->val[X]);
+            float calcWidth  = fabs(faces[x].edges[y]->begin->val[X]-faces[x].edges[y]->end->val[X]);
             if(calcWidth > width)
             {
                 width = calcWidth;
-                if(faces[x].edges[y].begin->val[X] < faces[x].edges[y].end->val[X])
+                if(faces[x].edges[y]->begin->val[X] < faces[x].edges[y]->end->val[X])
                 {
-                    minx = faces[x].edges[y].begin->val[X];
-                    maxx = faces[x].edges[y].end->val[X];
+                    minx = faces[x].edges[y]->begin->val[X];
+                    maxx = faces[x].edges[y]->end->val[X];
                 }
                 else
                 {
-                    minx = faces[x].edges[y].end->val[X];
-                    maxx = faces[x].edges[y].begin->val[X];
+                    minx = faces[x].edges[y]->end->val[X];
+                    maxx = faces[x].edges[y]->begin->val[X];
                 }
             }
 
-            float calcHeight = fabs(faces[x].edges[y].begin->val[Y]-faces[x].edges[y].end->val[Y]);
+            float calcHeight = fabs(faces[x].edges[y]->begin->val[Y]-faces[x].edges[y]->end->val[Y]);
             if(calcHeight > height)
             {
                 height = calcHeight;
-                if(faces[x].edges[y].begin->val[Y] < faces[x].edges[y].end->val[Y])
+                if(faces[x].edges[y]->begin->val[Y] < faces[x].edges[y]->end->val[Y])
                 {
-                    miny = faces[x].edges[y].begin->val[Y];
-                    maxy = faces[x].edges[y].end->val[Y];
+                    miny = faces[x].edges[y]->begin->val[Y];
+                    maxy = faces[x].edges[y]->end->val[Y];
                 }
                 else
                 {
-                    miny = faces[x].edges[y].end->val[Y];
-                    maxy = faces[x].edges[y].begin->val[Y];
+                    miny = faces[x].edges[y]->end->val[Y];
+                    maxy = faces[x].edges[y]->begin->val[Y];
                 }
             }
 
-            float calcDepth  = fabs(faces[x].edges[y].begin->val[Z]-faces[x].edges[y].end->val[Z]);
+            float calcDepth  = fabs(faces[x].edges[y]->begin->val[Z]-faces[x].edges[y]->end->val[Z]);
             if(calcDepth > depth)
             {
                 depth = calcDepth;
-                if(faces[x].edges[y].begin->val[Z] < faces[x].edges[y].end->val[Z])
+                if(faces[x].edges[y]->begin->val[Z] < faces[x].edges[y]->end->val[Z])
                 {
-                    minz = faces[x].edges[y].begin->val[Z];
-                    maxz = faces[x].edges[y].end->val[Z];
+                    minz = faces[x].edges[y]->begin->val[Z];
+                    maxz = faces[x].edges[y]->end->val[Z];
                 }
                 else
                 {
-                    minz = faces[x].edges[y].end->val[Z];
-                    maxz = faces[x].edges[y].begin->val[Z];
+                    minz = faces[x].edges[y]->end->val[Z];
+                    maxz = faces[x].edges[y]->begin->val[Z];
                 }
             }
         }
@@ -488,6 +492,64 @@ Vector Vector::operator-(const Vector &rhs)
     return result;
 }
 
+void Face::findNormal()
+{
+    Vector vec2;
+    Vector vec1;
+    if(numVertices == 3)
+    {
+        vec1.x = vertices[1]->val[X] - vertices[0]->val[X];
+        vec1.y = vertices[1]->val[Y] - vertices[0]->val[Y];
+        vec1.z = vertices[1]->val[Z] - vertices[0]->val[Z];
+
+        vec2.x = vertices[2]->val[X] - vertices[0]->val[X];
+        vec2.y = vertices[2]->val[Y] - vertices[0]->val[Y];
+        vec2.z = vertices[2]->val[Z] - vertices[0]->val[Z];
+    }
+    else
+    {
+
+
+        int largestindex = 0;
+        float largestmag = 0;
+        for(int x = 1; x < numVertices; x++)
+        {
+            Vector temp(vertices[0]->val[X] - vertices[x]->val[X], vertices[0]->val[Y] - vertices[x]->val[Y], vertices[0]->val[Z] - vertices[x]->val[Z]);
+            //Vector temp = vec1 - Vector(vertices[x]->val[X], vertices[x]->val[Y], vertices[x]->val[Z]);
+            float mag  = temp.magnitude();
+            if(mag > largestmag)
+            {
+                largestindex = x;
+                largestmag = mag;
+            }
+        }
+
+
+        bool vec1found = false;
+        for(int x = 1; x < numVertices; x++)
+        {
+            if(x != largestindex && vec1found == false)
+            {
+                vec1.x = vertices[x]->val[X] - vertices[0]->val[X];
+                vec1.y = vertices[x]->val[Y] - vertices[0]->val[Y];
+                vec1.z = vertices[x]->val[Z] - vertices[0]->val[Z];
+                vec1found = true;
+                continue;
+            }
+            if(x != largestindex && vec1found == true)
+            {
+                vec2.x = vertices[x]->val[X] - vertices[0]->val[X];
+                vec2.y = vertices[x]->val[Y] - vertices[0]->val[Y];
+                vec2.z = vertices[x]->val[Z] - vertices[0]->val[Z];
+            }
+        }
+    }
+
+    normal = vec1.crossProduct(vec2);
+    normal.normalize();
+
+}
+
 void Face::updateFaces()
 {
     /*edges = new Edge[numEdges];
@@ -517,7 +579,7 @@ void Face::updateFaces()
         }
     }*/
 
-    Vector vec2;
+    /*Vector vec2;
     Vector vec1;
     if(numVertices == 3)
     {
@@ -576,9 +638,11 @@ void Face::updateFaces()
     //normal = a.crossProduct(b);
     normal = vec1.crossProduct(vec2);
     normal.normalize();
+    sortVertices();*/
+    findNormal();
     sortVertices();
 
-    edges = new Edge[numEdges];
+    /*edges = new Edge[numEdges];
     for(int i=0; i < numVertices; i++) 
     {
         Vertex* v1 = vertices[i];
@@ -593,7 +657,25 @@ void Face::updateFaces()
         }
         
         edges[i] = Edge(v1, v2);
+    }*/
+
+    edges = new Edge*[numVertices];
+    for(int i=0; i < numVertices; i++) 
+    {
+        Vertex* v1 = vertices[i];
+        Vertex* v2;
+        if (i == numVertices - 1) 
+        {
+            v2 = vertices[0];
+        }
+        else 
+        {
+            v2 = vertices[i + 1];
+        }
+
+        edges[i] = new Edge(v1, v2);
     }
+
 }
 
 Face& Face::operator=(const Face &_face)
@@ -690,7 +772,7 @@ Edge* Geometry::planeFaceIntersection(const Plane &plane, const Face &face) {
 	std::vector<Vertex*> vertices;
 
 	for(int i=0; i < face.numEdges; i++) {
-		Edge e = face.edges[i];
+		Edge e = *(face.edges[i]);
 		Vector denomVector(e.end->val[X] - e.begin->val[X], e.end->val[Y] - e.begin->val[Y], e.end->val[Z] - e.begin->val[Z]);
 		Vector numVec(plane.v.val[X] - e.begin->val[X], plane.v.val[Y] - e.begin->val[Y], plane.v.val[Z] - e.begin->val[Z]);
 		float uDenom = denomVector.dotProduct(plane.dir);

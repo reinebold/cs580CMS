@@ -8,7 +8,7 @@
 
 #include "Defines.h"
 #include <math.h>        ///< For fabs
-#define EPSILON .0001    ///< For use when comparing floats.
+#define  EPSILON .0001           ///< For use when comparing floats.
 #define INFINITY FLT_MAX ///< To signify a vertical line
 
 namespace Geometry
@@ -82,7 +82,8 @@ namespace Geometry
         Vertex*   end;          ///< End vertex (counter-clockwise direction)
         EdgeState edgestate;    ///< Keeps track of facestates, slope, and set
 
-		    Face* faces[4];
+        int connectedFaces;
+		Face* faces[4];
     };
 
     class Cuboid
@@ -159,11 +160,12 @@ namespace Geometry
         void updateFaces();
         void sortVertices();
         float calcAngle(const Vector &v1, const Vector &v2, const Vector &normal);
+        void findNormal(); 
 
 		int numVertices;
 		int numEdges;
 		Vertex** vertices;  //array of Vertex*
-		Edge* edges;
+		Edge** edges;
 		Vector normal;
         int set;
 
