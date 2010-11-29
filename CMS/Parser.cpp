@@ -88,9 +88,9 @@ void Parser::vertexArray(string filename, int &numVerts, Vertex* &vertices, int 
             if(k == totalVerts) //If not, assign it.
             {
                 vertices[k] = temp;
-                vertices[k].faces[vertices[k].connectedFaces++] = &faces[i];
                 totalVerts++;
             }
+            vertices[k].faces[vertices[k].connectedFaces++] = &faces[i];
             faces[i].vertices[j] = &vertices[k];
 		}
 		faces[i].updateFaces();
