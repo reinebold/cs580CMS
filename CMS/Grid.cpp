@@ -831,11 +831,17 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
                     volume->numFaces = 6;
                     volume->faces = new Face*[volume->numFaces];
                     volume->faces[0] = face1;
+                    (face1->leftVolume == NULL) ? (face1->leftVolume = volume) : (face1->rightVolume = volume);
                     volume->faces[1] = face2;
+                    (face2->leftVolume == NULL) ? (face2->leftVolume = volume) : (face2->rightVolume = volume);
                     volume->faces[2] = face3;
+                    (face3->leftVolume == NULL) ? (face3->leftVolume = volume) : (face3->rightVolume = volume);
                     volume->faces[3] = face4;
+                    (face4->leftVolume == NULL) ? (face4->leftVolume = volume) : (face4->rightVolume = volume);
                     volume->faces[4] = face5;
+                    (face5->leftVolume == NULL) ? (face5->leftVolume = volume) : (face5->rightVolume = volume);
                     volume->faces[5] = face6;
+                    (face6->leftVolume == NULL) ? (face6->leftVolume = volume) : (face6->rightVolume = volume);
                     volume->state = UNASSIGNED;
                     volumes.push_back(volume);
                 }
@@ -844,6 +850,7 @@ void Grid::init(const CMSModel3D &model, const Cuboid &boundingBox)
         cout << volumes.size() << endl;
         timer.stop();
         timer.printSeconds();
+
     }
     else
     {
