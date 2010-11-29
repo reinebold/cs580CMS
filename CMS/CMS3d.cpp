@@ -260,7 +260,7 @@ namespace CMS3D
 				{
 					for(int iiitr = 0; iiitr < input.faces[iitr].numEdges; iiitr++)
 					{
-						addEdgeStates(vertexList.back(), input, grid, input.faces[iitr].edges[iiitr]);
+						addEdgeStates(vertexList.back(), input, grid, *(input.faces[iitr].edges[iiitr]));
 					}
 					addFaceStates(vertexList.back(), input, grid, input.faces[iitr]);
 				}
@@ -460,9 +460,9 @@ namespace CMS3D
     vert.val[2] = 0.0f;
     for(int x = 0; x < face.numEdges; x++)
     {
-      vert.val[0] += face.edges[x].begin->val[0];
-      vert.val[1] += face.edges[x].begin->val[1];
-      vert.val[2] += face.edges[x].begin->val[2];
+      vert.val[0] += face.edges[x]->begin->val[0];
+      vert.val[1] += face.edges[x]->begin->val[1];
+      vert.val[2] += face.edges[x]->begin->val[2];
     }
     vert.val[0] /= (float)face.numEdges;
     vert.val[1] /= (float)face.numEdges;
