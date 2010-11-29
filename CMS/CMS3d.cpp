@@ -57,10 +57,10 @@ namespace CMS3D
 	* sotrEdges( Vertex *v)
 	* Sorts the edges in a vertex edge list based on
 	* What faces created the edges.
-  * The edges are ranked based on the faces they connect to
 	*/
 	void sortEdges(Vertex *v)
 	{
+    //Unrolled buble sort of 3 face sets
     Face *ftemp;
     if(v->faces[0]->set > v->faces[1]->set)
     {
@@ -81,12 +81,15 @@ namespace CMS3D
       v->faces[1] = ftemp;
     }
 
+    //copy edges to the temp array;
 		Edge *temps[NUM_EDGES];
 		for(int itr = 0 ; itr < NUM_EDGES; itr++)
 		{
 			temps[itr] = v->edges[itr];
 		}
 
+    //For all edges in temp array move them back based on thier direction
+    //and faces they intersect with
 		for(int itr = 0; itr < NUM_EDGES; itr++)
 		{
       if(temps[itr] == NULL){continue;}
@@ -149,10 +152,8 @@ namespace CMS3D
 	}
 
 	/* Populates stateList with a list of valid states
-	* currently creates a pre-defined list
-	* but latter will take in a model that describes possible states
 	*/
-	void generateStates(vector<PotentialVertex> &stateList,  CMSModel3D &input,
+	void generateStates(vector<PotentialVertex> &vertexList,  CMSModel3D &input,
 		Grid &grid)
 	{
 		//find the faces that connect to this vertex
@@ -161,7 +162,7 @@ namespace CMS3D
 			int faces[3];
 			int numFaces = 0;
 			std::vector<PotentialVertex>::iterator PVSitr;
-			PVSitr = stateList.begin();
+			PVSitr = vertexList.begin();
 			vector<vector<Face*>>::iterator PFitr;
 			PFitr = grid.parallelFaces.begin();
 			while(numFaces < 3)
@@ -181,7 +182,7 @@ namespace CMS3D
 			//done finding faces connected to vertex
 
       //Check if potential vertex is being duplicated
-			for(PVSitr = stateList.begin(); PVSitr != stateList.end(); PVSitr++)
+			for(PVSitr = vertexList.begin(); PVSitr != vertexList.end(); PVSitr++)
 			{
 				if(	faces[0] == PVSitr->sets[0] &&
 					faces[1] == PVSitr->sets[1] &&
@@ -189,13 +190,16 @@ namespace CMS3D
 			}
 
       //No duplication found, make a new vertex
-			if(PVSitr == stateList.end())
+			if(PVSitr == vertexList.end())
 			{
-				stateList.push_back(PotentialVertex());
-				stateList.back().sets[0] = faces[0];
-				stateList.back().sets[1] = faces[1];
-				stateList.back().sets[2] = faces[2];
-				stateList.back().vertex = NULL;
+				vertexList.push_back(PotentialVertex());
+				vertexList.back().sets[0] = faces[0];
+				vertexList.back().sets[1] = faces[1];
+				vertexList.back().sets[2] = faces[2];
+				vertexList.back().vertex = NULL;
+
+        addInsideState(vertexList.back());
+        addOutsideState(vertexList.back());
         
         //Give the new potential vertex edges based on the input faces
         Vertex *sample;
@@ -217,72 +221,85 @@ namespace CMS3D
         //Translate edges to thier directions
         //IN edge vectors are reversed because the point in
         //We want thier vector pointing out
-        stateList.back().edgeDirections[SET1IN] = Vector(
+        vertexList.back().edgeDirections[SET1IN] = Vector(
           sample->edges[SET1IN]->begin->val[0] - sample->edges[SET1IN]->end->val[0],
           sample->edges[SET1IN]->begin->val[1] - sample->edges[SET1IN]->end->val[1],
           sample->edges[SET1IN]->begin->val[2] - sample->edges[SET1IN]->end->val[2] );
-        stateList.back().edgeDirections[SET1OUT] = Vector(
+        vertexList.back().edgeDirections[SET1OUT] = Vector(
           sample->edges[SET1OUT]->end->val[0] - sample->edges[SET1OUT]->begin->val[0],
           sample->edges[SET1OUT]->end->val[1] - sample->edges[SET1OUT]->begin->val[1],
           sample->edges[SET1OUT]->end->val[2] - sample->edges[SET1OUT]->begin->val[2] );
-        stateList.back().edgeDirections[SET2IN] = Vector(
+        vertexList.back().edgeDirections[SET2IN] = Vector(
           sample->edges[SET2IN]->begin->val[0] - sample->edges[SET2IN]->end->val[0],
           sample->edges[SET2IN]->begin->val[1] - sample->edges[SET2IN]->end->val[1],
           sample->edges[SET2IN]->begin->val[2] - sample->edges[SET2IN]->end->val[2] );
-        stateList.back().edgeDirections[SET2OUT] = Vector(
+        vertexList.back().edgeDirections[SET2OUT] = Vector(
           sample->edges[SET2OUT]->end->val[0] - sample->edges[SET2OUT]->begin->val[0],
           sample->edges[SET2OUT]->end->val[1] - sample->edges[SET2OUT]->begin->val[1],
           sample->edges[SET2OUT]->end->val[2] - sample->edges[SET2OUT]->begin->val[2] );
-        stateList.back().edgeDirections[SET3IN] = Vector(
+        vertexList.back().edgeDirections[SET3IN] = Vector(
           sample->edges[SET3IN]->begin->val[0] - sample->edges[SET3IN]->end->val[0],
           sample->edges[SET3IN]->begin->val[1] - sample->edges[SET3IN]->end->val[1],
           sample->edges[SET3IN]->begin->val[2] - sample->edges[SET3IN]->end->val[2] );
-        stateList.back().edgeDirections[SET3OUT] = Vector(
+        vertexList.back().edgeDirections[SET3OUT] = Vector(
           sample->edges[SET3OUT]->end->val[0] - sample->edges[SET3OUT]->begin->val[0],
           sample->edges[SET3OUT]->end->val[1] - sample->edges[SET3OUT]->begin->val[1],
           sample->edges[SET3OUT]->end->val[2] - sample->edges[SET3OUT]->begin->val[2] );
         //Normalize edge vectors
         for(int eitr = 0; eitr < NUM_EDGES; eitr++)
         {
-          stateList.back().edgeDirections[eitr].normalize();
+          vertexList.back().edgeDirections[eitr].normalize();
         }
 
         //For all elements in the input model check if the surrounding volumes are inside or outside
 				for(int iitr = 0; iitr < input.numVertices; iitr++)
 				{
-					addVertexStates(stateList.back(), input, grid, input.vertices[iitr]);
+					addVertexStates(vertexList.back(), input, grid, input.vertices[iitr]);
 				}
 				for(int iitr = 0; iitr < input.numFaces; iitr++)
 				{
 					for(int iiitr = 0; iiitr < input.faces[iitr].numEdges; iiitr++)
 					{
-						addEdgeStates(stateList.back(), input, grid, input.faces[iitr].edges[iiitr]);
+						addEdgeStates(vertexList.back(), input, grid, input.faces[iitr].edges[iiitr]);
 					}
-					addFaceStates(stateList.back(), input, grid, input.faces[iitr]);
+					addFaceStates(vertexList.back(), input, grid, input.faces[iitr]);
 				}
+        //Done adding possible vertex states
+
+        //Check all vertex states and remove duplicates for this vertex
+        for(vector<PotentialVertexState>::iterator PVSitr = vertexList.back().states.begin();
+          PVSitr != vertexList.back().states.end(); PVSitr++)
+        {
+          for(vector<PotentialVertexState>::iterator PVSitr2 = PVSitr;
+            PVSitr2 != vertexList.back().states.end(); PVSitr2++)
+          {
+            if( (*PVSitr) == (*PVSitr2) )
+              PVSitr2 = vertexList.back().states.erase(PVSitr2);
+          }
+        }
 			}
 		}
 	}
 
-	void addInsideState(PotentialVertex &potential)
-	{
+  void addInsideState(PotentialVertex &potential)
+  {
     PotentialVertexState state;
     for(int itr = 0; itr < NUM_VOLUMES; itr++)
     {
       state.volumes[itr] = INTERIOR;
     }
-      potential.states.push_back(state);
-	}
+    potential.states.push_back(state);
+  }
 
-	void addOutsideState(PotentialVertex &potential)
-	{
+  void addOutsideState(PotentialVertex &potential)
+  {
     PotentialVertexState state;
     for(int itr = 0; itr < NUM_VOLUMES; itr++)
     {
       state.volumes[itr] = EXTERIOR;
     }
-      potential.states.push_back(state);
-	}
+    potential.states.push_back(state);
+  }
 
   bool vectorIntersectFace(Face &face, Vector &vertex, Vector &vector)
   {
@@ -535,15 +552,16 @@ namespace CMS3D
 			for(vector<PotentialVertexState>::iterator state_itr = (*itr).states.begin();
 				state_itr != (*itr).states.end(); itr++)
 			{
-				//For all edges in the vertex states
+				//For all volumes in the vertex states
 				for(int i = 0; i < NUM_VOLUMES; i++)
 				{
-					//see if the edge is the edge we are concidering
+					//see if the volume is the volume we are constraining
           if((*itr).volumes[i] == volume)
 					{
-						// If so, then see if th edge does not conform to the constrained state
+						// If so, then see if th volume does not conform to the constrained state
             if(!((*state_itr).volumes[i] == volume->state))
 						{
+              //It it doesn't, delete it
 							state_itr = (*itr).states.erase(state_itr);
 						}
 					}
