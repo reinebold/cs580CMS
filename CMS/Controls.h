@@ -18,6 +18,8 @@ public:
     static void mouseMotionHandler(int x, int y);
     ///Callback function for use with the glutKeyboardFunc
     static void keyboardHandler(unsigned char key, int x, int y);
+	///Callback function for use with the glutSpecialFunc
+	static void specialKeyHandler(int key, int x, int y);
 
     //Gets
     bool  getLeftButton() const  { return leftButton; }

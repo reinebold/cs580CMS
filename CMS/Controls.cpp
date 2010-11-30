@@ -73,10 +73,39 @@ void Controls::mouseMotionHandler(int x, int y)
     glutPostRedisplay();
 }
 
+void Controls::specialKeyHandler(int key, int x, int y){
+	switch(key){
+		case GLUT_KEY_UP:
+			camera.setRotatex( camera.getRotatex() + 10);
+			glutPostRedisplay();
+			break;
+		case GLUT_KEY_DOWN:
+			camera.setRotatex( camera.getRotatex() - 10);
+			glutPostRedisplay();
+			break;
+		case GLUT_KEY_LEFT:
+			camera.setRotatey( camera.getRotatey() + 10);
+			glutPostRedisplay();
+			break;
+		case GLUT_KEY_RIGHT:
+			camera.setRotatey( camera.getRotatey() - 10);
+			glutPostRedisplay();
+			break;
+	}
+}
+
 void Controls::keyboardHandler(unsigned char key, int x, int y)
 {
     switch(key)
-    {
+    {	
+	case 'z':
+			camera.setTranslatez( camera.getTranslatez() + -.8f );
+			glutPostRedisplay();
+			break;
+	case 'x':
+			camera.setTranslatez( camera.getTranslatez() + .8f);
+			glutPostRedisplay();
+			break;
     case 'i':   //Prints the top left information on the screen
         state.setPrintInfoOnScreen(!state.getPrintInfoOnScreen());
         glutPostRedisplay();

@@ -192,6 +192,7 @@ void main(int argc, char **argv)
     glutMouseFunc(Controls::mousePressHandler);
     glutMotionFunc(Controls::mouseMotionHandler);
     glutKeyboardFunc(Controls::keyboardHandler);
+	glutSpecialFunc(Controls::specialKeyHandler);
 
     glutMainLoop();
 }
