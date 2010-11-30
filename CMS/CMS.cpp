@@ -527,7 +527,7 @@ void CMS::init()
         input3D.init(numVertices, vertices, numFaces, faces);
 
         grid.init(input3D, boundingBox);
-        //continuousModelSynthesis3D(grid.edges, grid.vertices);
+        continuousModelSynthesis3D(grid.edges, grid.vertices);
     }
 
     //Do the algorithm that changes the states.
