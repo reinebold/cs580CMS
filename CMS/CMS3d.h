@@ -68,8 +68,12 @@ namespace CMS3D
   void addInsideState(PotentialVertex &potential);
   void addOutsideState(PotentialVertex &potential);
   void addVertexStates(PotentialVertex &potential, CMSModel3D &input, Grid &grid, Vertex &vertex);
+  void addVertexStates(PotentialVertex &potential, CMSModel3D &input, Vector &vert);
+  void addEdgeStates(PotentialVertex &potential,CMSModel3D &input, Edge &edge);
+  void addFaceStates(PotentialVertex &potential,CMSModel3D &input, Face &face);
   void addEdgeStates(PotentialVertex &potential,CMSModel3D &input, Grid &grid, Edge &edge);
   void addFaceStates(PotentialVertex &potential,CMSModel3D &input, Grid &grid, Face &face);
+  void bruteForceGenerate(vector<PotentialVertex> &vertexList, CMSModel3D &input, Grid &grid);
 
 
   void assignStates(vector<Vertex*> &vertices, vector<PotentialVertex> &source,

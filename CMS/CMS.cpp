@@ -16,6 +16,8 @@
 #include "Parser.h"
 #include "Utilities.h"
 #include <time.h>
+#include <IL/il.h>
+#include <IL/ilu.h>
 using namespace Geometry;
 
 extern Lights lights;
@@ -63,11 +65,122 @@ void CMS::display3D()
         glEnd();
     }
 
+	ilBindImage(texids[0]);
+    glGenTextures(1, &texture); /* Texture name generation */
+    glBindTexture(GL_TEXTURE_2D, texture); /* Binding of texture name */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); /* We will use linear
+      interpolation for magnification filter */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); /* We will use linear
+      interpolation for minifying filter */
+    glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
+      ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
+      ilGetData());
+	
+	glTranslatef(0.0f, 500.0f, 0.0f);
+	glEnable(GL_TEXTURE_2D);
+	glBegin(GL_QUADS);
+	glTexCoord2f (0.0, 0.0);
+	glVertex3f(-500.0,-500.0,500.0);
+	glTexCoord2f (1.0, 0.0);
+	glVertex3f(-500.0,-500.0,-500.0);
+	glTexCoord2f (1.0, 1.0);
+	glVertex3f(500.0,-500.0,-500.0);
+	glTexCoord2f (0.0, 1.0);
+	glVertex3f(500.0,-500.0,500.0);
+	glEnd();
+	//glColor4f(1.0f,1.0f,1.0f,1.0f);
+
+	//ilDeleteImages(1, &texid);
+	glDeleteTextures(1, &texture);
+
+	ilBindImage(texids[1]);
+    glGenTextures(1, &texture); /* Texture name generation */
+    glBindTexture(GL_TEXTURE_2D, texture); /* Binding of texture name */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); /* We will use linear
+      interpolation for magnification filter */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); /* We will use linear
+      interpolation for minifying filter */
+    glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
+      ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
+      ilGetData());
+
+	/*glBindTexture(GL_TEXTURE_2D, clouds.getId());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,clouds.getWidth(), clouds.getHeight(), 0, clouds.getFormat(), GL_UNSIGNED_BYTE, clouds.getData());
+*/
+	glBegin(GL_QUADS);
+	//front face
+	glTexCoord2f (0.0, 0.0);
+	glVertex3f(-500.0f,-500.0f,500.0f);  
+	glTexCoord2f (1.0, 0.0);
+	glVertex3f(500.0,-500.0,500.0);
+	glTexCoord2f (1.0, 1.0);
+	glVertex3f(500.0,500.0,500.0);
+	glTexCoord2f (0.0, 1.0);
+	glVertex3f(-500.0,500.0,500.0);
+	//back face
+	glTexCoord2f (0.0, 0.0);
+	glVertex3f(-500.0,-500.0,-500.0);
+	glTexCoord2f (1.0, 0.0);
+	glVertex3f(500.0,-500.0,-500.0);
+	glTexCoord2f (1.0, 1.0);
+	glVertex3f(500.0,500.0,-500.0);
+	glTexCoord2f (0.0, 1.0);
+	glVertex3f(-500.0,500.0,-500.0);
+	//left face
+	glTexCoord2f (0.0, 0.0);
+	glVertex3f(-500.0,-500.0,500.0);
+	glTexCoord2f (1.0, 0.0);
+	glVertex3f(-500.0,-500.0,-500.0);
+	glTexCoord2f (1.0, 1.0);
+	glVertex3f(-500.0,500.0,-500.0);
+	glTexCoord2f (0.0, 1.0);
+	glVertex3f(-500.0,500.0,500.0);
+	//right face
+	glTexCoord2f (0.0, 0.0);
+	glVertex3f(500.0,-500.0,500.0);
+	glTexCoord2f (1.0, 0.0);
+	glVertex3f(500.0,-500.0,-500.0);
+	glTexCoord2f (1.0, 1.0);
+	glVertex3f(500.0,500.0,-500.0);
+	glTexCoord2f (0.0, 1.0);
+	glVertex3f(500.0,500.0,500.0);
+	glEnd();
+	glDeleteTextures(1, &texture);
+
+	ilBindImage(texids[2]);
+    glGenTextures(1, &texture); /* Texture name generation */
+    glBindTexture(GL_TEXTURE_2D, texture); /* Binding of texture name */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); /* We will use linear
+      interpolation for magnification filter */
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); /* We will use linear
+      interpolation for minifying filter */
+    glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
+      ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
+      ilGetData());
+	glBegin(GL_QUADS);
+	//top face
+	glTexCoord2f (0.0, 0.0);
+//	glBegin(GL_QUADS);
+	glVertex3f(500.0,500.0,500.0);
+	glTexCoord2f (1.0, 0.0);
+	glVertex3f(-500.0,500.0,500.0);
+	glTexCoord2f (1.0, 1.0);
+	glVertex3f(-500.0,500.0,-500.0);
+	glTexCoord2f (0.0, 1.0);
+	glVertex3f(500.0,500.0,-500.0);
+	glEnd();
+	glDisable(GL_TEXTURE_2D);
+	glDeleteTextures(1, &texture);
+	
     //Display the input model.
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glTranslatef(-20.0f, 0.0f, 0.0f);
+    glTranslatef(-20.0f, -500.5f, 0.0f);
 
     //The input model's edges.
     for(int numFaces = 0; numFaces < input3D.numFaces; ++numFaces)
@@ -362,6 +475,19 @@ void CMS::init()
     state.setDrawAxis(false);
     state.setPrintInfoOnScreen(true);
     state.setTest(4);
+
+	ilInit();
+	ilGenImages(3,texids);
+	ilBindImage(texids[0]);
+	ilLoadImage((const ILstring)"grass.jpg");
+	ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
+	ilBindImage(texids[1]);
+	ilLoadImage((const ILstring)"clouds.jpg");
+	iluFlipImage();
+	ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
+	ilBindImage(texids[2]);
+	ilLoadImage((const ILstring)"cloudst.jpg");
+	ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
     
     //unsigned int seed = (unsigned int)time(NULL);
     unsigned int seed = 1290455743;
@@ -401,7 +527,7 @@ void CMS::init()
         input3D.init(numVertices, vertices, numFaces, faces);
 
         grid.init(input3D, boundingBox);
-        continuousModelSynthesis3D(grid.edges, grid.vertices);
+        //continuousModelSynthesis3D(grid.edges, grid.vertices);
     }
 
     //Do the algorithm that changes the states.

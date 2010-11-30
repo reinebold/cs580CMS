@@ -9,6 +9,8 @@
 #include "Geometry.h"
 #include "Grid.h"
 #include "Parser.h"
+#include <IL/il.h>
+#include <IL/ilu.h>
 
 class CMS
 {
@@ -28,6 +30,9 @@ public:
     Cuboid   boundingBox;   ///< Bounding box
     Cuboid   world;         ///< The "world", bounding box must be inside this
     Grid     grid;          ///< Grid that splits up the bounding box into edges/vertices/planes etc
+
+	ILuint texids[3];
+	GLuint texture;
 
     bool     showBoundingBox;   ///< True if you want the bounding box to show.  Default true.
     bool     showGridVertices; ///< True if you want to see all the vertices.  Default true.
