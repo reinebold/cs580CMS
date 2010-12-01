@@ -285,6 +285,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\grass2.jpg"
+				>
+			</File>
+			<File
 				RelativePath=".\simple.fs"
 				>
 			</File>
@@ -294,6 +298,10 @@
 			</File>
 			<File
 				RelativePath=".\tetrahedron.model"
+				>
+			</File>
+			<File
+				RelativePath=".\window.jpg"
 				>
 			</File>
 		</Filter>

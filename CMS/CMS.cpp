@@ -26,10 +26,11 @@ extern Camera camera;
 
 CMS::CMS()
 :showBoundingBox(true),
- showGridVertices(true),
- showGridEdges(true),
- showGridFaces(true),
- showGridVolumes(false)
+ showGridVertices(false),
+ showGridEdges(false),
+ showGridFaces(false),
+ showGridVolumes(true),
+ showTexture(false)
 {
 
 }
@@ -52,6 +53,7 @@ void CMS::display3D()
     glScalef(.46f, .46f, .46f);
     if(showBoundingBox)
     {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
         glBegin(GL_QUADS);
             for(int x = 0; x < boundingBox.numFaces; x++)
@@ -65,99 +67,105 @@ void CMS::display3D()
         glEnd();
     }
 
-	ilBindImage(texids[0]);
-    glGenTextures(1, &texture); /* Texture name generation */
-    glBindTexture(GL_TEXTURE_2D, texture); /* Binding of texture name */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); /* We will use linear
-      interpolation for magnification filter */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); /* We will use linear
-      interpolation for minifying filter */
+	/*ilBindImage(texids[0]);
+    glGenTextures(1, &texture); 
+    glBindTexture(GL_TEXTURE_2D, texture); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
     glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
       ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
-      ilGetData());
+      ilGetData());*/
+
+    //glEnable(GL_TEXTURE_2D);
+    if(showTexture)
+    {
+        glEnable(GL_TEXTURE_2D);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glTranslatef(0.0f, 500.0f, 0.0f);
+	    glBindTexture(GL_TEXTURE_2D,texGrass.getId());
 	
-	glTranslatef(0.0f, 500.0f, 0.0f);
-	glEnable(GL_TEXTURE_2D);
 	glBegin(GL_QUADS);
-	glTexCoord2f (0.0, 0.0);
-	glVertex3f(-500.0,-500.0,500.0);
-	glTexCoord2f (1.0, 0.0);
-	glVertex3f(-500.0,-500.0,-500.0);
-	glTexCoord2f (1.0, 1.0);
-	glVertex3f(500.0,-500.0,-500.0);
-	glTexCoord2f (0.0, 1.0);
-	glVertex3f(500.0,-500.0,500.0);
+	    glTexCoord2f (0.0, 0.0);
+	    glVertex3f(-500.0,-500.0,500.0);
+	    glTexCoord2f (50.0, 0.0);
+	    glVertex3f(-500.0,-500.0,-500.0);
+	    glTexCoord2f (50.0, 50.0);
+	    glVertex3f(500.0,-500.0,-500.0);
+	    glTexCoord2f (0.0, 50.0);
+	    glVertex3f(500.0,-500.0,500.0);
 	glEnd();
-	//glColor4f(1.0f,1.0f,1.0f,1.0f);
 
-	//ilDeleteImages(1, &texid);
-	glDeleteTextures(1, &texture);
 
-	ilBindImage(texids[1]);
-    glGenTextures(1, &texture); /* Texture name generation */
-    glBindTexture(GL_TEXTURE_2D, texture); /* Binding of texture name */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); /* We will use linear
-      interpolation for magnification filter */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); /* We will use linear
-      interpolation for minifying filter */
+	/*ilBindImage(texids[1]);
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
       ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
       ilGetData());
 
-	/*glBindTexture(GL_TEXTURE_2D, clouds.getId());
+	glBindTexture(GL_TEXTURE_2D, clouds.getId());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,clouds.getWidth(), clouds.getHeight(), 0, clouds.getFormat(), GL_UNSIGNED_BYTE, clouds.getData());
 */
+    glBindTexture(GL_TEXTURE_2D,texCloudsSide.getId());
 	glBegin(GL_QUADS);
-	//front face
-	glTexCoord2f (0.0, 0.0);
-	glVertex3f(-500.0f,-500.0f,500.0f);  
-	glTexCoord2f (1.0, 0.0);
-	glVertex3f(500.0,-500.0,500.0);
-	glTexCoord2f (1.0, 1.0);
-	glVertex3f(500.0,500.0,500.0);
-	glTexCoord2f (0.0, 1.0);
-	glVertex3f(-500.0,500.0,500.0);
-	//back face
-	glTexCoord2f (0.0, 0.0);
-	glVertex3f(-500.0,-500.0,-500.0);
-	glTexCoord2f (1.0, 0.0);
-	glVertex3f(500.0,-500.0,-500.0);
-	glTexCoord2f (1.0, 1.0);
-	glVertex3f(500.0,500.0,-500.0);
-	glTexCoord2f (0.0, 1.0);
-	glVertex3f(-500.0,500.0,-500.0);
-	//left face
-	glTexCoord2f (0.0, 0.0);
-	glVertex3f(-500.0,-500.0,500.0);
-	glTexCoord2f (1.0, 0.0);
-	glVertex3f(-500.0,-500.0,-500.0);
-	glTexCoord2f (1.0, 1.0);
-	glVertex3f(-500.0,500.0,-500.0);
-	glTexCoord2f (0.0, 1.0);
-	glVertex3f(-500.0,500.0,500.0);
-	//right face
-	glTexCoord2f (0.0, 0.0);
-	glVertex3f(500.0,-500.0,500.0);
-	glTexCoord2f (1.0, 0.0);
-	glVertex3f(500.0,-500.0,-500.0);
-	glTexCoord2f (1.0, 1.0);
-	glVertex3f(500.0,500.0,-500.0);
-	glTexCoord2f (0.0, 1.0);
-	glVertex3f(500.0,500.0,500.0);
+	    //front face
+	    glTexCoord2f (0.0, 0.0);
+	    glVertex3f(-500.0f,-500.0f,500.0f);  
+	    glTexCoord2f (1.0, 0.0);
+	    glVertex3f(500.0,-500.0,500.0);
+	    glTexCoord2f (1.0, 1.0);
+	    glVertex3f(500.0,500.0,500.0);
+	    glTexCoord2f (0.0, 1.0);
+	    glVertex3f(-500.0,500.0,500.0);
+	    //back face
+	    glTexCoord2f (0.0, 0.0);
+	    glVertex3f(-500.0,-500.0,-500.0);
+	    glTexCoord2f (1.0, 0.0);
+	    glVertex3f(500.0,-500.0,-500.0);
+	    glTexCoord2f (1.0, 1.0);
+	    glVertex3f(500.0,500.0,-500.0);
+	    glTexCoord2f (0.0, 1.0);
+	    glVertex3f(-500.0,500.0,-500.0);
+	    //left face
+	    glTexCoord2f (0.0, 0.0);
+	    glVertex3f(-500.0,-500.0,500.0);
+	    glTexCoord2f (1.0, 0.0);
+	    glVertex3f(-500.0,-500.0,-500.0);
+	    glTexCoord2f (1.0, 1.0);
+	    glVertex3f(-500.0,500.0,-500.0);
+	    glTexCoord2f (0.0, 1.0);
+	    glVertex3f(-500.0,500.0,500.0);
+	    //right face
+	    glTexCoord2f (0.0, 0.0);
+	    glVertex3f(500.0,-500.0,500.0);
+	    glTexCoord2f (1.0, 0.0);
+	    glVertex3f(500.0,-500.0,-500.0);
+	    glTexCoord2f (1.0, 1.0);
+	    glVertex3f(500.0,500.0,-500.0);
+	    glTexCoord2f (0.0, 1.0);
+	    glVertex3f(500.0,500.0,500.0);
 	glEnd();
-	glDeleteTextures(1, &texture);
 
+    glTranslatef(0.0f, -500.5f, 0.0f);
+    glDisable(GL_TEXTURE_2D);
+    }
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    //glDisable(GL_TEXTURE_2D);
+	//glDeleteTextures(1, &texture);
+/*
 	ilBindImage(texids[2]);
-    glGenTextures(1, &texture); /* Texture name generation */
-    glBindTexture(GL_TEXTURE_2D, texture); /* Binding of texture name */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); /* We will use linear
-      interpolation for magnification filter */
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); /* We will use linear
-      interpolation for minifying filter */
+    glGenTextures(1, &texture); 
+    glBindTexture(GL_TEXTURE_2D, texture); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
     glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
       ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
       ilGetData());
@@ -175,13 +183,9 @@ void CMS::display3D()
 	glEnd();
 	glDisable(GL_TEXTURE_2D);
 	glDeleteTextures(1, &texture);
-	
+	*/
+    glTranslatef(-20.f,0.0f,0.0f);
     //Display the input model.
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glTranslatef(-20.0f, -500.5f, 0.0f);
-
     //The input model's edges.
     for(int numFaces = 0; numFaces < input3D.numFaces; ++numFaces)
     {
@@ -353,27 +357,45 @@ void CMS::display3D()
     //Draw Volumes
     if(showGridVolumes)
     {
+        glColor3f(1.0f,1.0f,1.0f);
+        glDisable(GL_BLEND);
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D,texBuilding.getId());
         for(int x = 0; x < (int)grid.volumes.size(); x++)
         {
-                           glColor4fv(Utils::randColor(.5f).val);
-                           glColor4f(((int)(grid.volumes[x]->faces[0]->edges[0]->begin->val[0]) % 50)/50.0f,
-                             ((int)(grid.volumes[x]->faces[0]->edges[0]->begin->val[1]) % 50)/50.0f,
-                             ((int)(grid.volumes[x]->faces[0]->edges[0]->begin->val[2]) % 50)/ -50.0f,
-                             1.0);
-                           if(grid.volumes[x]->state != INTERIOR)
-                             continue;
+            if(grid.volumes[x]->state != INTERIOR)
+            {
+                continue;
+            }
             for(int y = 0; y < (int)grid.volumes[x]->numFaces; y++)
             {
  
-                glBegin(GL_POLYGON);
+                glBegin(GL_QUADS);
                 for(int z = 0; z < (int)grid.volumes[x]->faces[y]->numVertices; z++)
                 {
+                    if(z == 0)
+                    {
+                        glTexCoord2f(0.0f,0.0f);
+                    }
+                    else if(z == 1)
+                    {
+                        glTexCoord2f(1.0f,0.0f);
+                    }
+                    else if(z == 2)
+                    {
+                        glTexCoord2f(1.0f,1.0f);
+                    }
+                    else if(z == 3)
+                    {
+                        glTexCoord2f(0.0f,1.0f);
+                    }
                     glVertex3fv(grid.volumes[x]->faces[y]->vertices[z]->val);
 
                 }
                 glEnd();
             }
         }
+        glDisable(GL_TEXTURE_2D);
     }
 }
 
@@ -476,18 +498,47 @@ void CMS::init()
     state.setPrintInfoOnScreen(true);
     state.setTest(4);
 
-	ilInit();
-	ilGenImages(3,texids);
-	ilBindImage(texids[0]);
-	ilLoadImage((const ILstring)"grass.jpg");
-	ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
-	ilBindImage(texids[1]);
-	ilLoadImage((const ILstring)"clouds.jpg");
-	iluFlipImage();
-	ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
-	ilBindImage(texids[2]);
-	ilLoadImage((const ILstring)"cloudst.jpg");
-	ilConvertImage(IL_RGB, IL_UNSIGNED_BYTE);
+    texCloudsTop.loadTexture("cloudst.jpg");
+    texCloudsSide.loadTexture("clouds.jpg");
+    texGrass.loadTexture("grass2.jpg");
+    texBuilding.loadTexture("windows2.jpg");
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glGenTextures(1, texCloudsTop.setId());
+    glBindTexture(GL_TEXTURE_2D, texCloudsTop.getId()); 
+    glTexImage2D(GL_TEXTURE_2D, 0, texCloudsTop.getFormat(),texCloudsTop.getWidth(),texCloudsTop.getHeight(), 0, texCloudsTop.getFormat(), GL_UNSIGNED_BYTE, texCloudsTop.getData());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST ); 
+    gluBuild2DMipmaps( GL_TEXTURE_2D, 3, texCloudsTop.getWidth(), texCloudsTop.getHeight(), texCloudsTop.getFormat(), GL_UNSIGNED_BYTE, texCloudsTop.getData() );
+    texCloudsTop.destroyTexture();
+
+    glGenTextures(1, texCloudsSide.setId());
+    glBindTexture(GL_TEXTURE_2D, texCloudsSide.getId()); 
+    glTexImage2D(GL_TEXTURE_2D, 0, texCloudsSide.getFormat(),texCloudsSide.getWidth(),texCloudsSide.getHeight(), 0, texCloudsSide.getFormat(), GL_UNSIGNED_BYTE, texCloudsSide.getData());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST ); 
+    gluBuild2DMipmaps( GL_TEXTURE_2D, 3, texCloudsSide.getWidth(), texCloudsSide.getHeight(), texCloudsSide.getFormat(), GL_UNSIGNED_BYTE, texCloudsSide.getData() );
+    texCloudsSide.destroyTexture();
+
+    glGenTextures(1, texGrass.setId());
+    glBindTexture(GL_TEXTURE_2D, texGrass.getId()); 
+    glTexImage2D(GL_TEXTURE_2D, 0, texGrass.getFormat(),texGrass.getWidth(),texGrass.getHeight(), 0, texGrass.getFormat(), GL_UNSIGNED_BYTE, texGrass.getData());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+    gluBuild2DMipmaps( GL_TEXTURE_2D, 3, texGrass.getWidth(), texGrass.getHeight(), texGrass.getFormat(), GL_UNSIGNED_BYTE, texGrass.getData() );
+    texGrass.destroyTexture();
+
+    glGenTextures(1, texBuilding.setId());
+    glBindTexture(GL_TEXTURE_2D, texBuilding.getId()); 
+    glTexImage2D(GL_TEXTURE_2D, 0, texBuilding.getFormat(),texBuilding.getWidth(),texBuilding.getHeight(), 0, texBuilding.getFormat(), GL_UNSIGNED_BYTE, texBuilding.getData());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
+    gluBuild2DMipmaps( GL_TEXTURE_2D, 3, texBuilding.getWidth(), texBuilding.getHeight(), texBuilding.getFormat(), GL_UNSIGNED_BYTE, texBuilding.getData() );
+    texBuilding.destroyTexture();
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+    //glDisable(GL_TEXTURE_2D);
+
     
     //unsigned int seed = (unsigned int)time(NULL);
     unsigned int seed = 1290455743;
@@ -529,7 +580,4 @@ void CMS::init()
         grid.init(input3D, boundingBox);
         continuousModelSynthesis3D(grid.edges, grid.vertices);
     }
-
-    //Do the algorithm that changes the states.
-    //continuousModelSynthesis(grid.edges, grid.vertices);
 }

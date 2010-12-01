@@ -122,13 +122,28 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
         glutPostRedisplay();
         break;
     case 'w':   //Turns on/off wireframe mode
-        state.setWireFrame(!state.getWireFrame());
+        /*state.setWireFrame(!state.getWireFrame());
 		state.setTest(4); 
         cms.showBoundingBox = !cms.showBoundingBox;
 		cms.showGridEdges = !cms.showGridEdges;
 		cms.showGridVertices = !cms.showGridVertices;
 		cms.showGridFaces = !cms.showGridFaces;
-		cms.showGridVolumes = !cms.showGridVolumes;
+		cms.showGridVolumes = !cms.showGridVolumes;*/
+        if(cms.showTexture == false)
+        {
+            //glEnable(GL_TEXTURE_2D);
+            cms.showGridEdges = false;
+            cms.showGridVertices = false;
+            cms.showGridFaces = false;
+            cms.showBoundingBox = false;
+            cms.showGridVolumes = true;
+            cms.showTexture = true;
+        }
+        else
+        {
+            cms.showTexture = false;
+            //glDisable(GL_TEXTURE_2D);
+        }
         glutPostRedisplay();
         break;
     case 'd':
