@@ -54,8 +54,8 @@ void Controls::mouseMotionHandler(int x, int y)
         //We fmod it by 360 because it is easier to see that it rotated 360 degrees instead of 720 degrees.
         //camera.setRotatex( fmod(camera.getRotatex() + (y - controls.getOldy()), 360) );
         //camera.setRotatey( fmod(camera.getRotatey() + (x - controls.getOldx()), 360) ); 
-		camera.pitch((y - controls.getOldy())/2.0);
-		camera.yaw((x - controls.getOldx())/2.0);
+		camera.pitch((y - controls.getOldy())/2.0f);
+		camera.yaw((x - controls.getOldx())/2.0f);
     }
     // Translate Camera
     else if(controls.getLeftButton() == false && controls.getRightButton() == true)
@@ -178,6 +178,10 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
         cms.showGridVolumes = !cms.showGridVolumes;
         glutPostRedisplay();
         break;
+    case 'h':
+      cms.continuousModelSynthesis3D(cms.grid.edges, cms.grid.vertices);
+      glutPostRedisplay();
+      break;
 
     }
 }
