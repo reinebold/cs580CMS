@@ -52,14 +52,18 @@ void Controls::mouseMotionHandler(int x, int y)
     if(controls.getLeftButton() == true && controls.getRightButton() == false)
     {
         //We fmod it by 360 because it is easier to see that it rotated 360 degrees instead of 720 degrees.
-        camera.setRotatex( fmod(camera.getRotatex() + (y - controls.getOldy()), 360) );
-        camera.setRotatey( fmod(camera.getRotatey() + (x - controls.getOldx()), 360) ); 
+        //camera.setRotatex( fmod(camera.getRotatex() + (y - controls.getOldy()), 360) );
+        //camera.setRotatey( fmod(camera.getRotatey() + (x - controls.getOldx()), 360) ); 
+		camera.pitch(camera.getRotatex() + (y - controls.getOldy()));
+		camera.yaw(camera.getRotatey() + (x - controls.getOldx()));
     }
     // Translate Camera
     else if(controls.getLeftButton() == false && controls.getRightButton() == true)
     {
-        camera.setTranslatex( camera.getTranslatex() +  .1f * (x - controls.getOldx()) ); 
-        camera.setTranslatey( camera.getTranslatey() + -.1f * (y - controls.getOldy()) ); 
+        //camera.setTranslatex( camera.getTranslatex() +  .1f * (x - controls.getOldx()) ); 
+        //camera.setTranslatey( camera.getTranslatey() + -.1f * (y - controls.getOldy()) ); 
+		camera.upd(camera.getTranslatey() - (y - controls.getOldy()));
+		camera.leftr(camera.getRotatey() + (x - controls.getOldx()));
     }
     // Scale Camera
     else if(controls.getLeftButton() == true && controls.getRightButton() == true)
@@ -76,19 +80,23 @@ void Controls::mouseMotionHandler(int x, int y)
 void Controls::specialKeyHandler(int key, int x, int y){
 	switch(key){
 		case GLUT_KEY_UP:
-			camera.setRotatex( camera.getRotatex() + 10);
+			//camera.setRotatex( camera.getRotatex() + 10);
+			camera.forwardb(5.0f);
 			glutPostRedisplay();
 			break;
 		case GLUT_KEY_DOWN:
-			camera.setRotatex( camera.getRotatex() - 10);
+			//camera.setRotatex( camera.getRotatex() - 10);
+			camera.forwardb(-5.0f);
 			glutPostRedisplay();
 			break;
 		case GLUT_KEY_LEFT:
-			camera.setRotatey( camera.getRotatey() + 10);
+			//camera.setRotatey( camera.getRotatey() + 10);
+			camera.leftr(5.0f);
 			glutPostRedisplay();
 			break;
 		case GLUT_KEY_RIGHT:
-			camera.setRotatey( camera.getRotatey() - 10);
+			//camera.setRotatey( camera.getRotatey() - 10);
+			camera.leftr(-5.0f);
 			glutPostRedisplay();
 			break;
 	}
@@ -123,12 +131,6 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
         break;
     case 'w':   //Turns on/off wireframe mode
         state.setWireFrame(!state.getWireFrame());
-		state.setTest(4); 
-        cms.showBoundingBox = !cms.showBoundingBox;
-		cms.showGridEdges = !cms.showGridEdges;
-		cms.showGridVertices = !cms.showGridVertices;
-		cms.showGridFaces = !cms.showGridFaces;
-		cms.showGridVolumes = !cms.showGridVolumes;
         glutPostRedisplay();
         break;
     case 'd':

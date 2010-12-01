@@ -9,6 +9,7 @@
 
 #include "Model.h"
 #include "Defines.h"
+#include "Geometry.h"
 
 class Camera
 {
@@ -76,6 +77,18 @@ private:
     GLfloat rotatex;        ///< Tells what to rotate the camera by in the x direction
     GLfloat rotatey;        ///< Tells what to rotate the camera by in the y direction
     GLfloat rotatez;        ///< Tells what to rotate the camera by in the z direction
+
+	Geometry::Vector position;
+	Geometry::Vector look;
+	Geometry::Vector up;
+
+public:
+	void pitch(float degrees);
+	void yaw(float degrees);
+	void forwardb(float ammount);
+	void upd(float ammount);
+	void leftr(float ammount);
+
 };
 
 #endif // _CAMERA_H
