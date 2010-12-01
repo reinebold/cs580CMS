@@ -26,6 +26,7 @@ namespace CMS3D
 		BackTracker history;
 		PotentialVertex *currentVertex;
 		std::vector<PotentialVertex*> unassignedVertices;
+		std::vector<PotentialVertex*>::iterator unassignedItr;
 		PotentialVertexState selectedState;
 
 		bruteForceGenerate(unassignedVertices, input, grid);
@@ -33,14 +34,13 @@ namespace CMS3D
 		while(unassignedVertices.size() > 0)
 		{
 			//std::cout << "Assignments Remaining: " << unassignedVertices.size() << std::endl;
-			sort(unassignedVertices.begin(), unassignedVertices.end());
-			currentVertex = *(unassignedVertices.begin());
-			if( currentVertex->states.size() == 0)
+			sort(unassignedVertices.begin(), unassignedVertices.end(), sortVertex);
+			if( (*unassignedVertices.begin())->states.size() == 0)
 			{
 				//unassignedVertices.erase(unassignedVertices.begin());
 				//continue;
 				//backtrack
-				//std::cout  << "BACKTRACK: " << unassignedVertices.size() << std::endl;
+				std::cout  << "BACKTRACK: " << unassignedVertices.size() << std::endl;
 				vector<vector<PotentialVertexState>*>::iterator listitr;
 				vector<PotentialVertexState>::iterator stateitr;
 				listitr = history.constrainedVertexList.back().begin();
@@ -66,7 +66,9 @@ namespace CMS3D
 				history.selectedState.pop_back();
 				continue;
 			}
-			unassignedVertices.erase(unassignedVertices.begin());
+			unassignedItr = unassignedVertices.begin();
+			currentVertex = *(unassignedItr);
+			unassignedVertices.erase(unassignedItr);
 			selectedState = currentVertex->getAndRemoveRandomState();
 			history.selectedVertexList.push_back(currentVertex);
 			history.selectedState.push_back(selectedState);
@@ -105,25 +107,25 @@ namespace CMS3D
 		//and faces they intersect with
 		for(int itr = 0; itr < v->connectedEdges; itr++)
 		{
-			Face* temp;
-			if(v->faces[0]->set < v->faces[1]->set)
-			{
-				temp = v->faces[0];
-				v->faces[0] = v->faces[1];
-				v->faces[1] = temp;
-			}
-			if(v->faces[1]->set < v->faces[2]->set)
-			{
-				temp = v->faces[1];
-				v->faces[1] = v->faces[2];
-				v->faces[2] = temp;
-			}
-			if(v->faces[0]->set < v->faces[1]->set)
-			{
-				temp = v->faces[0];
-				v->faces[0] = v->faces[1];
-				v->faces[1] = temp;
-			}
+			//Face* temp;
+			//if(v->faces[0]->set < v->faces[1]->set)
+			//{
+			//	temp = v->faces[0];
+			//	v->faces[0] = v->faces[1];
+			//	v->faces[1] = temp;
+			//}
+			//if(v->faces[1]->set < v->faces[2]->set)
+			//{
+			//	temp = v->faces[1];
+			//	v->faces[1] = v->faces[2];
+			//	v->faces[2] = temp;
+			//}
+			//if(v->faces[0]->set < v->faces[1]->set)
+			//{
+			//	temp = v->faces[0];
+			//	v->faces[0] = v->faces[1];
+			//	v->faces[1] = temp;
+			//}
 
 			//Find face sets connecting to edge, there should be 2;
 			int face1;
@@ -190,16 +192,16 @@ namespace CMS3D
 			vertexList.back()->vertex = sample;
 			vertexList.back()->findVolumes();
 
-			//int height = 30;
-			//if(vertexList.back()->vertex->val[0] > 5.0f &&
-			//   vertexList.back()->vertex->val[0] < 15.0f &&
-			//   vertexList.back()->vertex->val[2] < -5.0f &&
-			//   vertexList.back()->vertex->val[2] > -15.0f &&
-			//   vertexList.back()->vertex->val[1] < height )
-			//{
-			//  addInsideState(vertexList.back());
-			//  continue;
-			//}
+			int height = 30;
+			if(vertexList.back()->vertex->val[0] > 20.0f &&
+			   vertexList.back()->vertex->val[0] < 30.0f &&
+			   vertexList.back()->vertex->val[2] < -25.0f &&
+			   vertexList.back()->vertex->val[2] > -30.0f &&
+			   vertexList.back()->vertex->val[1] < height )
+			{
+			  addInsideState(vertexList.back());
+			  continue;
+			}
 
 			addOutsideState(vertexList.back());
 			//if(vertexList.back()->vertex->connectedEdges != 6)
@@ -298,6 +300,134 @@ namespace CMS3D
 						 PVSitr2++;
 				}
 			}
+
+			for(std::vector<PotentialVertexState>::iterator x = vertexList.back()->states.begin(); x != vertexList.back()->states.end() && vertexList.back()->states.size() > 1;)
+        {
+            if(vertexList.back()->volumes[0] == NULL || 
+                vertexList.back()->volumes[1] == NULL || 
+                vertexList.back()->volumes[2] == NULL || 
+                vertexList.back()->volumes[3] == NULL || 
+                vertexList.back()->volumes[4] == NULL ||
+                vertexList.back()->volumes[5] == NULL ||
+                vertexList.back()->volumes[6] == NULL ||
+                vertexList.back()->volumes[7] == NULL)
+            {
+                break;
+            }
+
+if((*x).volumes[0] == EXTERIOR &&
+                (*x).volumes[1] == EXTERIOR &&
+                (*x).volumes[2] == EXTERIOR &&
+                (*x).volumes[3] == EXTERIOR &&
+                (*x).volumes[4] == EXTERIOR &&
+                (*x).volumes[5] == EXTERIOR &&
+                (*x).volumes[6] == INTERIOR &&
+                (*x).volumes[7] == INTERIOR)
+                {
+                    x = vertexList.back()->states.erase(x);
+                }
+                else if((*x).volumes[0] == EXTERIOR &&
+                (*x).volumes[1] == EXTERIOR &&
+                (*x).volumes[2] == EXTERIOR &&
+                (*x).volumes[3] == EXTERIOR &&
+                (*x).volumes[4] == INTERIOR &&
+                (*x).volumes[5] == INTERIOR &&
+                (*x).volumes[6] == EXTERIOR &&
+                (*x).volumes[7] == EXTERIOR)
+                {
+
+                   x = vertexList.back()->states.erase(x);
+                }
+                else if((*x).volumes[0] == EXTERIOR &&
+                (*x).volumes[1] == EXTERIOR &&
+                (*x).volumes[2] == EXTERIOR &&
+                (*x).volumes[3] == EXTERIOR &&
+                (*x).volumes[4] == EXTERIOR &&
+                (*x).volumes[5] == INTERIOR &&
+                (*x).volumes[6] == EXTERIOR &&
+                (*x).volumes[7] == INTERIOR)
+                {
+
+                    x = vertexList.back()->states.erase(x);
+                }
+                else if((*x).volumes[0] == EXTERIOR &&
+                (*x).volumes[1] == EXTERIOR &&
+                (*x).volumes[2] == EXTERIOR &&
+                (*x).volumes[3] == EXTERIOR &&
+                (*x).volumes[4] == INTERIOR &&
+                (*x).volumes[5] == EXTERIOR &&
+                (*x).volumes[6] == INTERIOR &&
+                (*x).volumes[7] == EXTERIOR)
+                {
+
+                    x = vertexList.back()->states.erase(x);
+                }
+                else if((*x).volumes[0] == EXTERIOR &&
+                (*x).volumes[1] == EXTERIOR &&
+                (*x).volumes[2] == EXTERIOR &&
+                (*x).volumes[3] == EXTERIOR &&
+                (*x).volumes[4] == INTERIOR &&
+                (*x).volumes[5] == INTERIOR &&
+                (*x).volumes[6] == INTERIOR &&
+                (*x).volumes[7] == INTERIOR)
+                {
+
+                   x = vertexList.back()->states.erase(x);
+                }
+                            else if((*x).volumes[0] == EXTERIOR &&
+                (*x).volumes[1] == EXTERIOR &&
+                (*x).volumes[2] == EXTERIOR &&
+                (*x).volumes[3] == EXTERIOR &&
+                (*x).volumes[4] == EXTERIOR &&
+                (*x).volumes[5] == INTERIOR &&
+                (*x).volumes[6] == EXTERIOR &&
+                (*x).volumes[7] == EXTERIOR)
+                {
+
+                   x = vertexList.back()->states.erase(x);
+                }
+                            else if((*x).volumes[0] == EXTERIOR &&
+                (*x).volumes[1] == EXTERIOR &&
+                (*x).volumes[2] == EXTERIOR &&
+                (*x).volumes[3] == EXTERIOR &&
+                (*x).volumes[4] == EXTERIOR &&
+                (*x).volumes[5] == EXTERIOR &&
+                (*x).volumes[6] == INTERIOR &&
+                (*x).volumes[7] == EXTERIOR)
+                {
+
+                   x = vertexList.back()->states.erase(x);
+                }
+                                                   else if((*x).volumes[0] == EXTERIOR &&
+                (*x).volumes[1] == EXTERIOR &&
+                (*x).volumes[2] == EXTERIOR &&
+                (*x).volumes[3] == EXTERIOR &&
+                (*x).volumes[4] == EXTERIOR &&
+                (*x).volumes[5] == EXTERIOR &&
+                (*x).volumes[6] == EXTERIOR &&
+                (*x).volumes[7] == INTERIOR)
+                {
+                      x = vertexList.back()->states.erase(x);
+                            }
+                                            else if((*x).volumes[0] == EXTERIOR &&
+                (*x).volumes[1] == EXTERIOR &&
+                (*x).volumes[2] == EXTERIOR &&
+                (*x).volumes[3] == EXTERIOR &&
+                (*x).volumes[4] == INTERIOR &&
+                (*x).volumes[5] == EXTERIOR &&
+                (*x).volumes[6] == EXTERIOR &&
+                (*x).volumes[7] == EXTERIOR)
+                {
+                      x = vertexList.back()->states.erase(x);
+                }
+                else
+                {
+                    x++;
+                }
+            // }
+        }
+
+
 			//sanity check
 			if(vertexList.back()->states.size() == 0)
 			{
@@ -612,7 +742,8 @@ namespace CMS3D
 	bool PotentialVertex::operator<(const PotentialVertex &lhs) const
 	{
 		if(states.size() < lhs.states.size()) return true;
-		if(states.size() > lhs.states.size()) return false;
+		if(states.size() == lhs.states.size())
+			return vertex->val[1] < lhs.vertex->val[1];
 		return false;
 	}
 
@@ -668,4 +799,10 @@ namespace CMS3D
 		states.erase(itr);
 		return state;
 	}
+
+	
+  bool sortVertex (PotentialVertex* lhs, PotentialVertex* rhs)
+  {
+	  return lhs->operator<(*rhs);
+  }
 }
