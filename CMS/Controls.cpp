@@ -123,6 +123,12 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
         break;
     case 'w':   //Turns on/off wireframe mode
         state.setWireFrame(!state.getWireFrame());
+		state.setTest(4); 
+        cms.showBoundingBox = !cms.showBoundingBox;
+		cms.showGridEdges = !cms.showGridEdges;
+		cms.showGridVertices = !cms.showGridVertices;
+		cms.showGridFaces = !cms.showGridFaces;
+		cms.showGridVolumes = !cms.showGridVolumes;
         glutPostRedisplay();
         break;
     case 'd':
