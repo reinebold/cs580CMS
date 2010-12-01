@@ -26,12 +26,13 @@ Camera::Camera()
     scale(1.0f),
     aspect((float)windowWidth/(float)windowHeight)
 {
-	position.x = -50.0f;
-	position.y = 0.0f;
-	position.z = 0.0f;
-	look.x = 1.0f;
-	look.y = 0.0f;
-	look.z = 0.0f;
+	position.x = 25.0f;
+	position.y =30.0f;
+	position.z = 50.0f;
+	look.x = 0.0f;
+	look.y = -0.2f;
+	look.z = -1.0f;
+  look.normalize();
 	up.x=0.0f;
 	up.y=1.0f;
 	up.z=0.0f;
@@ -158,7 +159,6 @@ void Camera::moveTo3DSCamera( Model &model )
 		look.y -= degrees/100.0f;
 		look.normalize();
 		//setModelViewMatrix();
-		std::cout<< look.x << " " << look.y << " " << look.z << std::endl;
 	}
 	void Camera::yaw(float degrees)
 	{
