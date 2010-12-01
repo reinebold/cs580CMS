@@ -22,7 +22,7 @@ class Lights
 public:
     Lights();
     ///Add a light to the program
-    void addLight(GLfloat x, GLfloat y, GLfloat z, GLfloat r = 1.0f, GLfloat g = 1.0f, GLfloat b = 1.0f, GLfloat ca = 1.0f, GLfloat la = 0.0f, GLfloat qa = 0.0f);
+    void addLight(GLfloat x, GLfloat y, GLfloat z, GLfloat w = 1.0f, GLfloat r = 1.0f, GLfloat g = 1.0f, GLfloat b = 1.0f, GLfloat ca = 1.0f, GLfloat la = 0.0f, GLfloat qa = 0.0f);
     ///Renders all the lights that were added by addLight
     void renderLights();
 

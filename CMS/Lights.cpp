@@ -17,7 +17,7 @@ Lights::Lights()
     ambient.color[W] = 1.0f;
 }
 
-void Lights::addLight(GLfloat x, GLfloat y, GLfloat z, GLfloat r, GLfloat g, GLfloat b,
+void Lights::addLight(GLfloat x, GLfloat y, GLfloat z, GLfloat w, GLfloat r, GLfloat g, GLfloat b,
                       GLfloat ca,GLfloat la,GLfloat qa)
 {
     if(numLights < MAX_LIGHTS)
@@ -26,7 +26,7 @@ void Lights::addLight(GLfloat x, GLfloat y, GLfloat z, GLfloat r, GLfloat g, GLf
         lightInfo[numLights].position[X] = x;
         lightInfo[numLights].position[Y] = y;
         lightInfo[numLights].position[Z] = z;
-        lightInfo[numLights].position[W] = 1.0f;
+        lightInfo[numLights].position[W] = w;
 
         //Warning: Don't forget, after the first light the color defaults to 0,0,0,0
         lightInfo[numLights].color[X] = r;
@@ -62,8 +62,8 @@ void Lights::renderLights()
         }
 
         glEnable(GL_LIGHTING);
-        glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE); //basically turns all glColor calls into glMaterial calls for help lighting
-        glEnable(GL_COLOR_MATERIAL);
+        //glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE); //basically turns all glColor calls into glMaterial calls for help lighting
+        //glEnable(GL_COLOR_MATERIAL);
         glShadeModel(GL_SMOOTH);
 
         glEnable(GL_LIGHT0+i);

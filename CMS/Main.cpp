@@ -130,6 +130,20 @@ void reshape(GLsizei width, GLsizei height)
     camera.changeWindowSize(width, height);
 }
 
+void idle()
+{
+    if(cms.recreateCity)
+    {
+        cms.recreateCity = false;
+        for(unsigned int x = 0; x < cms.grid.volumes.size(); x++)
+        {
+            cms.grid.volumes[x]->state = UNASSIGNED;
+        }
+        cms.continuousModelSynthesis3D(cms.grid.edges,cms.grid.vertices);
+        glutPostRedisplay();
+    }
+}
+
 void main(int argc, char **argv)
 {
 	/*City c;
@@ -188,6 +202,7 @@ void main(int argc, char **argv)
  
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
+    glutIdleFunc(idle);
 
     glutMouseFunc(Controls::mousePressHandler);
     glutMotionFunc(Controls::mouseMotionHandler);

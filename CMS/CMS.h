@@ -36,6 +36,7 @@ public:
     Texture texCloudsTop;
     Texture texGrass;
     Texture texBuilding;
+    Texture texCement;
 	//ILuint texids[3];
 	//GLuint texture;
 
@@ -45,4 +46,6 @@ public:
     bool     showGridVolumes;
     bool     showGridFaces;
     bool     showTexture;
+    bool     recreateCity;
+    bool     showModel;
 };

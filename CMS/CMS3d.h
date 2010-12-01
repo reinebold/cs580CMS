@@ -61,6 +61,8 @@ namespace CMS3D
 	class BackTracker
 	{
 		public:
+		BackTracker(){};
+		~BackTracker();
 		vector<PotentialVertex*> selectedVertexList;
 		vector<PotentialVertexState> selectedState;
 		vector<vector<vector<PotentialVertexState>*>> constrainedVertexList;
