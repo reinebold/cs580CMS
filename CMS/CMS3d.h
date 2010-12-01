@@ -84,5 +84,7 @@ namespace CMS3D
     vector<PotentialVertex> &stateList);
   void constrainVolume(Volume *volume, VolumeState &state,
     vector<PotentialVertex*> &potentialVertices, BackTracker &history);
+
+  bool sortVertex (PotentialVertex* lhs, PotentialVertex* rhs);
 }
 #endif
