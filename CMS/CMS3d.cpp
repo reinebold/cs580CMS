@@ -9,6 +9,7 @@
 
 namespace CMS3D
 {
+	int firstrun = true;
 	/* Continuous model synthesis main function
 	*/
 	bool continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &vertices,
@@ -17,10 +18,14 @@ namespace CMS3D
 		unsigned int seed = (unsigned int)time(NULL);
 		std::cout<< "Seed is now:" << seed << std::endl;
 		srand(seed);
-		for( std::vector<Vertex*>::iterator vertex_itr = vertices.begin();
-			vertex_itr != vertices.end(); vertex_itr++)
+		if(firstrun)
 		{
-			sortEdges(*vertex_itr);
+			for( std::vector<Vertex*>::iterator vertex_itr = vertices.begin();
+				vertex_itr != vertices.end(); vertex_itr++)
+			{
+				sortEdges(*vertex_itr);
+			}
+			firstrun = false;
 		}
 
 		BackTracker history;
@@ -81,6 +86,10 @@ namespace CMS3D
 					constrainVolume(currentVertex->volumes[i], selectedState.volumes[i], unassignedVertices, history);
 				}
 			}
+		}
+		for(std::vector<PotentialVertex*>::iterator itr = unassignedVertices.begin(); itr != unassignedVertices.end(); itr++)
+		{
+			delete (*itr);
 		}
 		return true;
 	}
@@ -192,16 +201,16 @@ namespace CMS3D
 			vertexList.back()->vertex = sample;
 			vertexList.back()->findVolumes();
 
-			int height = 30;
-			if(vertexList.back()->vertex->val[0] > 20.0f &&
-			   vertexList.back()->vertex->val[0] < 30.0f &&
-			   vertexList.back()->vertex->val[2] < -25.0f &&
-			   vertexList.back()->vertex->val[2] > -30.0f &&
-			   vertexList.back()->vertex->val[1] < height )
-			{
-			  addInsideState(vertexList.back());
-			  continue;
-			}
+			//int height = 50;
+			//if(vertexList.back()->vertex->val[0] > 20.0f &&
+			//   vertexList.back()->vertex->val[0] < 30.0f &&
+			//   vertexList.back()->vertex->val[2] < -25.0f &&
+			//   vertexList.back()->vertex->val[2] > -30.0f &&
+			//   vertexList.back()->vertex->val[1] < height )
+			//{
+			//  addInsideState(vertexList.back());
+			//  continue;
+			//}
 
 			addOutsideState(vertexList.back());
 			//if(vertexList.back()->vertex->connectedEdges != 6)
@@ -804,5 +813,14 @@ if((*x).volumes[0] == EXTERIOR &&
   bool sortVertex (PotentialVertex* lhs, PotentialVertex* rhs)
   {
 	  return lhs->operator<(*rhs);
+  }
+
+
+  BackTracker::~BackTracker()
+  {
+	  for(vector<PotentialVertex*>::iterator itr = selectedVertexList.begin(); itr != selectedVertexList.end(); itr++)
+	  {
+		  delete (*itr);
+	  }
   }
 }
