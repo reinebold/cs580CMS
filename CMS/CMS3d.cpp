@@ -116,25 +116,25 @@ namespace CMS3D
 		//and faces they intersect with
 		for(int itr = 0; itr < v->connectedEdges; itr++)
 		{
-			//Face* temp;
-			//if(v->faces[0]->set < v->faces[1]->set)
-			//{
-			//	temp = v->faces[0];
-			//	v->faces[0] = v->faces[1];
-			//	v->faces[1] = temp;
-			//}
-			//if(v->faces[1]->set < v->faces[2]->set)
-			//{
-			//	temp = v->faces[1];
-			//	v->faces[1] = v->faces[2];
-			//	v->faces[2] = temp;
-			//}
-			//if(v->faces[0]->set < v->faces[1]->set)
-			//{
-			//	temp = v->faces[0];
-			//	v->faces[0] = v->faces[1];
-			//	v->faces[1] = temp;
-			//}
+			Face* temp;
+			if(v->faces[0]->set < v->faces[1]->set)
+			{
+				temp = v->faces[0];
+				v->faces[0] = v->faces[1];
+				v->faces[1] = temp;
+			}
+			if(v->faces[1]->set < v->faces[2]->set)
+			{
+				temp = v->faces[1];
+				v->faces[1] = v->faces[2];
+				v->faces[2] = temp;
+			}
+			if(v->faces[0]->set < v->faces[1]->set)
+			{
+				temp = v->faces[0];
+				v->faces[0] = v->faces[1];
+				v->faces[1] = temp;
+			}
 
 			//Find face sets connecting to edge, there should be 2;
 			int face1;
@@ -212,11 +212,13 @@ namespace CMS3D
 			//  continue;
 			//}
 
-			addOutsideState(vertexList.back());
 			//if(vertexList.back()->vertex->connectedEdges != 6)
 			//{
+			//  addOutsideState(vertexList.back());
 			//  continue;
 			//}
+
+			addOutsideState(vertexList.back());
 			addInsideState(vertexList.back());
 
 			//Translate edges to thier directions
@@ -310,134 +312,7 @@ namespace CMS3D
 				}
 			}
 
-			for(std::vector<PotentialVertexState>::iterator x = vertexList.back()->states.begin(); x != vertexList.back()->states.end() && vertexList.back()->states.size() > 1;)
-        {
-            if(vertexList.back()->volumes[0] == NULL || 
-                vertexList.back()->volumes[1] == NULL || 
-                vertexList.back()->volumes[2] == NULL || 
-                vertexList.back()->volumes[3] == NULL || 
-                vertexList.back()->volumes[4] == NULL ||
-                vertexList.back()->volumes[5] == NULL ||
-                vertexList.back()->volumes[6] == NULL ||
-                vertexList.back()->volumes[7] == NULL)
-            {
-                break;
-            }
-
-if((*x).volumes[0] == EXTERIOR &&
-                (*x).volumes[1] == EXTERIOR &&
-                (*x).volumes[2] == EXTERIOR &&
-                (*x).volumes[3] == EXTERIOR &&
-                (*x).volumes[4] == EXTERIOR &&
-                (*x).volumes[5] == EXTERIOR &&
-                (*x).volumes[6] == INTERIOR &&
-                (*x).volumes[7] == INTERIOR)
-                {
-                    x = vertexList.back()->states.erase(x);
-                }
-                else if((*x).volumes[0] == EXTERIOR &&
-                (*x).volumes[1] == EXTERIOR &&
-                (*x).volumes[2] == EXTERIOR &&
-                (*x).volumes[3] == EXTERIOR &&
-                (*x).volumes[4] == INTERIOR &&
-                (*x).volumes[5] == INTERIOR &&
-                (*x).volumes[6] == EXTERIOR &&
-                (*x).volumes[7] == EXTERIOR)
-                {
-
-                   x = vertexList.back()->states.erase(x);
-                }
-                else if((*x).volumes[0] == EXTERIOR &&
-                (*x).volumes[1] == EXTERIOR &&
-                (*x).volumes[2] == EXTERIOR &&
-                (*x).volumes[3] == EXTERIOR &&
-                (*x).volumes[4] == EXTERIOR &&
-                (*x).volumes[5] == INTERIOR &&
-                (*x).volumes[6] == EXTERIOR &&
-                (*x).volumes[7] == INTERIOR)
-                {
-
-                    x = vertexList.back()->states.erase(x);
-                }
-                else if((*x).volumes[0] == EXTERIOR &&
-                (*x).volumes[1] == EXTERIOR &&
-                (*x).volumes[2] == EXTERIOR &&
-                (*x).volumes[3] == EXTERIOR &&
-                (*x).volumes[4] == INTERIOR &&
-                (*x).volumes[5] == EXTERIOR &&
-                (*x).volumes[6] == INTERIOR &&
-                (*x).volumes[7] == EXTERIOR)
-                {
-
-                    x = vertexList.back()->states.erase(x);
-                }
-                else if((*x).volumes[0] == EXTERIOR &&
-                (*x).volumes[1] == EXTERIOR &&
-                (*x).volumes[2] == EXTERIOR &&
-                (*x).volumes[3] == EXTERIOR &&
-                (*x).volumes[4] == INTERIOR &&
-                (*x).volumes[5] == INTERIOR &&
-                (*x).volumes[6] == INTERIOR &&
-                (*x).volumes[7] == INTERIOR)
-                {
-
-                   x = vertexList.back()->states.erase(x);
-                }
-                            else if((*x).volumes[0] == EXTERIOR &&
-                (*x).volumes[1] == EXTERIOR &&
-                (*x).volumes[2] == EXTERIOR &&
-                (*x).volumes[3] == EXTERIOR &&
-                (*x).volumes[4] == EXTERIOR &&
-                (*x).volumes[5] == INTERIOR &&
-                (*x).volumes[6] == EXTERIOR &&
-                (*x).volumes[7] == EXTERIOR)
-                {
-
-                   x = vertexList.back()->states.erase(x);
-                }
-                            else if((*x).volumes[0] == EXTERIOR &&
-                (*x).volumes[1] == EXTERIOR &&
-                (*x).volumes[2] == EXTERIOR &&
-                (*x).volumes[3] == EXTERIOR &&
-                (*x).volumes[4] == EXTERIOR &&
-                (*x).volumes[5] == EXTERIOR &&
-                (*x).volumes[6] == INTERIOR &&
-                (*x).volumes[7] == EXTERIOR)
-                {
-
-                   x = vertexList.back()->states.erase(x);
-                }
-                                                   else if((*x).volumes[0] == EXTERIOR &&
-                (*x).volumes[1] == EXTERIOR &&
-                (*x).volumes[2] == EXTERIOR &&
-                (*x).volumes[3] == EXTERIOR &&
-                (*x).volumes[4] == EXTERIOR &&
-                (*x).volumes[5] == EXTERIOR &&
-                (*x).volumes[6] == EXTERIOR &&
-                (*x).volumes[7] == INTERIOR)
-                {
-                      x = vertexList.back()->states.erase(x);
-                            }
-                                            else if((*x).volumes[0] == EXTERIOR &&
-                (*x).volumes[1] == EXTERIOR &&
-                (*x).volumes[2] == EXTERIOR &&
-                (*x).volumes[3] == EXTERIOR &&
-                (*x).volumes[4] == INTERIOR &&
-                (*x).volumes[5] == EXTERIOR &&
-                (*x).volumes[6] == EXTERIOR &&
-                (*x).volumes[7] == EXTERIOR)
-                {
-                      x = vertexList.back()->states.erase(x);
-                }
-                else
-                {
-                    x++;
-                }
-            // }
-        }
-
-
-			//sanity check
+      //sanity check
 			if(vertexList.back()->states.size() == 0)
 			{
 				std::cout << "PotentialVertex with 0 states";
@@ -508,6 +383,10 @@ if((*x).volumes[0] == EXTERIOR &&
 		int testtrue = 0;
 		Vector vector;
 		int numintersections;
+
+    //Snap points to ABOVE the ground (y < 0) on the input model. this prevents creating floating stuff
+    //If the input model is not supposed to float then it's bottom vertices must have y values < 0.1
+    if(vertex.y < 0.0f) vertex.y = 0.1f; //Slight offset above ground
 
 		for(int testitr = 0; testitr < 15; testitr++)
 		{
