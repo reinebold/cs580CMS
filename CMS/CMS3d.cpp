@@ -11,6 +11,7 @@
 namespace CMS3D
 {
 	int firstrun = true;
+	BackTracker history;
    // std::vector<PotentialVertex*> unassignedVerticesSave;
 	/* Continuous model synthesis main function
 	*/
@@ -29,49 +30,48 @@ namespace CMS3D
 			{
 				sortEdges(*vertex_itr);
 			}
-            firstrun = false;
+            //firstrun = false;
 		}
 
-		BackTracker history;
 		PotentialVertex *currentVertex;
 		std::vector<PotentialVertex*> unassignedVertices;
 		std::vector<PotentialVertex*>::iterator unassignedItr;
 		PotentialVertexState selectedState;
 
-       // if(firstrun)
-       // {
+        if(firstrun)
+        {
             cout << "Generating states..." << endl;
             timer.start();
 		    bruteForceGenerate(unassignedVertices, input, grid);
             timer.stop();
             timer.printSeconds();
+			firstrun = false;
+		}
+		else
+		{
+			while(history.selectedVertexList.size() > 0)
+			{
+				vector<vector<PotentialVertexState>*>::iterator listitr;
+				vector<PotentialVertexState>::iterator stateitr;
+				listitr = history.constrainedVertexList.back().begin();
+				stateitr = history.removedStatesList.back().begin();
 
-      //      for(int x = 0; x < unassignedVertices.size(); x++)
-      //      {
-               
-      //      }
-      //      firstrun = false;
-     //   }
-        /*else
-        {
-            for(int x = 0; x < unassignedVerticesSave.size(); x++)
-            {
-                PotentialVertex* temp = new PotentialVertex;
-                for(int y = 0; y < NUM_FACE_SETS; y++)
-                {
-                    temp[x] = u
-                		int sets[NUM_FACE_SETS];
-		Vertex *vertex;
-    Volume *volumes[NUM_VOLUMES];
-	vector<PotentialVertexState> states;
-    Vector edgeDirections[NUM_EDGES];
-                unassignedVertices.push_back(unassignedVerticesSave[x]);
-            }
-        }*/
+				while( listitr != history.constrainedVertexList.back().end() && stateitr != history.removedStatesList.back().end() )
+				{
+					(*listitr)->push_back(*stateitr);
+					listitr++;
+					stateitr++;
+				}
+				history.constrainedVertexList.pop_back();
+				history.removedStatesList.pop_back();
 
+				unassignedVertices.push_back(history.selectedVertexList.back());
+				unassignedVertices.back()->states.push_back(history.selectedState.back());
+				history.selectedVertexList.pop_back();
+				history.selectedState.pop_back();
+			}
+		}
 
-
-		
         cout << "Assigning states..." << endl;
         timer.start();
 		while(unassignedVertices.size() > 0)
