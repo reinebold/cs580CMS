@@ -48,10 +48,10 @@ namespace CMS3D
 		int sets[NUM_FACE_SETS];
 		Vertex *vertex;
     Volume *volumes[NUM_VOLUMES];
-		vector<PotentialVertexState> states;
+	vector<PotentialVertexState> states;
     Vector edgeDirections[NUM_EDGES];
     
-		PotentialVertex(){};
+	PotentialVertex(){};
     PotentialVertex(const PotentialVertex &other);
     void findVolumes();
     PotentialVertexState getAndRemoveRandomState();
@@ -88,5 +88,7 @@ namespace CMS3D
     vector<PotentialVertex*> &potentialVertices, BackTracker &history);
 
   bool sortVertex (PotentialVertex* lhs, PotentialVertex* rhs);
+
+
 }
 #endif

@@ -11,6 +11,7 @@
 namespace CMS3D
 {
 	int firstrun = true;
+   // std::vector<PotentialVertex*> unassignedVerticesSave;
 	/* Continuous model synthesis main function
 	*/
 	bool continuousModelSynthesis(vector<Edge*> &edges, vector<Vertex*> &vertices,
@@ -28,7 +29,7 @@ namespace CMS3D
 			{
 				sortEdges(*vertex_itr);
 			}
-			firstrun = false;
+            firstrun = false;
 		}
 
 		BackTracker history;
@@ -37,11 +38,39 @@ namespace CMS3D
 		std::vector<PotentialVertex*>::iterator unassignedItr;
 		PotentialVertexState selectedState;
 
-        cout << "Generating states..." << endl;
-        timer.start();
-		bruteForceGenerate(unassignedVertices, input, grid);
-        timer.stop();
-        timer.printSeconds();
+       // if(firstrun)
+       // {
+            cout << "Generating states..." << endl;
+            timer.start();
+		    bruteForceGenerate(unassignedVertices, input, grid);
+            timer.stop();
+            timer.printSeconds();
+
+      //      for(int x = 0; x < unassignedVertices.size(); x++)
+      //      {
+               
+      //      }
+      //      firstrun = false;
+     //   }
+        /*else
+        {
+            for(int x = 0; x < unassignedVerticesSave.size(); x++)
+            {
+                PotentialVertex* temp = new PotentialVertex;
+                for(int y = 0; y < NUM_FACE_SETS; y++)
+                {
+                    temp[x] = u
+                		int sets[NUM_FACE_SETS];
+		Vertex *vertex;
+    Volume *volumes[NUM_VOLUMES];
+	vector<PotentialVertexState> states;
+    Vector edgeDirections[NUM_EDGES];
+                unassignedVertices.push_back(unassignedVerticesSave[x]);
+            }
+        }*/
+
+
+
 		
         cout << "Assigning states..." << endl;
         timer.start();

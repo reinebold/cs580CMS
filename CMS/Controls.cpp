@@ -62,8 +62,8 @@ void Controls::mouseMotionHandler(int x, int y)
     {
         //camera.setTranslatex( camera.getTranslatex() +  .1f * (x - controls.getOldx()) ); 
         //camera.setTranslatey( camera.getTranslatey() + -.1f * (y - controls.getOldy()) ); 
-		camera.upd((y - controls.getOldy())/10.0f);
-		camera.leftr((x - controls.getOldx())/10.0f);
+		camera.upd(-(y - controls.getOldy())/5.0f);
+		camera.leftr(-(x - controls.getOldx())/5.0f);
     }
     // Scale Camera
     else if(controls.getLeftButton() == true && controls.getRightButton() == true)
