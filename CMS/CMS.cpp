@@ -536,7 +536,7 @@ void CMS::init()
 	int bbnumVertices;
 	Vertex* bbvertices = NULL;  //Should be deleted in boundingbox.init
 	//parser.boundingBox("tetrahedron.model", bbnumVertices, bbvertices);
-    parser.boundingBox("lcube.model", bbnumVertices, bbvertices);
+    parser.boundingBox("hcube.model", bbnumVertices, bbvertices);
     boundingBox.init(bbnumVertices, bbvertices);
 
 	//Vertex info: Must be specified in a counter-clockwise order
@@ -545,7 +545,7 @@ void CMS::init()
 	Face* faces = NULL;
 	Vertex *vertices = NULL;
 	//parser.vertexArray("tetrahedron.model", numVertices, vertices, numFaces, faces);
-    parser.vertexArray("lcube.model", numVertices, vertices, numFaces, faces);
+    parser.vertexArray("hcube.model", numVertices, vertices, numFaces, faces);
 
 	int numVerticesCube;
 	int numFacesCube;
@@ -574,6 +574,6 @@ void CMS::init()
         input3D.init(numVertices, vertices, numFaces, faces);
 
         grid.init(cube, boundingBox);
-        continuousModelSynthesis3D(grid.edges, grid.vertices);
+        //continuousModelSynthesis3D(grid.edges, grid.vertices);
     }
 }
