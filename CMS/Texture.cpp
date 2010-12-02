@@ -5,6 +5,7 @@
 
 #include <IL/il.h>
 #include <IL/ilu.h>
+//#include "glew.h"
 
 #include <iostream>
 using namespace std;
@@ -54,6 +55,17 @@ void Texture::loadTexture(const char * fileName)
     if      (channels == 1) { format = GL_LUMINANCE; }
     else if (channels == 3) { format = GL_RGB; }
     else if (channels == 4) { format = GL_RGBA; }
+}
+
+void Texture::uploadTexture()
+{
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_2D, id); 
+    glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST ); 
+    gluBuild2DMipmaps( GL_TEXTURE_2D, 3, width, height, format, GL_UNSIGNED_BYTE, data );
+    destroyTexture();
 }
 
 void Texture::destroyTexture()

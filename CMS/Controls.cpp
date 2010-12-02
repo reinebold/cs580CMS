@@ -54,16 +54,16 @@ void Controls::mouseMotionHandler(int x, int y)
         //We fmod it by 360 because it is easier to see that it rotated 360 degrees instead of 720 degrees.
         //camera.setRotatex( fmod(camera.getRotatex() + (y - controls.getOldy()), 360) );
         //camera.setRotatey( fmod(camera.getRotatey() + (x - controls.getOldx()), 360) ); 
-		camera.pitch(camera.getRotatex() + (y - controls.getOldy()));
-		camera.yaw(camera.getRotatey() + (x - controls.getOldx()));
+		camera.pitch((y - controls.getOldy())/2.0f);
+		camera.yaw((x - controls.getOldx())/2.0f);
     }
     // Translate Camera
     else if(controls.getLeftButton() == false && controls.getRightButton() == true)
     {
         //camera.setTranslatex( camera.getTranslatex() +  .1f * (x - controls.getOldx()) ); 
         //camera.setTranslatey( camera.getTranslatey() + -.1f * (y - controls.getOldy()) ); 
-		camera.upd(camera.getTranslatey() - (y - controls.getOldy()));
-		camera.leftr(camera.getRotatey() + (x - controls.getOldx()));
+		camera.upd((y - controls.getOldy())/10.0f);
+		camera.leftr((x - controls.getOldx())/10.0f);
     }
     // Scale Camera
     else if(controls.getLeftButton() == true && controls.getRightButton() == true)
@@ -81,22 +81,22 @@ void Controls::specialKeyHandler(int key, int x, int y){
 	switch(key){
 		case GLUT_KEY_UP:
 			//camera.setRotatex( camera.getRotatex() + 10);
-			camera.forwardb(5.0f);
+			camera.forwardb(2.0f);
 			glutPostRedisplay();
 			break;
 		case GLUT_KEY_DOWN:
 			//camera.setRotatex( camera.getRotatex() - 10);
-			camera.forwardb(-5.0f);
+			camera.forwardb(-2.0f);
 			glutPostRedisplay();
 			break;
 		case GLUT_KEY_LEFT:
 			//camera.setRotatey( camera.getRotatey() + 10);
-			camera.leftr(5.0f);
+			camera.leftr(2.0f);
 			glutPostRedisplay();
 			break;
 		case GLUT_KEY_RIGHT:
 			//camera.setRotatey( camera.getRotatey() - 10);
-			camera.leftr(-5.0f);
+			camera.leftr(-2.0f);
 			glutPostRedisplay();
 			break;
 	}
@@ -147,11 +147,13 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
             cms.showGridVolumes = true;
             cms.showTexture = true;
             cms.showModel = false;
-            state.setLighting(true);
+            //state.setLighting(true);
         }
         else
         {
-            state.setLighting(false);
+            //state.setLighting(false);
+            cms.showModel = true;
+            cms.showGridVolumes = true;
             cms.showBoundingBox = true;
             cms.showTexture = false;
             //glDisable(GL_TEXTURE_2D);
@@ -211,6 +213,5 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
         cms.showModel = !cms.showModel;
         glutPostRedisplay();
         break;
-
     }
 }

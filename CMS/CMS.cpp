@@ -50,9 +50,8 @@ void CMS::continuousModelSynthesis3D(vector<Edge*> &edges, vector<Vertex*> &vert
 
 void CMS::display3D()
 {
-    //Display the bounding box
-    glTranslatef(12.8f, 11.6f, 0.0f);
-    glScalef(.46f, .46f, .46f);
+    //Show bounding box
+    const float epsilon =  .01f;
     if(showBoundingBox)
     {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -69,152 +68,134 @@ void CMS::display3D()
         glEnd();
     }
 
-    if(showTexture)
-    {
-            for(int x = 0; x < boundingBox.numFaces; x++)
-            {
-                if(boundingBox.faces[x].normal == Vector(0.0f,1.0f,0.0f))
-                {
-                    glEnable(GL_TEXTURE_2D);
-                glBegin(GL_QUADS);
-                glNormal3f(boundingBox.faces[x].normal.x,boundingBox.faces[x].normal.y,boundingBox.faces[x].normal.z);
-                for(int y = 0; y < boundingBox.faces[x].numVertices; y++)
-                {
-                    glVertex3fv((*boundingBox.faces[x].vertices[y]).val);
-                }
-                glEnd();
-                glDisable(GL_TEXTURE_2D);
-                break;
-                }
-            }
-    }
-
-	/*ilBindImage(texids[0]);
-    glGenTextures(1, &texture); 
-    glBindTexture(GL_TEXTURE_2D, texture); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
-    glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
-      ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
-      ilGetData());*/
-
-    //Grass
+    float sizex = boundingBox.width*4;
+    float sizey = boundingBox.height;
+    float sizez = boundingBox.width*4;
+    
+    //Show world
     if(showTexture)
     {
         glEnable(GL_TEXTURE_2D);
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        float size = 100.0f;
-        glTranslatef(0.0f, size, 0.0f);
-	    glBindTexture(GL_TEXTURE_2D,texGrass.getId());
-	
+        glTranslatef(-(sizex - boundingBox.width)/2.0f, 0.0f, (sizez - boundingBox.depth)/2.0f);
+
+        glBindTexture(GL_TEXTURE_2D,texSkyBox[2].getId());
+        glBegin(GL_QUADS);
+            glNormal3f(0.0f,1.0f,0.0f);
+            glTexCoord2f (0.0, 0.0);
+            glVertex3f(0.0f,0.0f,0.0f);
+            glTexCoord2f (1.0, 0.0);
+            glVertex3f(sizex,0.0f,0.0f);
+            glTexCoord2f (1.0, 1.0);
+            glVertex3f(sizex,0.0f,-sizez);
+            glTexCoord2f (0.0, 1.0);
+            glVertex3f(0.0f,0.0f,-sizez);
+        glEnd();
+
+        glBindTexture(GL_TEXTURE_2D,texSkyBox[3].getId());
+        glBegin(GL_QUADS);
+            glNormal3f(0.0f,-1.0f,0.0f);
+            glTexCoord2f (0.0, 0.0);
+            glVertex3f(0.0f,sizey,-sizez);
+            glTexCoord2f (1.0, 0.0);
+            glVertex3f(sizex,sizey,-sizez);
+            glTexCoord2f (1.0, 1.0);
+            glVertex3f(sizex,sizey,0.0f);
+            glTexCoord2f (0.0, 1.0);
+            glVertex3f(0.0f,sizey,0.0f);
+        glEnd();
+
+        glBindTexture(GL_TEXTURE_2D,texSkyBox[0].getId());
 	    glBegin(GL_QUADS);
-            glNormal3f(1.0f,1.0f,1.0f);
+	        //front face
+            glNormal3f(0.0f,0.0f,-1.0f);
 	        glTexCoord2f (0.0, 0.0);
-	        glVertex3f(-size,-size,size);
-	        glTexCoord2f (50.0, 0.0);
-	        glVertex3f(-size,-size,-size);
-	        glTexCoord2f (50.0, 50.0);
-	        glVertex3f(size,-size,-size);
-	        glTexCoord2f (0.0, 50.0);
-	        glVertex3f(size,-size,size);
+            glVertex3f(sizex,0.0f,0.0f);
+	        glTexCoord2f (1.0, 0.0);
+	        glVertex3f(0.0f,0.0f,0.0f);  
+	        glTexCoord2f (1.0, 1.0);
+            glVertex3f(0.0f,sizey,0.0f);
+	        glTexCoord2f (0.0, 1.0);
+            glVertex3f(sizex,sizey,0.0f);
+        glEnd();
+
+        glBindTexture(GL_TEXTURE_2D,texSkyBox[1].getId());
+	    glBegin(GL_QUADS);
+	        //back face
+            glNormal3f(0.0f,0.0f,1.0f);
+	        glTexCoord2f (0.0, 0.0);
+	        glVertex3f(0.0f, 0.0f,-sizez);
+	        glTexCoord2f (1.0, 0.0);
+	        glVertex3f(sizex,0.0f,-sizez);
+	        glTexCoord2f (1.0, 1.0);
+	        glVertex3f(sizex,sizey,-sizez);
+	        glTexCoord2f (0.0, 1.0);
+	        glVertex3f(0.0f,sizey,-sizez);
+        glEnd();
+
+        glBindTexture(GL_TEXTURE_2D,texSkyBox[4].getId());
+	    glBegin(GL_QUADS);
+	        //left face
+            glNormal3f(1.0f,0.0f,0.0f);
+	        glTexCoord2f (0.0, 0.0);
+	        glVertex3f(0.0f,0.0f,0.0f);
+	        glTexCoord2f (1.0, 0.0);
+	        glVertex3f(0.0f,0.0f,-sizez);
+	        glTexCoord2f (1.0, 1.0);
+	        glVertex3f(0.0f,sizey,-sizez);
+	        glTexCoord2f (0.0, 1.0);
+	        glVertex3f(0.0f,sizey,0.0f);
+        glEnd();
+
+        glBindTexture(GL_TEXTURE_2D,texSkyBox[5].getId());
+	    glBegin(GL_QUADS);
+	        //right face
+            glNormal3f(-1.0f,0.0f,0.0f);
+	        glTexCoord2f (0.0, 0.0);
+	        glVertex3f(sizex,0.0f,-sizez);
+	        glTexCoord2f (1.0, 0.0);
+	        glVertex3f(sizex,0.0f,0.0f);
+	        glTexCoord2f (1.0, 1.0);
+	        glVertex3f(sizex,sizey,0.0f);
+	        glTexCoord2f (0.0, 1.0);
+	        glVertex3f(sizex,sizey,-sizez);
 	    glEnd();
 
-
-	/*ilBindImage(texids[1]);
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
-      ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
-      ilGetData());
-
-	glBindTexture(GL_TEXTURE_2D, clouds.getId());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,clouds.getWidth(), clouds.getHeight(), 0, clouds.getFormat(), GL_UNSIGNED_BYTE, clouds.getData());
-*/
-    glBindTexture(GL_TEXTURE_2D,texCloudsSide.getId());
-	glBegin(GL_QUADS);
-	    //front face
-        glNormal3f(0.0f,0.0f,-1.0f);
-	    glTexCoord2f (0.0, 0.0);
-	    glVertex3f(-size,-size,size);  
-	    glTexCoord2f (1.0, 0.0);
-	    glVertex3f(size,-size,size);
-	    glTexCoord2f (1.0, 1.0);
-	    glVertex3f(size,size,size);
-	    glTexCoord2f (0.0, 1.0);
-	    glVertex3f(-size,size,size);
-	    //back face
-        glNormal3f(0.0f,0.0f,1.0f);
-	    glTexCoord2f (0.0, 0.0);
-	    glVertex3f(-size,-size,-size);
-	    glTexCoord2f (1.0, 0.0);
-	    glVertex3f(size,-size,-size);
-	    glTexCoord2f (1.0, 1.0);
-	    glVertex3f(size,size,-size);
-	    glTexCoord2f (0.0, 1.0);
-	    glVertex3f(-size,size,-size);
-	    //left face
-	    glTexCoord2f (0.0, 0.0);
-	    glVertex3f(-size,-size,size);
-	    glTexCoord2f (1.0, 0.0);
-	    glVertex3f(-size,-size,-size);
-	    glTexCoord2f (1.0, 1.0);
-	    glVertex3f(-size,size,-size);
-	    glTexCoord2f (0.0, 1.0);
-	    glVertex3f(-size,size,size);
-	    //right face
-	    glTexCoord2f (0.0, 0.0);
-	    glVertex3f(size,-size,size);
-	    glTexCoord2f (1.0, 0.0);
-	    glVertex3f(size,-size,-size);
-	    glTexCoord2f (1.0, 1.0);
-	    glVertex3f(size,size,-size);
-	    glTexCoord2f (0.0, 1.0);
-	    glVertex3f(size,size,size);
-	glEnd();
-
-        glTranslatef(0.0f, -size, 0.0f);
+        glTranslatef((sizex - boundingBox.width)/2.0f, 0.0f, -(sizez - boundingBox.depth)/2.0f);
         glDisable(GL_TEXTURE_2D);
     }
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    //glDisable(GL_TEXTURE_2D);
-	//glDeleteTextures(1, &texture);
-/*
-	ilBindImage(texids[2]);
-    glGenTextures(1, &texture); 
-    glBindTexture(GL_TEXTURE_2D, texture); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); 
-    glTexImage2D(GL_TEXTURE_2D, 0, ilGetInteger(IL_IMAGE_BPP), ilGetInteger(IL_IMAGE_WIDTH),
-      ilGetInteger(IL_IMAGE_HEIGHT), 0, ilGetInteger(IL_IMAGE_FORMAT), GL_UNSIGNED_BYTE,
-      ilGetData());
-	glBegin(GL_QUADS);
-	//top face
-	glTexCoord2f (0.0, 0.0);
-//	glBegin(GL_QUADS);
-	glVertex3f(size,size,size);
-	glTexCoord2f (1.0, 0.0);
-	glVertex3f(-size,size,size);
-	glTexCoord2f (1.0, 1.0);
-	glVertex3f(-size,size,-size);
-	glTexCoord2f (0.0, 1.0);
-	glVertex3f(size,size,-size);
-	glEnd();
-	glDisable(GL_TEXTURE_2D);
-	glDeleteTextures(1, &texture);
-	*/
+
+    //prevent z-fighting for street by moving it up a small amount
+    glTranslatef(0.0f,epsilon,0.0f);
+
+    //Show street
+    if(showTexture)
+    {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D,texStreet.getId());
+        glBegin(GL_QUADS);
+	        //right face
+            glNormal3f(0.0f,1.0f,0.0f);
+	        glTexCoord2f (0.0, 0.0);
+	        glVertex3f(boundingBox.minx,boundingBox.miny,boundingBox.maxz);
+	        glTexCoord2f (1.0, 0.0);
+	        glVertex3f(boundingBox.maxx,boundingBox.miny,boundingBox.maxz);
+	        glTexCoord2f (1.0, 1.0);
+	        glVertex3f(boundingBox.maxx,boundingBox.miny,boundingBox.minz);
+	        glTexCoord2f (0.0, 1.0);
+	        glVertex3f(boundingBox.minx,boundingBox.miny,boundingBox.minz);
+	    glEnd();
+        glDisable(GL_TEXTURE_2D);
+    }
+    
+    //Show model
     if(showModel)
     {
         glTranslatef(-20.f,0.0f,0.0f);
-
         //Display the input model.
         //The input model's edges.
         for(int numFaces = 0; numFaces < input3D.numFaces; ++numFaces)
@@ -252,10 +233,11 @@ void CMS::display3D()
                 }
             glEnd();
         }
+
+        glTranslatef(20.0f,0.0f,0.0f);
     }
 
     //Draw the parallel faces.
-    glTranslatef(20.0f,0.0f,0.0f);
     for(unsigned int x = 0; x < grid.parallelFaces.size(); x++)
     { 
         if(state.getTest() == x || state.getTest() == grid.parallelFaces.size() && state.getTest() != grid.parallelFaces.size() + 1)
@@ -273,49 +255,6 @@ void CMS::display3D()
             }
         }
     }
-    /*for(int x = 0; x < grid.vertices.size(); x++)
-    {
-        if(grid.vertices[x]->connectedEdges == 3)
-        {
-            glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
-            glPointSize(4.0f);          //Change the size of the point
-            glColor4f(1.0f, 1.0f, 0.0f, 1.0f);
-            glBegin(GL_POINTS);
-            glVertex3fv(grid.vertices[x]->val);
-            glEnd();
-            glDisable(GL_POINT_SMOOTH);
-        }
-        else if(grid.vertices[x]->connectedEdges == 4)
-        {
-            glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
-            glPointSize(4.0f);          //Change the size of the point
-            glColor4f(1.0f, 0.0f, 0.0f, 1.0f);
-            glBegin(GL_POINTS);
-            glVertex3fv(grid.vertices[x]->val);
-            glEnd();
-            glDisable(GL_POINT_SMOOTH);
-        }
-        else if(grid.vertices[x]->connectedEdges == 5)
-        {
-            glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
-            glPointSize(4.0f);          //Change the size of the point
-            glColor4f(0.0f, 0.0f, 1.0f, 1.0f);
-            glBegin(GL_POINTS);
-            glVertex3fv(grid.vertices[x]->val);
-            glEnd();
-            glDisable(GL_POINT_SMOOTH);
-        }
-        else if(grid.vertices[x]->connectedEdges == 6)
-        {
-            glEnable(GL_POINT_SMOOTH);  //Make the point a sphere basically.
-            glPointSize(4.0f);          //Change the size of the point
-            glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
-            glBegin(GL_POINTS);
-            glVertex3fv(grid.vertices[x]->val);
-            glEnd();
-            glDisable(GL_POINT_SMOOTH);
-        }
-    }*/
 
     //Draw Vertices
     if(showGridVertices)
@@ -392,7 +331,7 @@ void CMS::display3D()
         glDisable(GL_BLEND);
         if(showTexture)
         {
-        glEnable(GL_TEXTURE_2D);
+            glEnable(GL_TEXTURE_2D);
         
         }
         for(int x = 0; x < (int)grid.volumes.size(); x++)
@@ -403,14 +342,17 @@ void CMS::display3D()
             }
             for(int y = 0; y < (int)grid.volumes[x]->numFaces; y++)
             {
+                if(showTexture)
+                {
                
-                if(grid.volumes[x]->faces[y]->normal == Vector(0.0f, 1.0f, 0.0f))
-                {
-                    glBindTexture(GL_TEXTURE_2D,texCement.getId());
-                }
-                else
-                {
-                    glBindTexture(GL_TEXTURE_2D,texBuilding.getId());
+                    if(grid.volumes[x]->faces[y]->normal == Vector(0.0f, 1.0f, 0.0f))
+                    {
+                        glBindTexture(GL_TEXTURE_2D,texCement.getId());
+                    }
+                    else
+                    {
+                        glBindTexture(GL_TEXTURE_2D,texBuilding.getId());
+                    }
                 }
 
                 glBegin(GL_QUADS);
@@ -437,6 +379,14 @@ void CMS::display3D()
                         {
                             glTexCoord2f(0.0f,1.0f);
                         }
+                    }
+                    else
+                    {
+                        glColor4fv(Utils::randColor(.5f).val);
+                           glColor4f(((int)(grid.volumes[x]->faces[0]->edges[0]->begin->val[0]) % 50)/50.0f,
+                             ((int)(grid.volumes[x]->faces[0]->edges[0]->begin->val[1]) % 50)/50.0f,
+                             ((int)(grid.volumes[x]->faces[0]->edges[0]->begin->val[2]) % 50)/ -50.0f,
+                             1.0);
                     }
                     
                     glVertex3fv(grid.volumes[x]->faces[y]->vertices[z]->val);
@@ -543,6 +493,8 @@ void CMS::display2D()
 
 void CMS::init()
 {
+    cout << "---Initializing---" << endl;
+    cout << "Loading textures...";
     state.setWireFrame(true);
     state.setLighting(false);
     state.setDrawLights(true);
@@ -550,66 +502,36 @@ void CMS::init()
     state.setPrintInfoOnScreen(true);
     state.setTest(4);
 
-    texCloudsTop.loadTexture("cloudst.jpg");
-    texCloudsSide.loadTexture("clouds.jpg");
-    texGrass.loadTexture("grass2.jpg");
-    texBuilding.loadTexture("windows3.jpg");
+    texBuilding.loadTexture("windows.jpg");
     texCement.loadTexture("cement.jpg");
+    texStreet.loadTexture("street.jpg");
+    texSkyBox[0].loadTexture("greenhill_negative_z.png");
+    texSkyBox[1].loadTexture("greenhill_positive_z.png");
+    texSkyBox[2].loadTexture("greenhill_negative_y.png");
+    texSkyBox[3].loadTexture("greenhill_positive_y.png");
+    texSkyBox[4].loadTexture("greenhill_negative_x.png");
+    texSkyBox[5].loadTexture("greenhill_positive_x.png");
+
+    texSkyBox[0].uploadTexture();
+    texSkyBox[1].uploadTexture();
+    texSkyBox[2].uploadTexture();
+    texSkyBox[3].uploadTexture();
+    texSkyBox[4].uploadTexture();
+    texSkyBox[5].uploadTexture();
+    texStreet.uploadTexture();
+    texBuilding.uploadTexture();
+    texCement.uploadTexture();
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
-
-    glGenTextures(1, texCloudsTop.setId());
-    glBindTexture(GL_TEXTURE_2D, texCloudsTop.getId()); 
-    glTexImage2D(GL_TEXTURE_2D, 0, texCloudsTop.getFormat(),texCloudsTop.getWidth(),texCloudsTop.getHeight(), 0, texCloudsTop.getFormat(), GL_UNSIGNED_BYTE, texCloudsTop.getData());
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST ); 
-    gluBuild2DMipmaps( GL_TEXTURE_2D, 3, texCloudsTop.getWidth(), texCloudsTop.getHeight(), texCloudsTop.getFormat(), GL_UNSIGNED_BYTE, texCloudsTop.getData() );
-    texCloudsTop.destroyTexture();
-
-    glGenTextures(1, texCloudsSide.setId());
-    glBindTexture(GL_TEXTURE_2D, texCloudsSide.getId()); 
-    glTexImage2D(GL_TEXTURE_2D, 0, texCloudsSide.getFormat(),texCloudsSide.getWidth(),texCloudsSide.getHeight(), 0, texCloudsSide.getFormat(), GL_UNSIGNED_BYTE, texCloudsSide.getData());
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST ); 
-    gluBuild2DMipmaps( GL_TEXTURE_2D, 3, texCloudsSide.getWidth(), texCloudsSide.getHeight(), texCloudsSide.getFormat(), GL_UNSIGNED_BYTE, texCloudsSide.getData() );
-    texCloudsSide.destroyTexture();
-
-    glGenTextures(1, texGrass.setId());
-    glBindTexture(GL_TEXTURE_2D, texGrass.getId()); 
-    glTexImage2D(GL_TEXTURE_2D, 0, texGrass.getFormat(),texGrass.getWidth(),texGrass.getHeight(), 0, texGrass.getFormat(), GL_UNSIGNED_BYTE, texGrass.getData());
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
-    gluBuild2DMipmaps( GL_TEXTURE_2D, 3, texGrass.getWidth(), texGrass.getHeight(), texGrass.getFormat(), GL_UNSIGNED_BYTE, texGrass.getData() );
-    texGrass.destroyTexture();
-
-    glGenTextures(1, texBuilding.setId());
-    glBindTexture(GL_TEXTURE_2D, texBuilding.getId()); 
-    glTexImage2D(GL_TEXTURE_2D, 0, texBuilding.getFormat(),texBuilding.getWidth(),texBuilding.getHeight(), 0, texBuilding.getFormat(), GL_UNSIGNED_BYTE, texBuilding.getData());
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
-    gluBuild2DMipmaps( GL_TEXTURE_2D, 3, texBuilding.getWidth(), texBuilding.getHeight(), texBuilding.getFormat(), GL_UNSIGNED_BYTE, texBuilding.getData() );
-    texBuilding.destroyTexture();
-
-    glGenTextures(1, texCement.setId());
-    glBindTexture(GL_TEXTURE_2D, texCement.getId()); 
-    glTexImage2D(GL_TEXTURE_2D, 0, texCement.getFormat(),texCement.getWidth(),texCement.getHeight(), 0, texCement.getFormat(), GL_UNSIGNED_BYTE, texCement.getData());
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST );
-    gluBuild2DMipmaps( GL_TEXTURE_2D, 3, texCement.getWidth(), texCement.getHeight(), texCement.getFormat(), GL_UNSIGNED_BYTE, texCement.getData() );
-    texCement.destroyTexture();
-
     glBindTexture(GL_TEXTURE_2D, 0);
-
-    lights.addLight(250,250.0f,-250.0f, 0.0f);
-    //glDisable(GL_TEXTURE_2D);
-
+    cout << "done" << endl;
     
     //unsigned int seed = (unsigned int)time(NULL);
     unsigned int seed = 1290455743;
     srand(seed);
-    cout << "Seed value: " << seed << endl;
 
+    cout << "Parsing model files...";
 	//Bounding box info
 	int bbnumVertices;
 	Vertex* bbvertices = NULL;  //Should be deleted in boundingbox.init
@@ -625,6 +547,7 @@ void CMS::init()
 	//parser.vertexArray("tetrahedron.model", numVertices, vertices, numFaces, faces);
     parser.vertexArray("cube.model", numVertices, vertices, numFaces, faces);
 
+    cout << "done" << endl;
     if(numFaces == 1)
     {   
         //Load the vertices into the input model, find edges.

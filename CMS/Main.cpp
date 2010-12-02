@@ -146,35 +146,6 @@ void idle()
 
 void main(int argc, char **argv)
 {
-	/*City c;
-	c.setPopulation(4);
-	c.setDevelopment(1);
-
-	int gridWidth = 2;
-	int gridHeight = 2;
-
-	int** grid = c.getGrid(gridWidth, gridHeight);
-
-	for(int i=0; i < gridWidth; i++) {
-		for(int j=0; j < gridHeight; j++) {
-			std::cout << grid[i][j];
-		}
-		std::cout << endl;
-	}
-
-	for(int i=0; i < gridWidth; i++) {
-		delete grid[i];
-	}
-	delete grid;*/
-
-	//Geometry::Vector a(1, 2, 3);
-	//Geometry::Vector b(0, -1, 2);
-	//Geometry::Vector c;
-	//c = a.crossProduct(b);
-	//std::cout << a.dotProduct(b) << std::endl;
-
-	unitTest();
-
     //Initialize GLUT
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH | GLUT_DOUBLE);
@@ -191,9 +162,9 @@ void main(int argc, char **argv)
         cerr << "Error: " << glewGetErrorString(err) << endl;
         std::exit(EXIT_FAILURE);
     }
-    if (!glewIsSupported("GL_VERSION_3_3"))
+    if (!glewIsSupported("GL_VERSION_3_2"))
     {
-        cerr << "Warning: OpenGL version 3.3 not supported with GLEW" << endl;
+        cerr << "Warning: OpenGL version 3.2 not supported with GLEW" << endl;
     }
 
     Utils::printStatus();

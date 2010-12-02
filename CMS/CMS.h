@@ -37,6 +37,9 @@ public:
     Texture texGrass;
     Texture texBuilding;
     Texture texCement;
+    Texture texStreet;
+
+    Texture texSkyBox[6];
 	//ILuint texids[3];
 	//GLuint texture;
 

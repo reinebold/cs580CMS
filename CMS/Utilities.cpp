@@ -103,7 +103,7 @@ void Utils::printInfoOnScreen()
         glMatrixMode(GL_MODELVIEW);
         glPushMatrix();
             glLoadIdentity();
-            renderString(0,count,"-Transformations-");
+            /*renderString(0,count,"-Transformations-");
             count += 10;
             renderString(0,count,"Rotate x: " + numToString(camera.getRotatex()));
             count += 10;
@@ -118,7 +118,7 @@ void Utils::printInfoOnScreen()
             renderString(0,count,"Trans y:  " + numToString(camera.getTranslatey()));
             count += 10;
             renderString(0,count,"Trans z:  " + numToString(camera.getTranslatez()));
-            count += 20;
+            count += 20;*/
             renderString(0,count,"-CMS-");
             count += 10;
             renderString(0,count,"Vertices:  " + numToString(cms.grid.vertices.size()));

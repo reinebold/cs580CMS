@@ -19,6 +19,7 @@ public:
 
     ///Destroys the texture (good to use after a glTexImage2D call to save memory)
     void destroyTexture();
+    void uploadTexture();
 
     //Gets
     unsigned int getId() const       { return id; }

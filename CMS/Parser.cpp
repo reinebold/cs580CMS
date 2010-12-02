@@ -22,7 +22,6 @@ void Parser::vertexArray(string filename, int &numVerts, Vertex* &vertices, int 
 	std::istringstream tkn(line);
 	//gets the number of faces
 	tkn >> numFaces;
-	std::cout << numFaces << std::endl;
 	faces = new Face[numFaces];
 
 	//grab all the verticies
@@ -30,8 +29,6 @@ void Parser::vertexArray(string filename, int &numVerts, Vertex* &vertices, int 
 	std::getline(fin,line);
 	std::istringstream int_num(line);
 	int_num >> numVerts;
-	std::cout << numVerts << std::endl;
-    
 
     vertices = new Vertex[numVerts];
 
