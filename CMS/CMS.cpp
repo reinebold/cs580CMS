@@ -574,6 +574,7 @@ void CMS::init()
         input3D.init(numVertices, vertices, numFaces, faces);
 
         grid.init(cube, boundingBox);
+
         //grid.init(input3D,boundingBox);
         continuousModelSynthesis3D(grid.edges, grid.vertices);
     }

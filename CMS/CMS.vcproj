@@ -293,7 +293,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\lube.model"
+				RelativePath=".\hcube.model"
+				>
+			</File>
+			<File
+				RelativePath=".\lcube.model"
 				>
 			</File>
 			<File
