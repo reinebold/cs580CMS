@@ -27,6 +27,7 @@ public:
 
     CMSModel input;         ///< The input model for 2D
     CMSModel3D input3D;     ///< The input model for 3D
+	CMSModel3D cube;
 	Parser   parser;
     Cuboid   boundingBox;   ///< Bounding box
     Cuboid   world;         ///< The "world", bounding box must be inside this
