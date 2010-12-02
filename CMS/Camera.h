@@ -78,9 +78,7 @@ private:
     GLfloat rotatey;        ///< Tells what to rotate the camera by in the y direction
     GLfloat rotatez;        ///< Tells what to rotate the camera by in the z direction
 
-	Geometry::Vector position;
-	Geometry::Vector look;
-	Geometry::Vector up;
+	
 
 public:
 	void pitch(float degrees);
@@ -88,6 +86,10 @@ public:
 	void forwardb(float ammount);
 	void upd(float ammount);
 	void leftr(float ammount);
+
+    Geometry::Vector position;
+	Geometry::Vector look;
+	Geometry::Vector up;
 
 };
 

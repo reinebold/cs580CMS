@@ -91,8 +91,7 @@ void Controls::specialKeyHandler(int key, int x, int y){
 			break;
 		case GLUT_KEY_LEFT:
 			//camera.setRotatey( camera.getRotatey() + 10);
-			camera.leftr(2.0f);
-			glutPostRedisplay();
+			
 			break;
 		case GLUT_KEY_RIGHT:
 			//camera.setRotatey( camera.getRotatey() - 10);
@@ -125,18 +124,28 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
         state.setLighting(!state.getLighting());
         glutPostRedisplay();
         break;
-    case 'a':   //Turns on/off axis
+    case 'n':   //Turns on/off axis
         state.setDrawAxis(!state.getDrawAxis());
         glutPostRedisplay();
         break;
-    case 'w':   //Turns on/off wireframe mode
-        /*state.setWireFrame(!state.getWireFrame());
-		state.setTest(4); 
-        cms.showBoundingBox = !cms.showBoundingBox;
-		cms.showGridEdges = !cms.showGridEdges;
-		cms.showGridVertices = !cms.showGridVertices;
-		cms.showGridFaces = !cms.showGridFaces;
-		cms.showGridVolumes = !cms.showGridVolumes;*/
+    case 'w':
+        camera.forwardb(2.0f);
+		glutPostRedisplay();
+        break;
+    case 'a':
+        camera.leftr(2.0f);
+		glutPostRedisplay();
+        break;
+    case 's':
+        camera.forwardb(-2.0f);
+        glutPostRedisplay();
+	    break;
+    case 'd':
+        camera.leftr(-2.0f);
+        glutPostRedisplay();
+        break;
+
+    case 'y':   //Turns on/off textures
         if(cms.showTexture == false)
         {
             //glEnable(GL_TEXTURE_2D);
@@ -147,31 +156,31 @@ void Controls::keyboardHandler(unsigned char key, int x, int y)
             cms.showGridVolumes = true;
             cms.showTexture = true;
             cms.showModel = false;
-            //state.setLighting(true);
         }
         else
         {
-            //state.setLighting(false);
             cms.showModel = true;
             cms.showGridVolumes = true;
             cms.showBoundingBox = true;
             cms.showTexture = false;
-            //glDisable(GL_TEXTURE_2D);
         }
         glutPostRedisplay();
         break;
-    case 'd':
+   /* case 'd':
         state.setDrawLights(!state.getDrawLights());
         glutPostRedisplay();
-        break;
+        break;*/
     case 'r':   //Resets all transformations
-        camera.setTranslatex(0.0f);
-        camera.setTranslatey(0.0f);
-        camera.setTranslatez(0.0f);
-        camera.setScale(1.0f);
-        camera.setRotatex(0.0f);
-        camera.setRotatey(0.0f);
-        camera.setRotatez(0.0f);
+        camera.position.x = 15.0f;
+	    camera.position.y =45.0f;
+	    camera.position.z = 90.0f;
+	    camera.look.x = 0.0f;
+	    camera.look.y = -0.2f;
+	    camera.look.z = -1.0f;
+        camera.look.normalize();
+	    camera.up.x=0.0f;
+	    camera.up.y=1.0f;
+	    camera.up.z=0.0f;
         glutPostRedisplay();
         break;
     case 't':

@@ -26,9 +26,9 @@ Camera::Camera()
     scale(1.0f),
     aspect((float)windowWidth/(float)windowHeight)
 {
-	position.x = 25.0f;
-	position.y =30.0f;
-	position.z = 60.0f;
+	position.x = 15.0f;
+	position.y =45.0f;
+	position.z = 90.0f;
 	look.x = 0.0f;
 	look.y = -0.2f;
 	look.z = -1.0f;
